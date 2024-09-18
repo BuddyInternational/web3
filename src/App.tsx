@@ -5,7 +5,7 @@ import AllRoutes from './routes/AllRoutes';
 
 const App: React.FC = () => {
   return (
-    <div className=" m-auto px-5 bg-gray-800  min-h-screen">
+    <div className=" m-auto px-5 bg-gray-800 overflow-x-hidden min-h-screen">
       <ConnectWallet />
       <AllRoutes />
     </div>
