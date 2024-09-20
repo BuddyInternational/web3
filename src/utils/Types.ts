@@ -6,8 +6,9 @@ export interface NFTData {
     tokenType?: string;
     tokenUri?: string;
     imageUrl?: string;
+    mediaType?: any;
     timeLastUpdated?: string;
     floorPrice?: number | null;
-    floorPriceUsd?: number | null;
+    floorPriceUsd?: number;
     priceCurrency?: string | null;
   }
