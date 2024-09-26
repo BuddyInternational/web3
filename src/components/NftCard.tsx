@@ -4,7 +4,7 @@ import { FaCheck, FaCopy } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
 import { NFTData } from "../utils/Types";
 import Pagination from "../utils/Pagination";
-import ZoomedImage from "./modals/ZommedImage";
+import ZoomedImage from "./modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
 
 const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
