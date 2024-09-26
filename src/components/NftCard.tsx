@@ -91,7 +91,12 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
 
   return (
     <>
-      <div className="container mx-auto px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div
+        className="container mx-auto px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-4"
+        style={{
+          opacity: open ? 0.2 : 1,
+        }}
+      >
         {slicedNFTDetails?.map((nft, index) => (
           <div
             key={index + 1}
