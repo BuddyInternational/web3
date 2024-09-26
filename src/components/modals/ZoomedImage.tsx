@@ -14,7 +14,7 @@ const ZoomedImage: React.FC<{
             to exit full screen, press{" "}
             <span className="border p-2 text-sm">ESC</span>
           </h1>
-          <img className="h-full w-full object-fit" src={src} alt="NFT image" />
+          <img className="object-fit" src={src} alt="NFT image" style={{width: "100%", height:"auto"}} />
         </div>
       </Fade>
     </Modal>
