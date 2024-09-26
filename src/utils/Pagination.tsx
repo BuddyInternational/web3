@@ -12,6 +12,7 @@ const Pagination: React.FC<{
     }
   };
 
+  // Add pageNumber
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);

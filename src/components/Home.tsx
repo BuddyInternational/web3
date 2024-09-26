@@ -6,28 +6,42 @@ import { ERC20ABI } from "../utils/ABI";
 import Moralis from "moralis";
 import { FaCopy, FaCheck } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import {ethers,Contract} from "ethers";
+import { ethers, Contract } from "ethers";
 import Web3 from "web3";
+import TermsModel from "./modals/TermsModal";
 
 // Token address
-const token1Address:any = process.env.REACT_APP_TOKEN1_ADDRESS;
-const token2Address:any = process.env.REACT_APP_TOKEN2_ADDRESS;
+const token1Address: any = process.env.REACT_APP_TOKEN1_ADDRESS;
+const token2Address: any = process.env.REACT_APP_TOKEN2_ADDRESS;
+const token3Address: any = process.env.REACT_APP_TOKEN3_ADDRESS;
 
 // API KEY
-const api_key: any = process.env.REACT_APP_NFT_API_KEY;
+const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
+const rpc_url: any = process.env.REACT_APP_RPC_URL;
 
 // Another links
 const sponsorshipURL: any = process.env.REACT_APP_SPONSORSHIP_LINK;
 const purchaseTokenURL: any = process.env.REACT_APP_PURCHASE_TOKEN_LINK;
-const leadershipURL:any = process.env.REACT_APP_LEADERSHIP_LINK;
+const leadershipURL: any = process.env.REACT_APP_LEADERSHIP_LINK;
 
 const Home = () => {
   const { address } = useWeb3ModalAccount();
   const [token1Balance, setToken1Balance] = useState(0);
   const [token2Balance, setToken2Balance] = useState(0);
+  const [token3Balance, setToken3Balance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
+  const [openTermsModal, setOpenTermsModal] = useState(false);
+
+  // Handle termsModal
+  const handleClickOpenTermsModal = () => {
+    setOpenTermsModal(true);
+  };
+
+  const handleCloseTermsModal = () => {
+    setOpenTermsModal(false);
+  };
 
   // Function to calculate the total USD value of all NFTs
   const calculateTotalNFTValue = () => {
@@ -42,34 +56,47 @@ const Home = () => {
     return Number(totalFloorPriceUsd).toFixed(4);
   };
 
-  // fetch connected user token balance
+  // Fetch connected user token balance
   const fetchTokenBalance = async () => {
     try {
       if (address) {
-        const testAddress = '0xFaba74f2e5557323487e337A5f93BbfaEef00310'
-        const provider = ethers.getDefaultProvider();
+        console.log("token balance called---------");
+        const testAddress = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
+        const provider = new ethers.JsonRpcProvider(rpc_url);
         const token1Contract = new Contract(token1Address, ERC20ABI, provider);
         const token2Contract = new Contract(token2Address, ERC20ABI, provider);
+        const token3Contract = new Contract(token3Address, ERC20ABI, provider);
 
-        const [token1Bal, token2Bal] = await Promise.all([
+        const [token1Bal, token2Bal, token3Bal] = await Promise.all([
           token1Contract.balanceOf(testAddress),
           token2Contract.balanceOf(testAddress),
+          token3Contract.balanceOf(testAddress),
         ]);
 
-        const formattedToken1Bal = Number(Web3.utils.fromWei(token1Bal, "ether")).toFixed(4);
-        const formattedToken2Bal = Number(Web3.utils.fromWei(token2Bal, "ether")).toFixed(4);
+        const formattedToken1Bal = Number(
+          Web3.utils.fromWei(token1Bal, "ether")
+        ).toFixed(4);
+        const formattedToken2Bal = Number(
+          Web3.utils.fromWei(token2Bal, "ether")
+        ).toFixed(4);
+        const formattedToken3Bal = Number(
+          Web3.utils.fromWei(token3Bal, "ether")
+        ).toFixed(4);
 
         setToken1Balance(Number(formattedToken1Bal));
         setToken2Balance(Number(formattedToken2Bal));
+        setToken3Balance(Number(formattedToken3Bal));
       } else {
         console.log("No wallet connected");
-      setToken1Balance(0);
-      setToken2Balance(0);
+        setToken1Balance(0);
+        setToken2Balance(0);
+        setToken3Balance(0);
       }
     } catch (error) {
       console.error("Error fetching token balances:", error);
       setToken1Balance(0);
       setToken2Balance(0);
+      setToken3Balance(0);
     }
   };
 
@@ -110,19 +137,6 @@ const Home = () => {
           address: testWalletAddress,
         }),
       ]);
-
-      // console.log(
-      //   "ethereumNFTs Details ------------------",
-      //   ethereumNFTs.raw.result
-      // );
-      // console.log(
-      //   "polygonNFTs Details -----------------",
-      //   polygonNFTs.raw.result
-      // );
-      // console.log(
-      //   "arbitrumNFTs Details --------------",
-      //   arbitrumNFTs.raw.result
-      // );
 
       const combinedNFTs: NFTData[] = [
         ...ethereumNFTs.raw.result.map((nft: any) => ({
@@ -177,56 +191,136 @@ const Home = () => {
 
   useEffect(() => {
     fetchTokenBalance();
-    // fetchNFTs();
-  }, [address,token1Balance,token2Balance]);
-
-  // console.log("All nft Details------------", NFTdata);
+    fetchNFTs();
+  }, [address]);
 
   return (
     <>
       <div className="flex justify-between mt-2">
-        {/* connected address */}
-        <div className="flex gap-3 ml-2">
-          <p className="text-white">
-            Connected Address : {address?.slice(0, 6)}... {address?.slice(-4)}
-          </p>
-          {isAddressCopied ? (
-            <FaCheck className="mt-0.5 text-green-500 cursor-pointer" />
-          ) : (
-            <FaCopy
-              onClick={() => {
-                navigator.clipboard.writeText(address || "");
-                setIsAddressCopied(true);
-                clearTimeout(copyAddressTimeoutRef.current);
-                copyAddressTimeoutRef.current = setTimeout(() => {
-                  setIsAddressCopied(false);
-                }, 1000);
-              }}
-              className="text-white mt-1"
-              data-tip="Copy Wallet Address"
-              data-tip-content=".tooltip"
-            />
-          )}
+        {/* Start section */}
+        <div className="flex flex-col gap-4">
+          {/* connected address */}
+          <div className="flex gap-3 ml-2">
+            {address && (
+              <>
+                <p className="text-white">
+                  <span className="text-blue-400 mr-2">
+                    Connected Address :
+                  </span>{" "}
+                  {address?.slice(0, 6)}... {address?.slice(-4)}
+                </p>
+                {isAddressCopied ? (
+                  <FaCheck className="mt-0.5 text-green-500 cursor-pointer" />
+                ) : (
+                  <FaCopy
+                    onClick={() => {
+                      navigator.clipboard.writeText(address || "");
+                      setIsAddressCopied(true);
+                      clearTimeout(copyAddressTimeoutRef.current);
+                      copyAddressTimeoutRef.current = setTimeout(() => {
+                        setIsAddressCopied(false);
+                      }, 1000);
+                    }}
+                    className="text-white mt-1"
+                    data-tip="Copy Wallet Address"
+                    data-tip-content=".tooltip"
+                  />
+                )}
+              </>
+            )}
+          </div>
+          {/* Terms of use */}
+          <div className="">
+            <button
+              className="border px-2 py-2 text-white rounded-md hover:bg-neutral-500 hover:text-blue-700"
+              onClick={handleClickOpenTermsModal}
+            >
+              Gully Buddies Membership Rewards!!!! [Update]
+            </button>
+          </div>
         </div>
+
+        {/* middle section */}
         {/* Links */}
-        <div className="flex flex-col text-white text-center text-sm underline gap-2 mt-2">
-          <Link to="/jotform1" className="hover:text-blue-700 cursor-pointer" >Jotform 1</Link>
-          <Link to="/jotform2" className="hover:text-blue-700 cursor-pointer">Jotform 2</Link>
-          <Link to="/#" className="hover:text-blue-700 cursor-pointer">Sponsorship/Endoring</Link>
-          <Link to="/#" className="hover:text-blue-700 cursor-pointer">Purchase Token</Link>
-          <Link to="/#"  className="hover:text-blue-700 cursor-pointer">Leadership/Ranking</Link>
-          
+        <div className="flex flex-col text-white text-center text-sm gap-2 mt-2">
+          <button className="border px-1 py-2 rounded-md hover:bg-neutral-500 hover:text-blue-700">
+            Minigame [Player Vs. Player]
+          </button>
+          <Link
+            to="/jotform1"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Endorsee Quest Form
+          </Link>
+          <Link
+            to="/jotform2"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Jotform 2
+          </Link>
+          <Link
+            to="/#"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Sponsorship/Endorsements
+          </Link>
+          <Link
+            to="/#"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Purchase Token
+          </Link>
+          <Link
+            to="/#"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Leadership/Ranking
+          </Link>
+          <Link
+            to="/#"
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Click Here To Wrap CDE For Rewards [version 1.1 ]
+          </Link>
+          <Link
+            to={`/quest/completed/${address}`}
+            className="hover:text-blue-700 cursor-pointer underline"
+          >
+            Get Your Endorsee Quest Response
+          </Link>
         </div>
+
+        {/* Last section */}
         {/* Total valuation */}
         <div className="flex flex-col gap-1">
           <p className="text-white">
-            Total Value : {calculateTotalNFTValue()} USD
+            <span className="text-blue-400 mr-2">Total Value :</span>{" "}
+            {calculateTotalNFTValue()} USD
           </p>
-          <p className="text-white">CDE1 Token Balance : {token1Balance} CDE</p>
-          <p className="text-white">CDE2 Token Balance : {token2Balance} CDE</p>
+          <p className="text-white">
+            <span className="text-blue-400 mr-2">CDE1 Token Balance :</span>{" "}
+            {token1Balance} CDE
+          </p>
+          <p className="text-white">
+            <span className="text-blue-400 mr-2">CDE2 Token Balance :</span>{" "}
+            {token2Balance} CDE
+          </p>
+          <p className="text-white">
+            <span className="text-blue-400 mr-2">TIM Token Balance :</span>{" "}
+            {token3Balance} TIM
+          </p>
         </div>
       </div>
-      <NftCard NFTDetails={NFTdata} />
+
+      {/* NFT cards */}
+      <div className="mt-3">
+        <NftCard NFTDetails={NFTdata} />
+      </div>
+      {openTermsModal && (
+        <>
+          <TermsModel open={openTermsModal} onClose={handleCloseTermsModal} />
+        </>
+      )}
     </>
   );
 };

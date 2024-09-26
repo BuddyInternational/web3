@@ -29,7 +29,7 @@ This project utilizes React and WalletConnect to interact with blockchain applic
 
         REACT_APP_WALLET_PROJECT_ID =  Your WalletConnect project ID
 
-        REACT_APP_NFT_API_KEY = Your Alchemy  API key
+        REACT_APP_MORALIS_NFT_API = Your Alchemy  API key
 
 #### Running the Project:
 

@@ -4,7 +4,7 @@ import { FaCheck, FaCopy } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
 import { NFTData } from "../utils/Types";
 import Pagination from "../utils/Pagination";
-import ZoomedImage from "../utils/ZommedImage";
+import ZoomedImage from "./modals/ZommedImage";
 import { IoMdQrScanner } from "react-icons/io";
 
 const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
@@ -14,17 +14,25 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
   const copyTimeoutRef: any = useRef(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Number of images per page
-  const totalPages = Math.ceil(NFTDetails.length / itemsPerPage); // Calculate total pages
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(NFTDetails.length / itemsPerPage);
   const [open, setOpen] = useState(false);
   const [zommedImageURL, setZommedImageURL] = useState("");
 
+  // Handle page change
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
 
+  // Slice nftDetail
+  const slicedNFTDetails = NFTDetails.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Handle copy nft contract address
   const handleCopyAddress = (index: number) => {
     navigator.clipboard.writeText(NFTDetails[index]?.contractAddress || "");
     setIsContractAddressCopied(index);
@@ -34,6 +42,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
     }, 1000);
   };
 
+  // Handle copy tokenId
   const handleCopyTokenID = (index: number) => {
     navigator.clipboard.writeText(NFTDetails[index]?.tokenId || "");
     setIsTokenIdCopied(index);
@@ -43,6 +52,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
     }, 1000);
   };
 
+  // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
@@ -52,21 +62,17 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
     return imageUrl;
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setZommedImageURL("");
-  };
-
+  // Handle image zoomed action
   const handleImageClick = (imageUrl: any) => {
     const newImageUrl = convertIpfsUrl(imageUrl);
     setZommedImageURL(newImageUrl);
     setOpen(true);
   };
 
-  const slicedNFTDetails = NFTDetails.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleClose = () => {
+    setOpen(false);
+    setZommedImageURL("");
+  };
 
   // Handle Esc key to close zoomed image
   const handleEscKeyDown = (event: KeyboardEvent) => {
@@ -197,16 +203,6 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                 </span>
               </div>
 
-              {/* <div className="mb-2 text-sm flex flex-column justify-between">
-                <p className="text-sm">LooksRare Price </p>
-                <span className='flex  gap-2'>
-                  {""}
-                  {nft.floorPrices?.looksRare?.floorPrice === 0
-                    ? 'Not Listed'
-                    : `${nft.floorPrices?.looksRare?.floorPrice}  ${nft.floorPrices?.looksRare?.priceCurrency}`}
-                </span>
-              </div> */}
-
               <div className="mb-2 text-sm flex flex-column justify-between">
                 <p className="text-sm">Last Updated </p>
                 <p className="">
@@ -228,6 +224,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
         )}
       </div>
 
+      {/* open zoomed image components */}
       {open && (
         <>
           <ZoomedImage
@@ -235,7 +232,6 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
             handleClose={handleClose}
             src={zommedImageURL}
           />
-          ;
         </>
       )}
     </>

@@ -20,6 +20,7 @@ const ResponseTable: React.FC<{ ResponseDetails: Submission[] }> = ({
     }));
     setTableData(processedData);
   };
+
   useEffect(() => {
     fetchresponseData();
   }, [ResponseDetails]);
@@ -27,29 +28,29 @@ const ResponseTable: React.FC<{ ResponseDetails: Submission[] }> = ({
   const columns = useMemo(
     () => [
       {
-        accessorKey: "submissionId", //simple recommended way to define a column
+        accessorKey: "submissionId", 
         header: "SubmissionId",
-        muiTableHeadCellProps: { sx: { color: "green" } }, //custom props
+        muiTableHeadCellProps: { sx: { color: "#3B82F6" } }, 
       },
       {
         accessorKey: "walletAddress",
         header: "WalletAddress",
-        muiTableHeadCellProps: { sx: { color: "green" } },
+        muiTableHeadCellProps: { sx: { color: "#3B82F6" } },
       },
       {
         accessorKey: "firstname",
         header: "FirstName",
-        muiTableHeadCellProps: { sx: { color: "green" } },
+        muiTableHeadCellProps: { sx: { color: "#3B82F6" } },
       },
       {
         accessorKey: "lastname",
         header: "LastName",
-        muiTableHeadCellProps: { sx: { color: "green" } },
+        muiTableHeadCellProps: { sx: { color: "#3B82F6" } },
       },
       {
         accessorKey: "marketplace",
         header: "MarketPlace?",
-        muiTableHeadCellProps: { sx: { color: "green" } },
+        muiTableHeadCellProps: { sx: { color: "#3B82F6" } },
       },
     ],
     []
