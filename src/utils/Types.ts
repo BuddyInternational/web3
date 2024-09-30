@@ -29,7 +29,7 @@ export interface Submission {
       order: number;
       text: string;
       type: string;
-      answer?: { first: string; last: string };
+      answer?: string | { first: string; last: string };
     };
   };
 }

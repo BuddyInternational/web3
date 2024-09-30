@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Pagination: React.FC<{
   currentPage: number;
@@ -36,7 +36,7 @@ const Pagination: React.FC<{
             }`}
             onClick={() => handlePageClick(pageNumber)}
           >
-              {pageNumber}
+            {pageNumber}
           </li>
         ))}
         <button
