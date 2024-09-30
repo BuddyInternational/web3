@@ -23,11 +23,13 @@ const Form2 = () => {
         >
           <MdKeyboardBackspace className="text-3xl text-white mr-2" />
         </Link>
+        <div className="flex flex-col space-y-4 my-4">
         {jotformLoaded ? (
-          <Jotform src={form2Url || ""} className="w-full h-full m-4" />
+          <Jotform src={form2Url || ""} className="w-full h-auto border border-gray-300 rounded-lg shadow-md" />
         ) : (
           <Skeleton variant="rectangular" width="100%" height={300} />
         )}
+        </div>
       </div>
     </>
   );

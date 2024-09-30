@@ -26,15 +26,19 @@ const EndorseeQuestForm = () => {
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
-      {jotformLoaded ? (
-        <Jotform
-          src={form1Url || ""}
-          defaults={{ walletAddress: address || "" }}
-          className="w-full h-full"
-        />
-      ) : (
-        <Skeleton variant="rectangular" width="100%" height={300} />
-      )}
+      <div className="flex flex-col space-y-4">
+        {jotformLoaded ? (
+          <div className="w-full h-auto">
+            <Jotform
+              src={form1Url || ""}
+              defaults={{ walletAddress: address || "" }}
+              className="w-full h-full"
+            />
+          </div>
+        ) : (
+          <Skeleton variant="rectangular" width="100%" height={300} />
+        )}
+      </div>
     </div>
   );
 };

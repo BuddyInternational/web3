@@ -136,7 +136,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                       src={convertIpfsUrl(nft.imageUrl)}
                       alt="NFT image"
                     />
-                    <span className="absolute z-20 bg-red bottom-1 right-1  mr-2 mb-2 p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-75">
+                    <span className="absolute z-20 bg-transparent bottom-1 right-1  mr-2 mb-2 p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-75">
                       <IoMdQrScanner
                         className="text-white cursor-pointer"
                         onClick={() => handleImageClick(nft.imageUrl)}

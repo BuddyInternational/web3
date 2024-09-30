@@ -1,5 +1,6 @@
 import { Modal, Fade } from "@mui/material";
 import React from "react";
+import { MdZoomOutMap } from "react-icons/md";
 
 const ZoomedImage: React.FC<{
   open: any;
@@ -10,24 +11,21 @@ const ZoomedImage: React.FC<{
     <Modal open={open} onClose={handleClose} closeAfterTransition>
       <Fade in={open}>
         <div
-          className="relative h-full w-full"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="flex flex-col items-center justify-center h-full w-full relative p-4"
         >
-          <h1 className="my-2 m-auto p-1.5 w-96 text-center bg-neutral-600 text-white rounded capitalize">
+          <h1 className="hidden md:block my-2 m-auto p-1.5 w-96 text-center bg-neutral-600 text-white rounded capitalize">
             to exit full screen, press{" "}
             <span className="border p-2 text-sm">ESC</span>
           </h1>
           <img
-            className="object-fit"
+            className="object-contain sm:h-full md:h-5/6 w-auto h-5/6 max-h-[90vh]"
             src={src}
             alt="NFT image"
             style={{ width: "auto", height: "90%" }}
           />
+          <span className="absolute z-20 bg-gray-700 bottom-4 right-4 p-2 rounded-full hover:bg-gray-600 hover:bg-opacity-75">
+          <MdZoomOutMap className="text-white text-xl cursor-pointer"  onClick={handleClose}/>
+          </span>
         </div>
       </Fade>
     </Modal>
