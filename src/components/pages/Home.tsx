@@ -191,7 +191,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchTokenBalance();
-    // fetchNFTs();
+    fetchNFTs();
   }, [address]);
 
   return (
