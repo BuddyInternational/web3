@@ -24,7 +24,7 @@ const TermsModal: React.FC<{
             left: "50%",
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
-            width: { xs: "90%", sm: "70%", md: "50%" },
+            width: { sm: "80%", md: "70%", lg: "60%", xl: "50%" },
             maxHeight: "80%",
             overflowY: "auto",
             borderRadius: "8px",
@@ -43,8 +43,8 @@ const TermsModal: React.FC<{
             onClick={onClose}
             sx={(theme) => ({
               position: "absolute",
-              right: 40,
-              top: 35,
+              right: 16,
+              top: 16,
               fontSize: "20px",
               border: "1px solid gray",
               borderRadius: "10px",
