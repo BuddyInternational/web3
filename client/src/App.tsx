@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
 import ConnectWallet from "./components/navbar/ConnectWallet";
-import AllRoutes from "./routes/AllRoutes";
 import Footer from "./components/footer/Footer";
+import AllRoutes from "./routes/AllRoutes";
 
 const App: React.FC = () => {
   return (
