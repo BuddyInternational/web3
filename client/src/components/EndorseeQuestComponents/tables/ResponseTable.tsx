@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Submission } from "../../utils/Types";
+import { Submission } from "../../../utils/Types";
 import {
   MaterialReactTable,
   useMaterialReactTable,

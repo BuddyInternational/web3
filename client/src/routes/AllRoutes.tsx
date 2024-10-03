@@ -1,8 +1,8 @@
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
-import Home from "../components/pages/Home";
-import EndorseeQuestForm from "../components/forms/EndorseeQuestForm";
-import Form2 from "../components/forms/Form2";
-import EndorseeQuest from "../components/pages/EndorseeQuestReport";
+import Home from "../pages/Home";
+import EndorseeQuestForm from "../components/EndorseeQuestComponents/forms/EndorseeQuestForm";
+import Form2 from "../components/EndorseeQuestComponents/forms/Form2";
+import EndorseeQuest from "../pages/EndorseeQuestReport";
 import PageNotFound from "../utils/PageNotFound";
 
 const AllRoutes = () => {
@@ -18,7 +18,7 @@ const AllRoutes = () => {
             element={<EndorseeQuest />}
           />
           {/* Add 404 page */}
-          <Route path="*" element={<PageNotFound />}/>
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Router>
     </>

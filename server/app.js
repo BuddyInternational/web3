@@ -1,22 +1,21 @@
 import express from "express";
-import VanityEth from "./libs/VanityEth.js";
-import bodyParser from "body-parser";
 import connection from "./config/config.js";
 import { vanityRoutes } from "./routes/vanityRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
+import cors from "cors";
 
 const app = express();
-const port = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080;
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
-
+app.use(express.json());
+app.use(cors());
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

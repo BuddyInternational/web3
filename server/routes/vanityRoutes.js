@@ -1,9 +1,15 @@
-import express from 'express';
-const router = express.Router();
-import vanityController  from '../controllers/vanityController.js'; 
+import express from "express";
+import {
+  checkExistingVanityAddress,
+  generateAndStoreVanityAddress,
+} from "../controllers/vanityController.js";
 
+const vanityRoutes = express.Router();
 
-router.post("/generateVanityAddress", vanityController.generateVanityAddress);
-router.post("/saveVanityAddress", vanityController.storeVanityAddress);
+vanityRoutes.get("/checkVanityAddress", checkExistingVanityAddress);
+vanityRoutes.post(
+  "/generateAndStoreVanityAddress",
+  generateAndStoreVanityAddress
+);
 
-module.exports = router;
+export { vanityRoutes };

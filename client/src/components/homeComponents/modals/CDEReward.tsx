@@ -11,15 +11,17 @@ import {
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { useVanityContext } from "../../../context/VanityContext";
 
 const CDEReward: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-    const { address } = useWeb3ModalAccount();
+  const { address } = useWeb3ModalAccount();
+  const { vanityAddress } = useVanityContext();
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
-    vanityAddress: "0x364hjkdhgjhj65464565474fjghjfkh",
+    vanityAddress: vanityAddress,
     amount: "",
   });
 
@@ -47,7 +49,7 @@ const CDEReward: React.FC<{
             left: "50%",
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
-            width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" }, // Responsive width
+            width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" }, 
             maxHeight: "80%",
             overflowY: "auto",
             borderRadius: "8px",
@@ -100,7 +102,7 @@ const CDEReward: React.FC<{
                       readOnly: true,
                     },
                   }}
-                  defaultValue="0x364hjkdhgjhj65464565474fjghjfkh"
+                  defaultValue={vanityAddress}
                 />
                 <TextField
                   name="amount"

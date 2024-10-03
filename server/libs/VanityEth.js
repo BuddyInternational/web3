@@ -8,12 +8,14 @@ var getRandomWallet = function () {
   var address = "0x" + ethUtils.privateToAddress(randbytes).toString("hex");
   return { address: address, privKey: randbytes.toString("hex") };
 };
+
 var isValidHex = function (hex) {
   if (!hex.length) return true;
   hex = hex.toUpperCase();
   var re = /^[0-9A-F]+$/g;
   return re.test(hex);
 };
+
 var isValidVanityWallet = function (wallet, input, isChecksum, isContract) {
   var _add = wallet.address;
   if (isContract) {
@@ -29,6 +31,7 @@ var isValidVanityWallet = function (wallet, input, isChecksum, isContract) {
   // return _add.substr(2, input.length) == input;
   return _add.endsWith(input); // Check if the address ends with input
 };
+
 var getVanityWallet = function (
   input = "",
   isChecksum = false,
@@ -45,6 +48,7 @@ var getVanityWallet = function (
   if (isChecksum) _wallet.address = ethUtils.toChecksumAddress(_wallet.address);
   return _wallet;
 };
+
 var getDeterministicContractAddress = function (address) {
   return (
     "0x" +
@@ -54,4 +58,5 @@ var getDeterministicContractAddress = function (address) {
       .toString("hex")
   );
 };
+
 export default { getVanityWallet, isValidHex, ERRORS };

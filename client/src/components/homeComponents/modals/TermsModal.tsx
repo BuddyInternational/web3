@@ -24,7 +24,7 @@ const TermsModal: React.FC<{
             left: "50%",
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
-            width: { sm: "80%", md: "70%", lg: "60%", xl: "50%" },
+            width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
             maxHeight: "80%",
             overflowY: "auto",
             borderRadius: "8px",

@@ -2,9 +2,9 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { FaCheck, FaCopy } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
-import { NFTData } from "../../utils/Types";
-import Pagination from "../../utils/Pagination";
-import ZoomedImage from "../modals/ZoomedImage";
+import { NFTData } from "../../../utils/Types";
+import Pagination from "../../../utils/Pagination";
+import ZoomedImage from "../../homeComponents/modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
 
 const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
@@ -216,6 +216,9 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                   {moment(nft.timeLastUpdated).format("DD-MM-YY")}
                 </p>
               </div>
+              {/* <div className="mb-2 text-sm flex flex-column justify-between">
+                  <button className="">Interact</button>
+              </div> */}
             </div>
           </div>
         ))}

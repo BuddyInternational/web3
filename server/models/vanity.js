@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const vanitySchema = new mongoose.Schema({
   walletAddress: {
@@ -20,5 +20,5 @@ const vanitySchema = new mongoose.Schema({
   }
 });
 
-const VanityModel = mongoose.model('vanityData', vanitySchema);
-module.exports = {VanityModel};
+const VanityData = mongoose.model('vanitydata', vanitySchema);
+export { VanityData }; 

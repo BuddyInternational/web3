@@ -1,15 +1,21 @@
-import { VanityModel } from "../models/vanity.js";
+import { VanityData } from "../models/vanity.js";
 import VanityEth from "../libs/VanityEth.js";
 
-// Generate Vanity Address
-const generateVanityAddress = (req,res) => {
-  const { input, isChecksum = false, isContract = false, count = 1 } = req.body;
+// Generate and Store Vanity Address
+export const generateAndStoreVanityAddress = async (req, res) => {
+  const {
+    suffix,
+    isChecksum = true,
+    isContract = false,
+    count = 1,
+    walletAddress,
+  } = req.body;
   try {
-    // Validate input
-    if (!VanityEth.isValidHex(input)) {
+    // Validate suffix
+    if (!VanityEth.isValidHex(suffix)) {
       return res
         .status(400)
-        .json({ error: `${input} is not valid hexadecimal` });
+        .json({ error: `${suffix} is not valid hexadecimal` });
     }
 
     const results = [];
@@ -22,43 +28,59 @@ const generateVanityAddress = (req,res) => {
 
     while (walletsFound < count) {
       const wallet = VanityEth.getVanityWallet(
-        input,
+        suffix,
         isChecksum,
         isContract,
         counter
       );
       results.push(wallet);
+
+      // Store each generated wallet's details in the database
+      const newAddress = new VanityData({
+        walletAddress,
+        vanityAddress: wallet.address,
+        vanityPrivateKey: wallet.privKey,
+        createdAt: new Date(),
+      });
+      console.log("newAddress-----------", newAddress);
+      await newAddress.save();
+
       walletsFound++;
     }
+
     console.log("Generated wallets:", results);
-    res
-      .status(200)
-      .json({ data: results, message: "Generate vanity address successfully" });
-    // res.json(results);
-  } catch (e) {
-    return res
-      .status(500)
-      .json({ message: "Vanity Address not generated ", error: e.message });
-  }
-};
-
-// Store Vanity Address
-const storeVanityAddress = async (req, res) => {
-  const { walletAddress, vanityAddress, vanityPrivateKey } = req.body;
-  try {
-    const newaddress = new VanityModel({
-      walletAddress,
-      vanityAddress,
-      vanityPrivateKey,
-      createdAt: new Date(),
+    res.status(200).json({
+      data: results,
+      message: "Vanity address generated and saved successfully",
     });
-    await newaddress.save();
-    res.status(200).json({ message: "Vanity address saved succefully" });
   } catch (e) {
     return res
       .status(500)
-      .json({ message: "Vanity Address not saved ", error: e.message });
+      .json({ message: "Vanity Address not generated", error: e.message });
   }
 };
 
-module.exports = { generateVanityAddress, storeVanityAddress };
+// Check if a vanity address exists for a given wallet address
+export const checkExistingVanityAddress = async (req, res) => {
+  const { walletAddress } = req.query;
+  try {
+    const existingEntry = await VanityData.findOne({ walletAddress });
+
+    if (existingEntry) {
+      console.log("address found----------", existingEntry);
+      return res.status(200).json({
+        message: "Vanity address found",
+        vanityAddress: existingEntry.vanityAddress,
+        vanityPrivateKey: existingEntry.vanityPrivateKey,
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No vanity address found for this wallet" });
+    }
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: "Error checking vanity address", error: e.message });
+  }
+};
