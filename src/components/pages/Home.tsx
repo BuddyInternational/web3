@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
 import Web3 from "web3";
 import TermsModel from "../modals/TermsModal";
+import CDEReward from "../modals/CDEReward";
 
 // Token address
 const token1Address: any = process.env.REACT_APP_TOKEN1_ADDRESS;
@@ -33,6 +34,7 @@ const Home = () => {
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const [openTermsModal, setOpenTermsModal] = useState(false);
+  const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
 
   // Handle termsModal
   const handleClickOpenTermsModal = () => {
@@ -41,6 +43,15 @@ const Home = () => {
 
   const handleCloseTermsModal = () => {
     setOpenTermsModal(false);
+  };
+
+  // Handle CDE RewardModal
+  const handleClickOpenCDERewardModal = () => {
+    setOpenCDERewardModal(true);
+  };
+
+  const handleCloseCDERewardModal = () => {
+    setOpenCDERewardModal(false);
   };
 
   // Function to calculate the total USD value of all NFTs
@@ -199,45 +210,6 @@ const Home = () => {
       <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3">
         {/* Start section */}
         <div className="flex flex-col gap-8 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
-          {/* connected address */}
-          <div className="flex gap-2 sm:m-auto md:m-0 sm:flex-col 2xl:flex-row items-center">
-            {address && (
-              <>
-                <div className="text-[#5692D9] font-normal font-sans text-base">
-                  Connected Address :
-                </div>
-                <div className="flex flex-col">
-                  <div className="text-white flex gap-3 font-normal font-sans text-sm">
-                    <span className="mt-1">
-                      {address?.slice(0, 6)}... {address?.slice(-4)}
-                    </span>
-                    <span className="">
-                      {isAddressCopied ? (
-                        <FaCheck className="mt-1 text-green-500 cursor-pointer" />
-                      ) : (
-                        <FaRegCopy
-                          onClick={() => {
-                            navigator.clipboard.writeText(address || "");
-                            setIsAddressCopied(true);
-                            clearTimeout(copyAddressTimeoutRef.current);
-                            copyAddressTimeoutRef.current = setTimeout(() => {
-                              setIsAddressCopied(false);
-                            }, 1000);
-                          }}
-                          className="text-[#5692D9] font-thin mt-1 "
-                          data-tip="Copy Wallet Address"
-                          data-tip-content=".tooltip"
-                        />
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    <hr className="border-t border-gray-600 w-full mt-2" />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
           {/* Terms of use */}
           <div className="">
             <button
@@ -247,6 +219,17 @@ const Home = () => {
               Gully Buddies Membership Rewards!!!! [Update]
             </button>
           </div>
+          {/* Account Persona: [Default] */}
+          <div className="flex flex-col mt-2 gap-4 sm:items-center md:items-start">
+            <p className="text-md font-sans text-[#5692D9]">
+              Account Persona: [Default]
+            </p>
+            <img
+              src="/accountPersona.png"
+              alt="Account Persona image"
+              className="md:w-30 sm:w-48 h-auto rounded-md"
+            />
+          </div>
           {/* divider */}
           <div>
             <hr className="sm:border-t sm:border-gray-600 sm:w-11/12 sm:m-auto sm:my-3 md:border-t-0 md:w-0 md:my-0 md:m-0" />
@@ -255,7 +238,7 @@ const Home = () => {
 
         {/* middle section */}
         {/* Links */}
-        <div className="flex flex-col text-white text-sm gap-3 justify-center items-center m-auto w-full md:w-1/2">
+        <div className="flex flex-col text-white text-sm gap-3 items-center w-full md:w-1/2">
           <div className="flex flex-col gap-3 font-sans font-normal sm: ml-4 md:ml-10 lg:ml-0">
             <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
               Minigame (Player Vs. Player)
@@ -293,6 +276,7 @@ const Home = () => {
             <Link
               to="/#"
               className="hover:text-[#5692D9] cursor-pointer underline"
+              onClick={handleClickOpenCDERewardModal}
             >
               Click Here To Wrap CDE For Rewards (version 1.1)
             </Link>
@@ -311,22 +295,54 @@ const Home = () => {
 
         {/* Last section */}
         {/* Total valuation */}
-        <div className="flex flex-col gap-5 text-sm font-normal font-sans w-full md:w-1/4 sm:text-center md:text-left">
+
+        <div className="flex flex-col gap-4 text-md font-normal font-sans w-full md:w-1/4 sm:text-center md:text-left">
+          {/* Total value */}
           <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
             <span className="text-blue-400 mr-2">Total Value :</span>{" "}
             <span className="text-left">{calculateTotalNFTValue()} USD </span>
           </div>
-          <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1 ">
-            <span className="text-blue-400 mr-2">CDE1 Token Balance :</span>{" "}
-            <span>{token1Balance} CDE </span>
+          {/* wallet address balance */}
+          <div className="flex flex-col gap-2">
+            <div className="lg:m-0 xl:m-auto mb-2 flex flex-col">
+              <span className="text-md font-sans text-blue-400 font-bold">
+                Wallet Address Balance
+              </span>
+              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-1/2 sm:m-auto sm:my-3 md:border-t md:w-full md:my-2 " />
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1 ">
+              <span className="text-[#5692D9] mr-2">CDE1 Token Balance :</span>{" "}
+              <span>{token1Balance} CDE </span>
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">CDE2 Token Balance :</span>{" "}
+              <span>{token2Balance} CDE </span>
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">TIM Token Balance :</span>{" "}
+              <span>{token3Balance} TIM</span>
+            </div>
           </div>
-          <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-            <span className="text-blue-400 mr-2">CDE2 Token Balance :</span>{" "}
-            <span>{token2Balance} CDE </span>
-          </div>
-          <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-            <span className="text-blue-400 mr-2">TIM Token Balance :</span>{" "}
-            <span>{token3Balance} TIM</span>
+          {/* Vanity address balance */}
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="lg:m-0 xl:m-auto mb-2 flex flex-col">
+              <span className="text-md font-sans text-blue-400 font-bold">
+                Vanity Address Balance
+              </span>
+              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-1/2 sm:m-auto sm:my-3 md:border-t md:w-full md:my-2 " />
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1 ">
+              <span className="text-[#5692D9] mr-2">CDE1 Token Balance :</span>{" "}
+              <span>{token1Balance} CDE </span>
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">CDE2 Token Balance :</span>{" "}
+              <span>{token2Balance} CDE </span>
+            </div>
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">TIM Token Balance :</span>{" "}
+              <span>{token3Balance} TIM</span>
+            </div>
           </div>
         </div>
       </div>
@@ -340,6 +356,16 @@ const Home = () => {
       {openTermsModal && (
         <>
           <TermsModel open={openTermsModal} onClose={handleCloseTermsModal} />
+        </>
+      )}
+
+      {/* CDE Reward Modal */}
+      {openCDERewardModal && (
+        <>
+          <CDEReward
+            open={openCDERewardModal}
+            onClose={handleCloseCDERewardModal}
+          />
         </>
       )}
     </>

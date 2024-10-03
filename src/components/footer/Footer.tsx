@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="w-full md:w-1/3 lg:w-1/5 flex-shrink-0 p-1 flex justify-center">
         <img
           src="/footer.gif"
-          alt="Giphy Background 1"
+          alt="Giphy"
           className=" w-full h-auto max-h-28 object-cover"
         />
       </div>

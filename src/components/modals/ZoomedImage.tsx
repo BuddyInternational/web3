@@ -23,8 +23,9 @@ const ZoomedImage: React.FC<{
             alt="NFT image"
             style={{ width: "auto", height: "90%" }}
           />
-          <span className="absolute z-20 bg-gray-700 bottom-4 right-4 p-2 rounded-full hover:bg-gray-600 hover:bg-opacity-75">
-          <MdZoomOutMap className="text-white text-xl cursor-pointer"  onClick={handleClose}/>
+          <span className="absolute z-20 bg-gray-700 sm:bottom-2 sm:right-4 lg:bottom-4 lg:right-6 p-2 rounded-lg hover:bg-gray-600 hover:bg-opacity-75">
+          {/* <MdZoomOutMap className="text-white text-xl cursor-pointer"  onClick={handleClose}/> */}
+          <button className="text-white text-xl p-1 cursor-pointer" onClick={handleClose}>Close</button>
           </span>
         </div>
       </Fade>

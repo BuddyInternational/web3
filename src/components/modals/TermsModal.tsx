@@ -11,8 +11,8 @@ import {
 import { IoClose } from "react-icons/io5";
 
 const TermsModal: React.FC<{
-  open: any;
-  onClose: any;
+  open: boolean;
+  onClose: () => void;
 }> = ({ open, onClose }) => {
   return (
     <Modal open={open} onClose={onClose}>
