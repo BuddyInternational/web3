@@ -20,12 +20,10 @@ export const checkExistingVanityAddress = async (
   walletAddress: string
 ): Promise<ExistingVanityResponse | null> => {
   try {
-    const response: AxiosResponse<ExistingVanityResponse |null> = await axios.get(
-      `${server_api_base_url}/checkVanityAddress`,
-      {
-        params: { walletAddress }
-      }
-    );
+    const response: AxiosResponse<ExistingVanityResponse | null> =
+      await axios.get(`${server_api_base_url}/api/vanity/checkVanityAddress`, {
+        params: { walletAddress },
+      });
     return response.data;
   } catch (error) {
     console.error("Error checking existing vanity address:", error);
@@ -39,8 +37,9 @@ export const generateAndSaveVanityAddress = async (
   walletAddress: string
 ): Promise<GenerateVanityResponse | null> => {
   try {
+    console.log("server_api_base_url", server_api_base_url);
     const response: AxiosResponse<GenerateVanityResponse> = await axios.post(
-      `${server_api_base_url}/generateAndStoreVanityAddress`,
+      `${server_api_base_url}/api/vanity/generateAndStoreVanityAddress`,
       {
         suffix,
         walletAddress,
