@@ -27,9 +27,10 @@ const EndorseeQuest = () => {
       };
       const response = await axios.request(config);
       const data: Submission[] = response.data.content;
+      console.log("data-------------",data);
       // Filter the connected user response
       const filteredResponses = data.filter((response) => {
-        const walletAddress = response.answers["15"].answer;
+        const walletAddress = response.answers["18"].answer;
         return walletAddress === address;
       });
 
@@ -45,6 +46,7 @@ const EndorseeQuest = () => {
     handleResponse(form1Id);
   }, [form1Id, address]);
 
+  console.log("form response-------------",formResponse)
   return (
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <Link

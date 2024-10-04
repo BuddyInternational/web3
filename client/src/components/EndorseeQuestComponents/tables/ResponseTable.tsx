@@ -12,7 +12,7 @@ const ResponseTable: React.FC<{ ResponseDetails: Submission[] }> = ({
 
   const fetchresponseData = () => {
     const processedData = ResponseDetails.map((submission) => {
-      const walletAddress = submission.answers[15].answer;
+      const walletAddress = submission.answers[18].answer;
 
       // Check if walletAddress is a string before using slice
       const slicedWalletAddress =

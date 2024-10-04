@@ -101,7 +101,6 @@ export default function App() {
   const { isConnected, address } = useWeb3ModalAccount();
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
-  // const [vanityAddress, setVanityAddress] = useState("");
   const { vanityAddress, setVanityAddress } = useVanityContext();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -130,7 +129,7 @@ export default function App() {
     };
 
     handleWalletConnect();
-  }, [isConnected, address, vanityAddress]);
+  }, [isConnected, address, vanityAddress,setVanityAddress]);
 
   return (
     <>

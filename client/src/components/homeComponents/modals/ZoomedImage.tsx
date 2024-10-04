@@ -1,6 +1,6 @@
 import { Modal, Fade } from "@mui/material";
 import React from "react";
-import { MdZoomOutMap } from "react-icons/md";
+// import { MdZoomOutMap } from "react-icons/md";
 
 const ZoomedImage: React.FC<{
   open: any;
@@ -20,7 +20,7 @@ const ZoomedImage: React.FC<{
           <img
             className="object-contain sm:h-full md:h-5/6 w-auto h-5/6 max-h-[90vh]"
             src={src}
-            alt="NFT image"
+            alt="NFT"
             style={{ width: "auto", height: "90%" }}
           />
           <span className="absolute z-20 bg-gray-700 sm:bottom-2 sm:right-4 lg:bottom-4 lg:right-6 p-2 rounded-lg hover:bg-gray-600 hover:bg-opacity-75">

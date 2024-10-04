@@ -20,8 +20,8 @@ const style = {
   maxHeight: "80%",
   overflowY: "auto",
   borderRadius: "16px",
-  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Softer shadow
-  p: 4, // Adjusted padding for more space
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+  p: 4, 
 };
 
 interface CustomModalProps {
@@ -61,7 +61,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
               top: 16,
               fontSize: "24px",
               bgcolor: "rgba(0, 0, 0, 0.05)",
-              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" }, // Subtle hover effect
+              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" }, 
               borderRadius: "50%",
             }}
           >
@@ -75,7 +75,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                 controls
                 sx={{
                   borderRadius: "8px",
-                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Add subtle shadow to the video
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", 
                 }}
                 src={modalContents.videoUrl}
               />
