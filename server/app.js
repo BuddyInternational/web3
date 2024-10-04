@@ -15,6 +15,13 @@ app.use(cors());
 // Routes
 app.use("/api/vanity", vanityRoutes);
 
+app.get("/api/ping", (req, res)=> {
+  res.status(200).json({
+    success: true,
+    message: "Server running successfully.
+  });
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
