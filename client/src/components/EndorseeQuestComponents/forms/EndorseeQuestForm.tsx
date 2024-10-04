@@ -36,7 +36,7 @@ const EndorseeQuestForm = () => {
             />
           </div>
         ) : (
-          <Skeleton variant="rectangular" width="100%" height={300} />
+          <Skeleton variant="rectangular" width="100%" height={300} animation="wave" sx={{ bgcolor: '#132743' }}/>
         )}
       </div>
     </div>

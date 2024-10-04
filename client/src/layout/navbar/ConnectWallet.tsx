@@ -136,7 +136,7 @@ export default function App() {
         {/* connected vanity address */}
         <div className="py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
-            <Skeleton variant="rectangular" width="100%" height={50} />
+            <Skeleton variant="rectangular" width="100%" height={50} animation="wave" sx={{ bgcolor: '#132743' }}/>
           ) : (
             vanityAddress && (
               <>

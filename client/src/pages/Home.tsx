@@ -130,7 +130,7 @@ const Home = () => {
             format: "decimal",
             mediaItems: true,
             normalizeMetadata: true,
-            limit: 10,
+            limit: 5,
             address: testWalletAddressNFT,
           })
           .then((res) =>

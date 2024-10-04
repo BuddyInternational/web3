@@ -6,6 +6,8 @@ import { NFTData } from "../../../utils/Types";
 import Pagination from "../../../utils/Pagination";
 import ZoomedImage from "../../homeComponents/modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
+import { MdKeyboardArrowDown } from "react-icons/md";
+import CardInteractMenus from "./CardInteractMenus";
 
 const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
@@ -216,9 +218,9 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                   {moment(nft.timeLastUpdated).format("DD-MM-YY")}
                 </p>
               </div>
-              {/* <div className="mb-2 text-sm flex flex-column justify-between">
-                  <button className="">Interact</button>
-              </div> */}
+            </div>
+            <div className="flex justify-end items-end mt-auto mr-2 mb-2">
+              <CardInteractMenus />
             </div>
           </div>
         ))}
