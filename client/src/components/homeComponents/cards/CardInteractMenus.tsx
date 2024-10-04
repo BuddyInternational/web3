@@ -72,6 +72,7 @@ export default function CardInteractMenus() {
   ) => {
     setModalContent({ title, description, videoUrl });
     setOpenModal(true);
+    setAnchorEl(null);
   };
 
   const handleCloseModal = () => {
@@ -81,8 +82,8 @@ export default function CardInteractMenus() {
 
   const options = [
     {
-      label: "Use Buddy to Earn TIM",
-      title: "Use Buddy to Earn TIM",
+      label: "Use A Buddy Earn TIM",
+      title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
       videoUrl: "/placeholderVideo.mp4",
     },
@@ -90,7 +91,7 @@ export default function CardInteractMenus() {
       label: "View Reputation",
       onClick: handleOpenModal,
       title: "View Reputation",
-      description: "This feature is comming soon.",
+      description: "This feature is coming soon.",
     },
   ];
 

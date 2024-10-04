@@ -112,23 +112,25 @@ export default function App() {
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
         if (existingAddress != null) {
-          console.log("existingAddress----------",existingAddress);
+          console.log("existingAddress----------", existingAddress);
           setVanityAddress(existingAddress.vanityAddress);
         } else {
           // If no vanity address exists, generate and save a new one
-          const generatedAddress:any = await generateAndSaveVanityAddress(
+          const generatedAddress: any = await generateAndSaveVanityAddress(
             vanity_suffix!,
             address
           );
-          setVanityAddress(generatedAddress?.data[0]?.address);
-          console.log("Generated Vanity Address:", generatedAddress);
+          if (!!generatedAddress?.data[0]?.address) {
+            setVanityAddress(generatedAddress?.data[0]?.address);
+            console.log("Generated Vanity Address:", generatedAddress);
+          }
         }
         setIsLoading(false);
       }
     };
 
     handleWalletConnect();
-  }, [isConnected, address,vanityAddress]);
+  }, [isConnected, address, vanityAddress]);
 
   return (
     <>
@@ -136,44 +138,48 @@ export default function App() {
         {/* connected vanity address */}
         <div className="py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
-            <Skeleton variant="rectangular" width="100%" height={50} animation="wave" sx={{ bgcolor: '#132743' }}/>
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={50}
+              animation="wave"
+              sx={{ bgcolor: "#132743" }}
+            />
           ) : (
-            vanityAddress && (
-              <>
-                <div className="text-[#5692D9] font-normal font-sans text-base">
-                  Vanity Address :
+            <>
+              <div className="text-[#5692D9] font-normal font-sans text-base">
+                Vanity Address :
+              </div>
+              <div className="flex flex-col">
+                <div className="text-white flex gap-3 font-normal font-sans text-sm">
+                  <span className="mt-1">
+                    {vanityAddress?.slice(0, 6)}... {vanityAddress?.slice(-4)}
+                  </span>
+                  <span className="">
+                    {isAddressCopied ? (
+                      <FaCheck className="mt-1 text-green-500 cursor-pointer" />
+                    ) : (
+                      <FaRegCopy
+                        onClick={() => {
+                          navigator.clipboard.writeText(vanityAddress || "");
+                          setIsAddressCopied(true);
+                          clearTimeout(copyAddressTimeoutRef.current);
+                          copyAddressTimeoutRef.current = setTimeout(() => {
+                            setIsAddressCopied(false);
+                          }, 1000);
+                        }}
+                        className="text-[#5692D9] font-thin mt-1 "
+                        data-tip="Copy Vanity Address"
+                        data-tip-content=".tooltip"
+                      />
+                    )}
+                  </span>
                 </div>
-                <div className="flex flex-col">
-                  <div className="text-white flex gap-3 font-normal font-sans text-sm">
-                    <span className="mt-1">
-                      {vanityAddress?.slice(0, 6)}... {vanityAddress?.slice(-4)}
-                    </span>
-                    <span className="">
-                      {isAddressCopied ? (
-                        <FaCheck className="mt-1 text-green-500 cursor-pointer" />
-                      ) : (
-                        <FaRegCopy
-                          onClick={() => {
-                            navigator.clipboard.writeText(vanityAddress || "");
-                            setIsAddressCopied(true);
-                            clearTimeout(copyAddressTimeoutRef.current);
-                            copyAddressTimeoutRef.current = setTimeout(() => {
-                              setIsAddressCopied(false);
-                            }, 1000);
-                          }}
-                          className="text-[#5692D9] font-thin mt-1 "
-                          data-tip="Copy Vanity Address"
-                          data-tip-content=".tooltip"
-                        />
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    <hr className="border-t border-gray-600 w-full mt-2" />
-                  </div>
+                <div>
+                  <hr className="border-t border-gray-600 w-full mt-2" />
                 </div>
-              </>
-            )
+              </div>
+            </>
           )}
         </div>
         {/* connect/disconnect button */}
@@ -184,7 +190,7 @@ export default function App() {
             <Button
               variant="contained"
               onClick={() => {
-                setVanityAddress("");
+                setVanityAddress("0x0000000000000000000000000000000000000000");
                 disconnect();
               }}
               sx={{

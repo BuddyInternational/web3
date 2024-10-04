@@ -1,7 +1,13 @@
 import React from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import { DialogContent, DialogTitle, Fade, IconButton } from "@mui/material";
+import {
+  DialogContent,
+  DialogTitle,
+  Fade,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { IoClose } from "react-icons/io5";
 
 const style = {
@@ -9,13 +15,13 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  backgroundColor: "white",
+  bgcolor: "background.paper",
   width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
   maxHeight: "80%",
   overflowY: "auto",
-  borderRadius: "8px",
-  boxShadow: 3,
-  p: 3,
+  borderRadius: "16px",
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Softer shadow
+  p: 4, // Adjusted padding for more space
 };
 
 interface CustomModalProps {
@@ -34,34 +40,52 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       <Fade in={open}>
         <Box sx={style}>
           <DialogTitle
-            sx={{ m: 0, p: 2, textAlign: "center" }}
+            sx={{
+              m: 0,
+              p: 2,
+              textAlign: "center",
+              borderBottom: "1px solid #e0e0e0",
+            }}
             id="customized-dialog-title"
           >
-            {modalContents.title}
+            <Typography variant="h4" component="h4">
+              {modalContents.title}
+            </Typography>
           </DialogTitle>
           <IconButton
             aria-label="close"
             onClick={onClose}
-            sx={(theme) => ({
+            sx={{
               position: "absolute",
               right: 16,
               top: 16,
-              fontSize: "20px",
-              border: "1px solid gray",
-              borderRadius: "10px",
-            })}
+              fontSize: "24px",
+              bgcolor: "rgba(0, 0, 0, 0.05)",
+              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" }, // Subtle hover effect
+              borderRadius: "50%",
+            }}
           >
             <IoClose />
           </IconButton>
-          <DialogContent dividers>
+          <DialogContent dividers sx={{ padding: "24px" }}>
             {modalContents.videoUrl ? (
-              <video
+              <Box
+                component="video"
                 className="h-auto w-full object-cover"
                 controls
+                sx={{
+                  borderRadius: "8px",
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Add subtle shadow to the video
+                }}
                 src={modalContents.videoUrl}
               />
             ) : (
-              <p>{modalContents.description}</p>
+              <Typography
+                variant="h6"
+                sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}
+              >
+                {modalContents.description}
+              </Typography>
             )}
           </DialogContent>
         </Box>
