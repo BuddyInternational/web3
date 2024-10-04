@@ -18,7 +18,7 @@ app.use("/api/vanity", vanityRoutes);
 app.get("/api/ping", (req, res)=> {
   res.status(200).json({
     success: true,
-    message: "Server running successfully.
+    message: "Server running successfully."
   });
 });
 
