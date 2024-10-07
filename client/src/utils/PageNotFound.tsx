@@ -8,7 +8,7 @@ const PageNotFound = () => {
     <div className="flex flex-col items-center justify-center  bg-gray-800 px-4 py-4 text-center">
       <img
         src="/notFound.png"
-        alt="404 Image"
+        alt="Page not found"
         className="w-3/4 max-w-md object-cover mb-8"
       />
       <h1 className="text-4xl font-bold text-white mb-4">

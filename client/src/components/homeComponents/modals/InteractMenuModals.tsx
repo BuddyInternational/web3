@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
+import ReactPlayer from "react-player";
 
 const style = {
   position: "absolute" as "absolute",
@@ -20,8 +21,8 @@ const style = {
   maxHeight: "80%",
   overflowY: "auto",
   borderRadius: "16px",
-  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
-  p: 4, 
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+  p: 4,
 };
 
 interface CustomModalProps {
@@ -35,6 +36,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   onClose,
   modalContents,
 }) => {
+  console.log("model contents=============", modalContents);
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -61,7 +63,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
               top: 16,
               fontSize: "24px",
               bgcolor: "rgba(0, 0, 0, 0.05)",
-              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" }, 
+              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" },
               borderRadius: "50%",
             }}
           >
@@ -69,15 +71,20 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
           </IconButton>
           <DialogContent dividers sx={{ padding: "24px" }}>
             {modalContents.videoUrl ? (
-              <Box
-                component="video"
-                className="h-auto w-full object-cover"
-                controls
-                sx={{
+              <ReactPlayer
+                style={{
+                  width:"100%",
+                  height: "100%",
+                  objectFit: "cover",
                   borderRadius: "8px",
-                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", 
+                  boxShadow: "0px 4px 12px rgba(0,0,0,01)",
                 }}
-                src={modalContents.videoUrl}
+                width="100%"
+                height="100%"
+                controls={true}
+                url={modalContents.videoUrl}
+                loop={true}
+                playing={true}
               />
             ) : (
               <Typography

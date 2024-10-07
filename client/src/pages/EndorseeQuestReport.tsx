@@ -17,36 +17,36 @@ const EndorseeQuest = () => {
   const [formResponse, setFormResponse] = useState<Submission[]>();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get user endorsee form response
-  const handleResponse = async (formID: string) => {
-    setIsLoading(true);
-    try {
-      const config = {
-        method: "get",
-        url: `https://api.jotform.com/form/${formID}/submissions?apiKey=${jotformApi}`,
-      };
-      const response = await axios.request(config);
-      const data: Submission[] = response.data.content;
-      console.log("data-------------",data);
-      // Filter the connected user response
-      const filteredResponses = data.filter((response) => {
-        const walletAddress = response.answers["18"].answer;
-        return walletAddress === address;
-      });
-
-      setFormResponse(filteredResponses);
-    } catch (error) {
-      console.error("Error fetching form submissions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    handleResponse(form1Id);
-  }, [form1Id, address]);
+    // Get user endorsee form response
+    const handleResponse = async (formID: string) => {
+      setIsLoading(true);
+      try {
+        const config = {
+          method: "get",
+          url: `https://api.jotform.com/form/${formID}/submissions?apiKey=${jotformApi}`,
+        };
+        const response = await axios.request(config);
+        const data: Submission[] = response.data.content;
+        console.log("data-------------", data);
+        // Filter the connected user response
+        const filteredResponses = data.filter((response) => {
+          const walletAddress = response.answers["18"].answer;
+          return walletAddress === address;
+        });
 
-  console.log("form response-------------",formResponse)
+        setFormResponse(filteredResponses);
+      } catch (error) {
+        console.error("Error fetching form submissions:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    handleResponse(form1Id);
+  }, [address]);
+
+  console.log("form response-------------", formResponse);
   return (
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <Link

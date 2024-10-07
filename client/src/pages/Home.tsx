@@ -28,7 +28,6 @@ const purchaseTokenURL: any = process.env.REACT_APP_PURCHASE_TOKEN_LINK;
 const leadershipURL: any = process.env.REACT_APP_LEADERSHIP_LINK;
 
 const testWalletAddress: string = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
-const testVanityAddress: string = "0x273a6fa0cA05601b4703Cb6C1C500594e44C5CDE";
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
@@ -104,11 +103,10 @@ const Home = () => {
           TIM: Number(formattedVanityBalances[2]),
         },
       });
-
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [address, vanityAddress]);
+  }, [isConnected,address, vanityAddress]);
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
@@ -160,11 +158,11 @@ const Home = () => {
   useEffect(() => {
     fetchTokenBalance();
     fetchNFTs();
-  }, [address, vanityAddress]);
+  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs]);
 
   return (
     <>
-      <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3">
+      <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3 ">
         {/* Start section */}
         <div className="flex flex-col gap-8 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
           {/* Terms of use */}
@@ -183,7 +181,7 @@ const Home = () => {
             </p>
             <img
               src="/accountPersona.png"
-              alt="Account Persona image"
+              alt="Account Persona not found"
               className="md:w-30 sm:w-48 h-auto rounded-md"
             />
           </div>
@@ -299,6 +297,11 @@ const Home = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* divider */}
+      <div className="">
+      <hr className="container m-auto sm:border sm:border-t-2 sm:border-gray-600 sm:w-full sm:my-2 sm:m-auto md:w-full md:my-4" />
       </div>
 
       {/* NFT cards */}

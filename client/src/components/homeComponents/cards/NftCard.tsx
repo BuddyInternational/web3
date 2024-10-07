@@ -6,8 +6,8 @@ import { NFTData } from "../../../utils/Types";
 import Pagination from "../../../utils/Pagination";
 import ZoomedImage from "../../homeComponents/modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
-import { MdKeyboardArrowDown } from "react-icons/md";
 import CardInteractMenus from "./CardInteractMenus";
+import CardChainFilterMenus from "./CardChainFilterMenus";
 
 const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
@@ -17,9 +17,33 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
-  const totalPages = Math.ceil(NFTDetails.length / itemsPerPage);
   const [open, setOpen] = useState(false);
   const [zommedImageURL, setZommedImageURL] = useState("");
+  const [selectedChain, setSelectedChain] = useState<string>("All");
+
+  // Filter NFTs based on selected chain
+  const filteredNFTDetails =
+    selectedChain === "All"
+      ? NFTDetails
+      : NFTDetails.filter((nft) => nft.chainName === selectedChain);
+
+  // Total number of page
+  const totalPages = Math.ceil(filteredNFTDetails.length / itemsPerPage);
+
+  // Slice nftDetail
+  const slicedNFTDetails = filteredNFTDetails.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Get unique chains from NFTDetails
+  const uniqueChains: string[] = Array.from(
+    new Set(
+      NFTDetails.map((nft) => nft.chainName).filter(
+        (chain): chain is string => chain !== undefined
+      )
+    )
+  );
 
   // Handle page change
   const handlePageChange = (pageNumber: number) => {
@@ -27,12 +51,6 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
       setCurrentPage(pageNumber);
     }
   };
-
-  // Slice nftDetail
-  const slicedNFTDetails = NFTDetails.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   // Handle copy nft contract address
   const handleCopyAddress = (index: number) => {
@@ -76,14 +94,13 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
     setZommedImageURL("");
   };
 
-  // Handle Esc key to close zoomed image
-  const handleEscKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && open) {
-      handleClose();
-    }
-  };
-
   useEffect(() => {
+    // Handle Esc key to close zoomed image
+    const handleEscKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && open) {
+        handleClose();
+      }
+    };
     window.addEventListener("keydown", handleEscKeyDown);
 
     return () => {
@@ -91,10 +108,30 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
     };
   }, [open]);
 
+  // Reset current page on chain change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedChain]);
+
   return (
     <>
+      {/* Dropdown for filtering by chain */}
+      <div className="flex justify-end sm: mb-1 md:mb-3 container mx-auto px-4 gap-2">
+        <label
+          htmlFor="chainSelect"
+          className="text-md font-bold text-[#5692D9] sm:py-2 md:py-4 "
+        >
+          Filter by Chain:
+        </label>
+        <CardChainFilterMenus
+          uniqueChains={uniqueChains}
+          selectedChain={selectedChain}
+          setSelectedChain={setSelectedChain}
+        />
+      </div>
+      {/* Grid of NFTs*/}
       <div
-        className="container mx-auto px-4 mt-4 grid grid-cols-1  sm:p-0 md:px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
+        className="container mx-auto px-4 mt-2 grid grid-cols-1  sm:p-0 md:px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
         style={{
           opacity: open ? 0.2 : 1,
         }}
@@ -136,7 +173,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                     <img
                       className="h-full w-full object-cover hover:scale-110 transition duration-300 ease-in-out"
                       src={convertIpfsUrl(nft.imageUrl)}
-                      alt="NFT image"
+                      alt={nft.name || "NFT"}
                     />
                     <span className="absolute z-20 bg-transparent bottom-1 right-1  mr-2 mb-2 p-2 rounded-full hover:bg-gray-700 hover:bg-opacity-75">
                       <IoMdQrScanner
@@ -150,7 +187,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                 <img
                   className="h-full w-full object-cover hover:scale-110 transition duration-300 ease-in-out"
                   src="/blank_nft.png"
-                  alt="NFT image"
+                  alt="NFT not found"
                 />
               )}
             </div>
@@ -225,6 +262,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
           </div>
         ))}
       </div>
+
       {/* Pagination at the bottom */}
       <div className="text-white py-4">
         {totalPages > 1 && (

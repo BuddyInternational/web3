@@ -85,12 +85,17 @@ export default function CardInteractMenus() {
       label: "Use A Buddy Earn TIM",
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
-      videoUrl: "/placeholderVideo.mp4",
+      videoUrl: "https://youtu.be/ym1zJGAW3WE",
     },
     {
       label: "View Reputation",
       onClick: handleOpenModal,
       title: "View Reputation",
+      description: "This feature is coming soon.",
+    },
+    {
+      label: "Order This NFTs Apparel",
+      title: "Order NFTs Apparel",
       description: "This feature is coming soon.",
     },
   ];
