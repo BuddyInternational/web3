@@ -75,12 +75,11 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                 style={{
                   width:"100%",
                   height: "100%",
+                  minHeight: "400px",
                   objectFit: "cover",
                   borderRadius: "8px",
                   boxShadow: "0px 4px 12px rgba(0,0,0,01)",
                 }}
-                width="100%"
-                height="100%"
                 controls={true}
                 url={modalContents.videoUrl}
                 loop={true}
