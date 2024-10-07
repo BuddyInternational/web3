@@ -6,7 +6,7 @@ import { ethers, Contract } from "ethers";
 import Web3 from "web3";
 import { NFTData } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
-import NftCard from "../components/homeComponents/cards/NftCard";
+import NftCard from "../components/homeComponents/card/NftCard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
 import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
@@ -106,7 +106,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [isConnected,address, vanityAddress]);
+  }, [isConnected, address, vanityAddress]);
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
@@ -301,7 +301,7 @@ const Home = () => {
 
       {/* divider */}
       <div className="">
-      <hr className="container m-auto sm:border sm:border-t-2 sm:border-gray-600 sm:w-full sm:my-2 sm:m-auto md:w-full md:my-4" />
+        <hr className="container m-auto sm:border sm:border-t-2 sm:border-gray-600 sm:w-full sm:my-2 sm:m-auto md:w-full md:my-4" />
       </div>
 
       {/* NFT cards */}

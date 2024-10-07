@@ -5,6 +5,7 @@ import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InteractMenuModals from "../modals/InteractMenuModals";
+import OrderNFTApparel from "../content/OrderNFTApparel";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -57,7 +58,8 @@ export default function CardInteractMenus() {
     title: string;
     description: string;
     videoUrl: string;
-  }>({ title: "", description: "", videoUrl: "" });
+    content: any;
+  }>({ title: "", description: "", videoUrl: "" ,content:""});
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -68,9 +70,10 @@ export default function CardInteractMenus() {
   const handleOpenModal = (
     title: string,
     description: string,
-    videoUrl: string
+    videoUrl: string,
+    content: any
   ) => {
-    setModalContent({ title, description, videoUrl });
+    setModalContent({ title, description, videoUrl ,content});
     setOpenModal(true);
     setAnchorEl(null);
   };
@@ -95,8 +98,9 @@ export default function CardInteractMenus() {
     },
     {
       label: "Order This NFTs Apparel",
-      title: "Order NFTs Apparel",
-      description: "This feature is coming soon.",
+      onClick: handleOpenModal,
+      title: "Gully Buddy Retail Ambassador Apparels",
+      content: <OrderNFTApparel />
     },
   ];
 
@@ -128,7 +132,7 @@ export default function CardInteractMenus() {
             <MenuItem
               key={index}
               onClick={() =>
-                handleOpenModal(item.title, item.description!, item.videoUrl!)
+                handleOpenModal(item.title, item.description!, item.videoUrl!,item.content)
               }
             >
               {item.label}

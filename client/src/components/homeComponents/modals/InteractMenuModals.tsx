@@ -86,7 +86,10 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                 loop={true}
                 playing={true}
               />
-            ) : (
+            ) :  modalContents.content ? (
+              // Render custom content if available
+              modalContents.content
+            ):(
               <Typography
                 variant="h6"
                 sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}

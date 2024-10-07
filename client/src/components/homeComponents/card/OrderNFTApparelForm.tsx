@@ -3,9 +3,9 @@ import { MdKeyboardBackspace } from "react-icons/md";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import CommonJotform from "../../../utils/CommonJotform";
 
-const form1Url = process.env.REACT_APP_JOTFORM1_LINK;
+const form3Url = process.env.REACT_APP_JOTFORM3_LINK;
 
-const EndorseeQuestForm = () => {
+const OrderNFTApparelForm = () => {
   const { address } = useWeb3ModalAccount();
 
   return (
@@ -16,10 +16,10 @@ const EndorseeQuestForm = () => {
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
-      <CommonJotform formUrl={form1Url!} defaults={{ walletAddress: address || "" }}/>
+      <CommonJotform formUrl={form3Url!} defaults={{ walletAddress: address || "" }}/>
 
     </div>
   );
 };
 
-export default EndorseeQuestForm;
+export default OrderNFTApparelForm;
