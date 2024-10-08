@@ -1,4 +1,4 @@
-import { Button, Skeleton } from "@mui/material";
+import { Box, Button, Skeleton } from "@mui/material";
 import {
   createWeb3Modal,
   defaultConfig,
@@ -13,50 +13,47 @@ import {
 } from "../../api/vanityAPI";
 import { useVanityContext } from "../../context/VanityContext";
 
-// Type for chain information
-interface Chain {
-  chainId: number;
-  name: string;
-  currency: string;
-  explorerUrl: string;
-  rpcUrl: string;
-}
-
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
 
 // 2. Set chains
-const mainnet: Chain = {
-  chainId: 1,
-  name: "Ethereum",
-  currency: "ETH",
-  explorerUrl: "https://etherscan.io",
-  rpcUrl: "https://cloudflare-eth.com",
-};
-
-const polygon: Chain = {
-  chainId: 137,
-  name: "Polygon",
-  currency: "Matic",
-  explorerUrl: "https://polygonscan.com/",
-  rpcUrl: "https://polygon-rpc.com/",
-};
-
-const arbitrum: Chain = {
-  chainId: 42161,
-  name: "Arbitrum One",
-  currency: "ETH",
-  explorerUrl: "https://arbiscan.io/",
-  rpcUrl: "https://arb1.arbitrum.io/rpc",
-};
-
-const sepolia: Chain = {
-  chainId: 11155111,
-  name: "Sepolia Testnet",
-  currency: "SepoliaETH",
-  explorerUrl: "https://sepolia.etherscan.io",
-  rpcUrl: "https://sepolia.infura.io/v3/",
-};
+const chains = [
+  {
+    chainId: 1,
+    name: "Ethereum",
+    currency: "ETH",
+    explorerUrl: "https://etherscan.io",
+    rpcUrl: "https://cloudflare-eth.com",
+  },
+  {
+    chainId: 137,
+    name: "Polygon",
+    currency: "Matic",
+    explorerUrl: "https://polygonscan.com/",
+    rpcUrl: "https://polygon-rpc.com/",
+  },
+  {
+    chainId: 42161,
+    name: "Arbitrum One",
+    currency: "ETH",
+    explorerUrl: "https://arbiscan.io/",
+    rpcUrl: "https://arb1.arbitrum.io/rpc",
+  },
+  {
+    chainId: 11155111,
+    name: "Sepolia Testnet",
+    currency: "SepoliaETH",
+    explorerUrl: "https://sepolia.etherscan.io",
+    rpcUrl: "https://sepolia.infura.io/v3/",
+  },
+  {
+    chainId: 31337,
+    name: "Localhost",
+    currency: "HETH",
+    explorerUrl: "",
+    rpcUrl: "http://localhost:8545",
+  },
+];
 
 // 3. Create a metadata object
 const metadata = {
@@ -88,7 +85,7 @@ const ethersConfig = defaultConfig({
 // 5. Create a AppKit instance
 createWeb3Modal({
   ethersConfig,
-  chains: [mainnet, polygon, arbitrum, sepolia],
+  chains,
   projectId,
   enableAnalytics: true, // Optional - defaults to your Cloud configuration
 });
@@ -129,7 +126,7 @@ export default function App() {
     };
 
     handleWalletConnect();
-  }, [isConnected, address, vanityAddress,setVanityAddress]);
+  }, [isConnected, address, vanityAddress, setVanityAddress]);
 
   return (
     <>
@@ -186,20 +183,30 @@ export default function App() {
           {!isConnected ? (
             <w3m-button />
           ) : (
-            <Button
-              variant="contained"
-              onClick={() => {
-                setVanityAddress("0x0000000000000000000000000000000000000000");
-                disconnect();
-              }}
+            <Box
               sx={{
-                borderRadius: "22px",
-                textTransform: "capitalize",
-                background: "#5773FF",
+                display: "flex",
+                gap: 2,
               }}
             >
-              Disconnect Wallet
-            </Button>
+              <w3m-network-button />
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setVanityAddress(
+                    "0x0000000000000000000000000000000000000000"
+                  );
+                  disconnect();
+                }}
+                sx={{
+                  borderRadius: "22px",
+                  textTransform: "capitalize",
+                  background: "#5773FF",
+                }}
+              >
+                Disconnect Wallet
+              </Button>
+            </Box>
           )}
         </div>
       </div>
