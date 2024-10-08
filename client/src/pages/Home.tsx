@@ -10,6 +10,8 @@ import NftCard from "../components/homeComponents/card/NftCard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
 import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
+import { FiArrowRightCircle } from "react-icons/fi";
+import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -38,6 +40,7 @@ const Home = () => {
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
+  const [openMeetingRoomModal, setOpenMeetingRoomModal] = useState(false);
   const { vanityAddress } = useVanityContext();
 
   // Handle Modal
@@ -304,6 +307,15 @@ const Home = () => {
         <hr className="container m-auto sm:border sm:border-t-2 sm:border-gray-600 sm:w-full sm:my-2 sm:m-auto md:w-full md:my-4" />
       </div>
 
+      {/* arrow icon */}
+
+      <div className="container m-auto flex justify-end py-2 px-4">
+        <FiArrowRightCircle
+          className="text-white text-3xl mx-6 hover:text-gray-400 cursor-pointer"
+          onClick={handleOpenModal(setOpenMeetingRoomModal)}
+        />
+      </div>
+
       {/* NFT cards */}
       <div className="mt-3">
         <NftCard NFTDetails={NFTdata} />
@@ -325,6 +337,16 @@ const Home = () => {
           <CDEReward
             open={openCDERewardModal}
             onClose={handleCloseModal(setOpenCDERewardModal)}
+          />
+        </>
+      )}
+
+      {/* Meeting Room Modal */}
+      {openMeetingRoomModal && (
+        <>
+          <MeetingRoom
+            open={openMeetingRoomModal}
+            onClose={handleCloseModal(setOpenMeetingRoomModal)}
           />
         </>
       )}
