@@ -6,6 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InteractMenuModals from "../modals/InteractMenuModals";
 import OrderNFTApparel from "../content/OrderNFTApparel";
+import { NFTData } from "../../../utils/Types";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -50,7 +51,7 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-export default function CardInteractMenus() {
+const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -59,7 +60,8 @@ export default function CardInteractMenus() {
     description: string;
     videoUrl: string;
     content: any;
-  }>({ title: "", description: "", videoUrl: "" ,content:""});
+    nftDetail: NFTData;
+  }>({ title: "", description: "", videoUrl: "" ,content:"",nftDetail:{}});
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -71,9 +73,10 @@ export default function CardInteractMenus() {
     title: string,
     description: string,
     videoUrl: string,
-    content: any
+    content: any,
+    nftDetail: NFTData
   ) => {
-    setModalContent({ title, description, videoUrl ,content});
+    setModalContent({ title, description, videoUrl ,content,nftDetail});
     setOpenModal(true);
     setAnchorEl(null);
   };
@@ -89,6 +92,7 @@ export default function CardInteractMenus() {
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
       videoUrl: "https://youtu.be/ym1zJGAW3WE",
+      nftDetail: nftData,
     },
     {
       label: "View Reputation",
@@ -132,7 +136,7 @@ export default function CardInteractMenus() {
             <MenuItem
               key={index}
               onClick={() =>
-                handleOpenModal(item.title, item.description!, item.videoUrl!,item.content)
+                handleOpenModal(item.title, item.description!, item.videoUrl!,item.content,item.nftDetail || {})
               }
             >
               {item.label}
@@ -149,3 +153,4 @@ export default function CardInteractMenus() {
     </div>
   );
 }
+export default CardInteractMenus;

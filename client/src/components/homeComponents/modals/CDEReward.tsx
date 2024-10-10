@@ -10,8 +10,10 @@ import {
   Button,
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../../context/VanityContext";
+import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import { ethers } from "ethers";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -19,6 +21,9 @@ const CDEReward: React.FC<{
 }> = ({ open, onClose }) => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
+  const { walletProvider } = useWeb3ModalProvider();
+  const nftMarketContractAddress: string | undefined =
+    process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
     vanityAddress: vanityAddress,
@@ -33,9 +38,47 @@ const CDEReward: React.FC<{
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submitted values:", inputValues);
+    if (typeof window.ethereum === "undefined") {
+      console.error(
+        "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
+      );
+      return;
+    }
+    const ethersProvider = new ethers.BrowserProvider(
+      walletProvider as ethers.Eip1193Provider
+    );
+    const signer = await ethersProvider.getSigner();
+    console.log("signer-------------",signer);
+    const nftMarketContract = new ethers.Contract(
+      nftMarketContractAddress!,
+      nftMarketAbi.abi,
+      signer
+    );
+    try {
+      // Convert the price from Ether to Wei
+      const amountInEther = inputValues?.amount;
+      if (typeof amountInEther === "string") {
+        const amountInWei = ethers.parseEther(amountInEther);
+        console.log("amountInWei-----------", amountInWei);
+
+        const tx = await nftMarketContract.transferEthAndGetTestCDE(
+          amountInWei,
+          vanityAddress,{
+            value: 0, // Pass the Ether amount
+        }
+        );
+        console.log("Transaction sent:", tx);
+        // Wait for the transaction to be confirmed
+        await tx.wait();
+        console.log("Transaction confirmed:", tx.hash);
+      }
+      
+    } catch (error) {
+      console.error("Error executing transaction:", error);
+    }
     onClose();
   };
 

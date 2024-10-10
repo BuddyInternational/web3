@@ -47,6 +47,13 @@ const chains = [
     rpcUrl: "https://sepolia.infura.io/v3/",
   },
   {
+    chainId: 80002,
+    name: "POLYGON AMOY TESTNET",
+    currency: "MATIC",
+    explorerUrl: "https://www.oklink.com/amoy",
+    rpcUrl: "https://rpc-amoy.polygon.technology/",
+  },
+  {
     chainId: 31337,
     name: "Localhost",
     currency: "HETH",

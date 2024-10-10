@@ -257,7 +257,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
               </div>
             </div>
             <div className="flex justify-end items-end mt-auto mr-2 mb-2">
-              <CardInteractMenus />
+              <CardInteractMenus nftData={nft}/>
             </div>
           </div>
         ))}

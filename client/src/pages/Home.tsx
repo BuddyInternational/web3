@@ -18,6 +18,7 @@ const tokenAddresses: any = {
   CDE1: process.env.REACT_APP_TOKEN1_ADDRESS,
   CDE2: process.env.REACT_APP_TOKEN2_ADDRESS,
   TIM: process.env.REACT_APP_TOKEN3_ADDRESS,
+  TestCDE: process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS,
 };
 
 // API KEY
@@ -33,9 +34,10 @@ const testWalletAddress: string = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
+  console.log("address----------",address);
   const [balances, setBalances] = useState<any>({
     wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-    vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
+    vanity: { CDE1: 0, CDE2: 0, TIM: 0 ,TestCDE: 0},
   });
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
@@ -66,7 +68,7 @@ const Home = () => {
       if (!isConnected && !address && !vanityAddress) {
         setBalances({
           wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-          vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
+          vanity: { CDE1: 0, CDE2: 0, TIM: 0 ,TestCDE: 0},
         });
         return;
       }
@@ -104,6 +106,7 @@ const Home = () => {
           CDE1: Number(formattedVanityBalances[0]),
           CDE2: Number(formattedVanityBalances[1]),
           TIM: Number(formattedVanityBalances[2]),
+          TestCDE: Number(formattedVanityBalances[3]),
         },
       });
     } catch (error) {
@@ -118,10 +121,15 @@ const Home = () => {
         await Moralis.start({ apiKey: api_key });
       }
       const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
+      // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
+      // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
+      // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // polygon amoy
       const chains = [
         { chain: "0x1", name: "Ethereum" },
         { chain: "0x89", name: "Polygon" },
         { chain: "0xa4b1", name: "Arbitrum" },
+        { chain: "0xaa36a7", name: "Sepolia" },
+        { chain: "0x13882", name: "Polygon Amoy" },
       ];
 
       const nftPromises = chains.map((chain) =>
@@ -132,7 +140,7 @@ const Home = () => {
             mediaItems: true,
             normalizeMetadata: true,
             limit: 5,
-            address: testWalletAddressNFT,
+            address:testWalletAddressNFT,
           })
           .then((res) =>
             res.raw.result.map((nft: any) => ({
