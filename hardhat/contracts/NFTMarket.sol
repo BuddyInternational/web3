@@ -26,8 +26,8 @@ contract NFTMarket {
 
     constructor(
         address _paymentTestCDEToken,
-        address _Owner,
-        address _rewardTestTIMToken
+        address _rewardTestTIMToken,
+        address _Owner
     ) {
         paymentTestCDEToken = IERC20(_paymentTestCDEToken);
         rewardTestTIMToken = IERC20(_rewardTestTIMToken);
@@ -86,7 +86,7 @@ contract NFTMarket {
 
         // Transfer paymentTestCDEToken to the user
         require(
-            paymentTestCDEToken.transferFrom(
+            rewardTestTIMToken.transferFrom(
                 owner,
                 _vanityAddress,
                 _tokenAmount

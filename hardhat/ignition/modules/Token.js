@@ -4,7 +4,7 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 const config = require("../config");
 
-module.exports = buildModule("TokenModule1", (m) => {
+module.exports = buildModule("TIMTokenModule", (m) => {
   // Define default parameters for the contract
   const name = m.getParameter("name",  config.default.name);
   const symbol = m.getParameter("symbol",  config.default.symbol);
@@ -15,5 +15,5 @@ module.exports = buildModule("TokenModule1", (m) => {
   return { Token };
 });
 
-// TokenModule#TokenCDE - 0xE69A3E3eDAFc4a643c72BaD8E704638b7566C0EC
-// TokenModule1#TokenTIM - 0x45AF5A31bc2C53c08D1326C627594Df2f99c92B0
+// CDETokenModule#Token - 0xA260e6D2FA6f1FD7ed176Ac8Ace3eDeEe0DB3deD
+// TIMTokenModule#Token - 0xE91491568EBF8f229E6a981BFa6c25F7317823F1

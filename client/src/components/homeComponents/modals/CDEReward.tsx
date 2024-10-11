@@ -24,6 +24,7 @@ const CDEReward: React.FC<{
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
+    const [loading, setLoading] = useState(false);
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
     vanityAddress: vanityAddress,
@@ -38,13 +39,16 @@ const CDEReward: React.FC<{
     }));
   };
 
+    // Handle submit
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+   
     console.log("Submitted values:", inputValues);
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
+      setLoading(false);
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
@@ -57,6 +61,7 @@ const CDEReward: React.FC<{
       nftMarketAbi.abi,
       signer
     );
+    setLoading(true);
     try {
       // Convert the price from Ether to Wei
       const amountInEther = inputValues?.amount;
@@ -65,7 +70,7 @@ const CDEReward: React.FC<{
         console.log("amountInWei-----------", amountInWei);
 
         const tx = await nftMarketContract.transferEthAndGetTestCDE(
-          amountInWei,
+          amountInEther,
           vanityAddress,{
             value: 0, // Pass the Ether amount
         }
@@ -78,11 +83,14 @@ const CDEReward: React.FC<{
       
     } catch (error) {
       console.error("Error executing transaction:", error);
+    }finally {
+      setLoading(false); 
+      onClose();
     }
-    onClose();
   };
 
   return (
+    <>
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
         <Box
@@ -167,9 +175,15 @@ const CDEReward: React.FC<{
               </Box>
             </form>
           </DialogContent>
+        {loading && (
+     <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-10 z-50">
+     <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-12 h-12 animate-spin"></div>
+   </div>
+      )}
         </Box>
       </Fade>
     </Modal>
+    </>
   );
 };
 

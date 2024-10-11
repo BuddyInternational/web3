@@ -12,18 +12,21 @@ import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
 import { FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
+import testCDETokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
 
 // Constant Token address
 const tokenAddresses: any = {
   CDE1: process.env.REACT_APP_TOKEN1_ADDRESS,
   CDE2: process.env.REACT_APP_TOKEN2_ADDRESS,
   TIM: process.env.REACT_APP_TOKEN3_ADDRESS,
-  TestCDE: process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS,
 };
+const TestCDEAddress: any =
+  process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS;
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
+const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 
 // Another links
 const sponsorshipURL: any = process.env.REACT_APP_SPONSORSHIP_LINK;
@@ -34,11 +37,12 @@ const testWalletAddress: string = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
-  console.log("address----------",address);
+  console.log("address----------", address);
   const [balances, setBalances] = useState<any>({
     wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-    vanity: { CDE1: 0, CDE2: 0, TIM: 0 ,TestCDE: 0},
+    vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
   });
+  const [testCDEBalance, setTestCDEBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
@@ -68,8 +72,9 @@ const Home = () => {
       if (!isConnected && !address && !vanityAddress) {
         setBalances({
           wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-          vanity: { CDE1: 0, CDE2: 0, TIM: 0 ,TestCDE: 0},
+          vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
         });
+        setTestCDEBalance(0);
         return;
       }
 
@@ -78,10 +83,19 @@ const Home = () => {
         (token) => new Contract(tokenAddresses[token], ERC20ABI, provider)
       );
 
+      const testCDEProvider = new ethers.JsonRpcProvider(sepolia_rpc_url);
+      const testCDETokenContract = new Contract(
+        TestCDEAddress,
+        testCDETokenAbi.abi,
+        testCDEProvider
+      );
+
       // wallet address balance
       const walletbalances = await Promise.all(
         tokenContracts.map((contract) => contract.balanceOf(testWalletAddress))
       );
+
+      console.log("walletbalances--------------", walletbalances);
 
       const formattedWalletBalances = walletbalances.map((balance) =>
         Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
@@ -92,9 +106,19 @@ const Home = () => {
         tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
       );
 
+      console.log("vanitybalances---------", vanitybalances);
+
       const formattedVanityBalances = vanitybalances.map((balance) =>
         Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
       );
+
+      // test CDE address balance
+      const testCDETokenBalance = await testCDETokenContract.balanceOf(
+        vanityAddress
+      );
+      const formattedTestCDEBalance = Number(
+        Web3.utils.fromWei(testCDETokenBalance, "wei")
+      ).toFixed(4);
 
       setBalances({
         wallet: {
@@ -106,9 +130,9 @@ const Home = () => {
           CDE1: Number(formattedVanityBalances[0]),
           CDE2: Number(formattedVanityBalances[1]),
           TIM: Number(formattedVanityBalances[2]),
-          TestCDE: Number(formattedVanityBalances[3]),
         },
       });
+      setTestCDEBalance(Number(formattedTestCDEBalance));
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
@@ -140,7 +164,7 @@ const Home = () => {
             mediaItems: true,
             normalizeMetadata: true,
             limit: 5,
-            address:testWalletAddressNFT,
+            address: testWalletAddressNFT,
           })
           .then((res) =>
             res.raw.result.map((nft: any) => ({
@@ -306,6 +330,14 @@ const Home = () => {
                 </span>
               </div>
             ))}
+            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+            <span className="text-[#5692D9] mr-2">
+                 Test CDE Token Balance:
+                </span>{" "}
+                <span>
+                  {testCDEBalance} TCDE
+                </span>
+            </div>
           </div>
         </div>
       </div>

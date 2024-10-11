@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InteractMenuModals from "../modals/InteractMenuModals";
 import OrderNFTApparel from "../content/OrderNFTApparel";
-import { NFTData } from "../../../utils/Types";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -51,7 +50,7 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
+const CardInteractMenus = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -60,8 +59,7 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
     description: string;
     videoUrl: string;
     content: any;
-    nftDetail: NFTData;
-  }>({ title: "", description: "", videoUrl: "" ,content:"",nftDetail:{}});
+  }>({ title: "", description: "", videoUrl: "", content: "" });
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -73,10 +71,9 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
     title: string,
     description: string,
     videoUrl: string,
-    content: any,
-    nftDetail: NFTData
+    content: any
   ) => {
-    setModalContent({ title, description, videoUrl ,content,nftDetail});
+    setModalContent({ title, description, videoUrl, content });
     setOpenModal(true);
     setAnchorEl(null);
   };
@@ -92,7 +89,6 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
       videoUrl: "https://youtu.be/ym1zJGAW3WE",
-      nftDetail: nftData,
     },
     {
       label: "View Reputation",
@@ -104,7 +100,7 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
       label: "Order This NFTs Apparel",
       onClick: handleOpenModal,
       title: "Gully Buddy Retail Ambassador Apparels",
-      content: <OrderNFTApparel />
+      content: <OrderNFTApparel />,
     },
   ];
 
@@ -136,7 +132,12 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
             <MenuItem
               key={index}
               onClick={() =>
-                handleOpenModal(item.title, item.description!, item.videoUrl!,item.content,item.nftDetail || {})
+                handleOpenModal(
+                  item.title,
+                  item.description!,
+                  item.videoUrl!,
+                  item.content
+                )
               }
             >
               {item.label}
@@ -152,5 +153,5 @@ const CardInteractMenus:React.FC<{nftData:NFTData}> = ({nftData}) => {
       />
     </div>
   );
-}
+};
 export default CardInteractMenus;

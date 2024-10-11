@@ -6,9 +6,9 @@ const config = require("../config");
 
 module.exports = buildModule("NFTMarketModule", (m) => {
   // Define default parameters for the contract
-  const owner = m.getParameter("owner",  config.default.tokenOwnerAddress);
   const paymentTestCDEToken = m.getParameter("paymentTestCDEToken",  config.default.paymentTestCDEToken);
   const rewardTesrTIMToken = m.getParameter("rewardTestTIMToken",  config.default.rewardTestTIMToken);
+  const owner = m.getParameter("owner",  config.default.tokenOwnerAddress);
 
   // Deploy the NFTMarket contract
   const nftMarket = m.contract("NFTMarket", [paymentTestCDEToken,rewardTesrTIMToken,owner]);
@@ -16,4 +16,4 @@ module.exports = buildModule("NFTMarketModule", (m) => {
   return { nftMarket };
 });
 
-// NFTMarketModule#NFTMarket - 0xdcD5eC1cd8d5a35C8aeD722d66b768eCd01bd6dC
+// NFTMarketModule#NFTMarket - 0x5E1c643C9E88Bf77679254A84A31C020b0CE7C18
