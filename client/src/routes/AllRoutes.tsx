@@ -5,6 +5,7 @@ import Form2 from "../components/EndorseeQuestComponents/forms/Form2";
 import EndorseeQuest from "../pages/EndorseeQuestReport";
 import PageNotFound from "../utils/PageNotFound";
 import OrderNFTApparelForm from "../components/homeComponents/card/OrderNFTApparelForm";
+import NotFound from "../utils/NotFound";
 
 const AllRoutes = () => {
   return (
@@ -20,7 +21,8 @@ const AllRoutes = () => {
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           {/* Add 404 page */}
-          <Route path="*" element={<PageNotFound />} />
+          {/* <Route path="*" element={<PageNotFound />} /> */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </>

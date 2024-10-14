@@ -13,6 +13,10 @@ import { useVanityContext } from "../context/VanityContext";
 import { FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
 import testCDETokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
+import Leadership from "../components/homeComponents/modals/Leadership";
+import { FaEthereum } from "react-icons/fa";
+import { Tooltip } from "@mui/material";
+import { SiPolygon } from "react-icons/si";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -46,6 +50,7 @@ const Home = () => {
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
+  const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
   const [openMeetingRoomModal, setOpenMeetingRoomModal] = useState(false);
   const { vanityAddress } = useVanityContext();
 
@@ -92,7 +97,7 @@ const Home = () => {
 
       // wallet address balance
       const walletbalances = await Promise.all(
-        tokenContracts.map((contract) => contract.balanceOf(testWalletAddress))
+        tokenContracts.map((contract) => contract.balanceOf(address))
       );
 
       console.log("walletbalances--------------", walletbalances);
@@ -245,7 +250,7 @@ const Home = () => {
               Jotform 2
             </Link>
             <Link
-              to="/#"
+              to="/jotform2"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
               Sponsorship/Endorsements
@@ -253,12 +258,7 @@ const Home = () => {
             <Link
               to="/#"
               className="hover:text-[#5692D9] cursor-pointer underline"
-            >
-              Purchase Token
-            </Link>
-            <Link
-              to="/#"
-              className="hover:text-[#5692D9] cursor-pointer underline"
+              onClick={handleOpenModal(setOpenLeadershipModal)}
             >
               Leadership/Ranking
             </Link>
@@ -267,13 +267,19 @@ const Home = () => {
               className="hover:text-[#5692D9] cursor-pointer underline"
               onClick={handleOpenModal(setOpenCDERewardModal)}
             >
-              Click Here To Wrap CDE For Rewards (version 1.1)
+              Wrap Your CDE & TIM Token
             </Link>
             <Link
               to={`/quest/completed/${address}`}
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
               Get Your Endorsee Quest Response
+            </Link>
+            <Link
+              to="/#"
+              className="hover:text-[#5692D9] cursor-pointer underline"
+            >
+              How to Withdraw ?
             </Link>
             {/* divider */}
             <div>
@@ -283,22 +289,56 @@ const Home = () => {
         </div>
 
         {/* Last section : Total valuation */}
-        <div className="flex flex-col gap-4 text-md font-normal w-full md:w-1/4 sm:text-center md:text-left">
+        <div className="flex flex-col sm:gap-4 md:gap-4 lg:gap-6 text-md font-normal w-full md:w-1/4 sm:text-center md:text-left">
           <div className="text-white flex gap-1">
             <span className="text-blue-400 mr-2">Total Value :</span>{" "}
             <span>{calculateTotalNFTValue()} USD</span>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="lg:m-0 xl:m-auto mb-2 flex flex-col">
-              <span className="text-md font-sans text-blue-400 font-bold">
+            <div className="md:mb-0 lg:mb-2 flex flex-col">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3">
                 Wallet Address Balance
+                {/* Etherscan Link */}
+                <Tooltip title="View on Etherscan" arrow>
+                    <a
+                      href={`https://etherscan.io/address/${address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Etherscan"
+                    >
+                      <img
+                        src="/etherscan.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
+                  {/* Polygonscan Link */}
+                  <Tooltip title="View on Polygonscan" arrow>
+                    <a
+                      href={`https://polygonscan.com/address/${address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Polygonscan"
+                    >
+                      <img
+                        src="/polygon.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
               </span>
-              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-1/2 sm:m-auto md:w-full md:my-2" />
+              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
             {Object.keys(balances.wallet).map((token, idx) => (
               <div
                 key={idx}
-                className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
               >
                 <span className="text-[#5692D9] mr-2">
                   {token} Token Balance:
@@ -311,16 +351,50 @@ const Home = () => {
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
-            <div className="lg:m-0 xl:m-auto mb-2 flex flex-col">
-              <span className="text-md font-sans text-blue-400 font-bold">
+            <div className="md:mb-0 lg:mb-2 flex flex-col">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3">
                 Vanity Address Balance
+                {/* Etherscan Link */}
+                <Tooltip title="View on Etherscan" arrow>
+                    <a
+                      href={`https://etherscan.io/address/${vanityAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Etherscan"
+                    >
+                      <img
+                        src="/etherscan.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
+                  {/* Polygonscan Link */}
+                  <Tooltip title="View on Polygonscan" arrow>
+                    <a
+                      href={`https://polygonscan.com/address/${vanityAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Polygonscan"
+                    >
+                      <img
+                        src="/polygon.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
               </span>
-              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-1/2 sm:m-auto md:w-full md:my-2" />
+              <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
             {Object.keys(balances.vanity).map((token, idx) => (
               <div
                 key={idx}
-                className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
               >
                 <span className="text-[#5692D9] mr-2">
                   {token} Token Balance:
@@ -330,13 +404,11 @@ const Home = () => {
                 </span>
               </div>
             ))}
-            <div className="text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-            <span className="text-[#5692D9] mr-2">
-                 Test CDE Token Balance:
-                </span>{" "}
-                <span>
-                  {testCDEBalance} TCDE
-                </span>
+            <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">
+                Test CDE Token Balance:
+              </span>{" "}
+              <span>{testCDEBalance} TCDE</span>
             </div>
           </div>
         </div>
@@ -387,6 +459,16 @@ const Home = () => {
           <MeetingRoom
             open={openMeetingRoomModal}
             onClose={handleCloseModal(setOpenMeetingRoomModal)}
+          />
+        </>
+      )}
+
+      {/* Leadership Modal */}
+      {openLeadershipModal && (
+        <>
+          <Leadership
+            open={openLeadershipModal}
+            onClose={handleCloseModal(setOpenLeadershipModal)}
           />
         </>
       )}

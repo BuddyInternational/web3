@@ -2,71 +2,66 @@ import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <div className="bg-gray-700 mt-2 flex flex-col md:flex-row justify-between items-center p-4">
-      {/* GIF container */}
-      <div className="w-full md:w-1/3 lg:w-1/5 flex-shrink-0 p-1 flex justify-center">
-        <img
-          src="/footer.gif"
-          alt="Giphy"
-          className=" w-full h-auto max-h-28 object-cover"
-        />
-      </div>
-      <div className="flex flex-col gap-5 mx-6">
-        {/* Footer content  */}
-        <p className="text-gray-300 text-sm">
-          This does not serve as investment advice, nor does it represent an
-          invitation or endorsement to participate in any cryptocurrency
-          transactions. Investing in crypto assets involves the risk of losing
-          all or part of your investment, along with the possibility of
-          considerable price fluctuations, which may not be suitable for
-          individual investors. Historical financial results do not assure
-          future outcomes. Only invest what you can afford to lose. For further
-          information on the associated risks, please refer to the provided
-          link.
-        </p>
+    <footer className="bg-[#00000044] text-white py-8">
+      <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+        {/* GIF Container */}
+        <div className="flex-shrink-0 w-full md:w-1/4 lg:w-1/5 mb-6 md:mb-0 flex justify-center">
+          <img
+            src="/footer.gif"
+            alt="Footer Animation"
+            className="rounded-xl shadow-xl w-full h-auto max-h-32 object-cover cursor-pointer transition-transform duration-300 transform hover:scale-110"
+          />
+        </div>
+
+        {/* Footer Text Content */}
+        <div className="text-center md:text-left flex-1 md:px-8">
+          <p className="text-sm leading-relaxed opacity-90">
+            {/* <span className="font-semibold text-lg">Important:</span>  */}
+            This does not serve as investment advice, nor does it represent an
+            invitation or endorsement to participate in any cryptocurrency
+            transactions. Investing in crypto assets involves the risk of losing
+            all or part of your investment. Only invest what you can afford to
+            lose. For more information, please refer to the provided link.
+          </p>
+        </div>
 
         {/* Links Container */}
-        <div className="flex flex-col md:flex-row items-center justify-end text-white mt-4 md:mt-0">
-          <div className="flex flex-wrap justify-center md:justify-start">
-            <a
-              href="/privacy-policy.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline hover:text-blue-500 mx-2 mb-2"
-            >
-              Terms of Use
-            </a>
-            <span className="text-gray-400">|</span>
-            <a
-             href="/privacy-policy.pdf"
-             target="_blank"
-             rel="noopener noreferrer"
-              className="hover:underline hover:text-blue-500 mx-2 mb-2"
-            >
-              Copyright
-            </a>
-            <span className="text-gray-400">|</span>
-            <a
-              href="/privacy-policy.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline hover:text-blue-500 mx-2 mb-2"
-            >
-              Feedback
-            </a>
-            <span className="text-gray-400">|</span>
-            <a
-              href="/privacy-policy.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline hover:text-blue-500 mx-2 mb-2"
-            >
-              Support
-            </a>
-          </div>
+        <div className="flex flex-col gap-2 md:gap-4 items-center text-white mt-8 md:mt-0">
+          <a
+            href="/privacy-policy.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
+          >
+            Terms of Use
+          </a>
+          <a
+            href="/privacy-policy.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
+          >
+            Copyright
+          </a>
+          <a
+            href="/privacy-policy.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
+          >
+            Feedback
+          </a>
+          <a
+            href="/privacy-policy.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
+          >
+            Support
+          </a>
         </div>
       </div>
-    </div>
+    </footer>
   );
 };
 

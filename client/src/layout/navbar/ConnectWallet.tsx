@@ -1,4 +1,4 @@
-import { Box, Button, Skeleton } from "@mui/material";
+import { Box, Button, Skeleton, Tooltip } from "@mui/material";
 import {
   createWeb3Modal,
   defaultConfig,
@@ -6,12 +6,13 @@ import {
   useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
-import { FaCheck, FaRegCopy } from "react-icons/fa";
+import { FaCheck, FaRegCopy, FaEthereum } from "react-icons/fa";
 import {
   checkExistingVanityAddress,
   generateAndSaveVanityAddress,
 } from "../../api/vanityAPI";
 import { useVanityContext } from "../../context/VanityContext";
+import { SiPolygon } from "react-icons/si";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -171,12 +172,46 @@ export default function App() {
                             setIsAddressCopied(false);
                           }, 1000);
                         }}
-                        className="text-[#5692D9] font-thin mt-1 "
+                        className="text-[#5692D9] font-thin mt-1 cursor-pointer"
                         data-tip="Copy Vanity Address"
                         data-tip-content=".tooltip"
                       />
                     )}
                   </span>
+                  {/* Etherscan Link */}
+                  <Tooltip title="View on Etherscan" arrow>
+                    <a
+                      href={`https://etherscan.io/address/${vanityAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Etherscan"
+                    >
+                      <img
+                        src="/etherscan.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
+                  {/* Polygonscan Link */}
+                  <Tooltip title="View on Polygonscan" arrow>
+                    <a
+                      href={`https://polygonscan.com/address/${vanityAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1"
+                      data-tip="View on Polygonscan"
+                    >
+                      <img
+                        src="/polygon.svg"
+                        alt=""
+                        height={"auto"}
+                        width={"21px"}
+                      />
+                    </a>
+                  </Tooltip>
                 </div>
                 <div>
                   <hr className="border-t border-gray-600 w-full mt-2" />

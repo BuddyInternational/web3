@@ -238,7 +238,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
                       <span className=" flex flex-col gap-2">
                         <p className="">
                           {Number(nft?.floorPrice).toFixed(4)}{" "}
-                          {nft?.priceCurrency}
+                          {nft?.priceCurrency} ETH
                         </p>
                         <p className="">
                           {Number(nft?.floorPriceUsd).toFixed(2)} USD
