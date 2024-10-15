@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Fade,
@@ -27,7 +27,8 @@ const CDEReward: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-  const { address } = useWeb3ModalAccount();
+  const { address,chainId } = useWeb3ModalAccount();
+  console.log("chainId========",chainId);
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
@@ -43,6 +44,25 @@ const CDEReward: React.FC<{
     receiver: "walletAddress", // Default receiver
   });
 
+  // Mapping chainId to chain names
+  const chainMapping:any = {
+    1: "Ethereum",     
+    137: "Polygon",     
+    42161: "Arbitrum",  
+    11155111: "Sepolia" 
+  };
+
+  useEffect(() => {
+    if (chainId) {
+      const selectedChain = chainMapping[chainId] || "Ethereum"; 
+      setInputValues(prevValues => ({
+        ...prevValues,
+        selectedChain,
+      }));
+    }
+  }, [chainId]);
+
+
   // Updated handleChange function
   const handleChange = (
     e:
@@ -55,6 +75,7 @@ const CDEReward: React.FC<{
       [name!]: value,
     }));
   };
+
   // Calculate discount
   const getDiscountText = () => {
     const { receiver, selectedToken } = inputValues;
@@ -66,10 +87,10 @@ const CDEReward: React.FC<{
   };
 
   // Determine the text color based on the receiver
-const getDiscountColor = () => {
-  const { receiver } = inputValues;
-  return receiver === "vanityAddress" ? "green" : "red";
-};
+  const getDiscountColor = () => {
+    const { receiver } = inputValues;
+    return receiver === "vanityAddress" ? "green" : "red";
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -96,11 +117,11 @@ const getDiscountColor = () => {
     try {
       // Convert the price from Ether to Wei
       const amountInEther = inputValues?.amount;
-      console.log("amountInEther--------",amountInEther);
+      console.log("amountInEther--------", amountInEther);
       const tokenType = inputValues?.selectedToken;
-      console.log("tokenType---------",tokenType);
+      console.log("tokenType---------", tokenType);
       const receiverType = inputValues?.receiver;
-      console.log("receiverType-----------",receiverType);
+      console.log("receiverType-----------", receiverType);
 
       if (typeof amountInEther === "string") {
         const amountInWei = ethers.parseEther(amountInEther);
@@ -128,10 +149,10 @@ const getDiscountColor = () => {
     }
   };
   // Helper function to slice the address
-const formatAddress = (address:any) => {
-  if (!address) return '';
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-};
+  const formatAddress = (address: any) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
     <>
@@ -149,6 +170,7 @@ const formatAddress = (address:any) => {
               overflowY: "auto",
               borderRadius: "8px",
               boxShadow: 3,
+              zIndex: 2000,
               p: 3,
             }}
           >
@@ -176,6 +198,7 @@ const formatAddress = (address:any) => {
               <form onSubmit={handleSubmit}>
                 <Box display="flex" flexDirection="column" gap={6}>
                   {/* Chain Dropdown */}
+                  
                   <FormControl fullWidth variant="outlined">
                     <InputLabel>Chain</InputLabel>
                     <Select
@@ -183,6 +206,8 @@ const formatAddress = (address:any) => {
                       value={inputValues.selectedChain}
                       onChange={handleChange}
                       label="Chain"
+                      inputProps={{ readOnly: true }} 
+                      disabled
                     >
                       <MenuItem value="Ethereum">Ethereum</MenuItem>
                       <MenuItem value="Polygon">Polygon</MenuItem>
@@ -214,16 +239,24 @@ const formatAddress = (address:any) => {
                       onChange={handleChange}
                       label="Receiver Address"
                     >
-                      <MenuItem value="walletAddress">Your Wallet Address<span className="ml-2">({formatAddress(inputValues.walletAddress)})</span></MenuItem>
-                      <MenuItem value="vanityAddress">Your Vanity Address<span className="ml-2">({formatAddress(inputValues.vanityAddress)})</span></MenuItem>
+                      <MenuItem value="walletAddress">
+                        Your Wallet Address
+                        <span className="ml-2">
+                          ({formatAddress(inputValues.walletAddress)})
+                        </span>
+                      </MenuItem>
+                      <MenuItem value="vanityAddress">
+                        Your Vanity Address
+                        <span className="ml-2">
+                          ({formatAddress(inputValues.vanityAddress)})
+                        </span>
+                      </MenuItem>
                     </Select>
                     {/* Display Discount */}
-                  <Box mt={1} textAlign="left" color={getDiscountColor()}>
-                    {getDiscountText()}
-                  </Box>
+                    <Box mt={1} textAlign="left" color={getDiscountColor()}>
+                      {getDiscountText()}
+                    </Box>
                   </FormControl>
-
-                  
 
                   {/* Amount */}
                   <TextField
