@@ -6,6 +6,7 @@ import EndorseeQuest from "../pages/EndorseeQuestReport";
 import PageNotFound from "../utils/PageNotFound";
 import OrderNFTApparelForm from "../components/homeComponents/card/OrderNFTApparelForm";
 import NotFound from "../utils/NotFound";
+import Shop from "../pages/Shop";
 
 const AllRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AllRoutes = () => {
             element={<EndorseeQuest />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
+          <Route path="/nft/shop" element={<Shop />} />
           {/* Add 404 page */}
           {/* <Route path="*" element={<PageNotFound />} /> */}
           <Route path="*" element={<NotFound />} />

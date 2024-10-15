@@ -10,12 +10,15 @@ import NftCard from "../components/homeComponents/card/NftCard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
 import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
-import { FiArrowRightCircle } from "react-icons/fi";
+import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
 import testCDETokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
 import Leadership from "../components/homeComponents/modals/Leadership";
 import { Tooltip } from "@mui/material";
 import Withdraw from "../components/homeComponents/modals/Withdraw";
+import { SiPolygon } from "react-icons/si";
+import { FaEthereum } from "react-icons/fa";
+import SocketNFT from "../components/homeComponents/modals/SocketNFT";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -31,11 +34,6 @@ const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 
-// Another links
-const sponsorshipURL: any = process.env.REACT_APP_SPONSORSHIP_LINK;
-const purchaseTokenURL: any = process.env.REACT_APP_PURCHASE_TOKEN_LINK;
-const leadershipURL: any = process.env.REACT_APP_LEADERSHIP_LINK;
-
 const testWalletAddress: string = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
 
 const Home = () => {
@@ -50,6 +48,7 @@ const Home = () => {
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
   const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
+  const [openSocketNFTModal, setOpenSocketNFTModal] = useState(false);
   const [openMeetingRoomModal, setOpenMeetingRoomModal] = useState(false);
   const { vanityAddress } = useVanityContext();
 
@@ -277,6 +276,13 @@ const Home = () => {
             <Link
               to="/#"
               className="hover:text-[#5692D9] cursor-pointer underline"
+              onClick={handleOpenModal(setOpenSocketNFTModal)}
+            >
+              Edit Persona Socket NFT
+            </Link>
+            <Link
+              to="/#"
+              className="hover:text-[#5692D9] cursor-pointer underline"
               onClick={handleOpenModal(setOpenWithdrawModal)}
             >
               How to Withdraw ?
@@ -298,40 +304,6 @@ const Home = () => {
             <div className="md:mb-0 lg:mb-2 flex flex-col">
               <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 items-center">
                 <span className="text-center mt-1">Wallet Address Balance</span>
-                {/* Etherscan Link */}
-                <Tooltip title="View on Etherscan" arrow>
-                    <a
-                      href={`https://etherscan.io/address/${address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
-                      data-tip="View on Etherscan"
-                    >
-                      <img
-                        src="/etherscan.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
-                    </a>
-                  </Tooltip>
-                  {/* Polygonscan Link */}
-                  <Tooltip title="View on Polygonscan" arrow>
-                    <a
-                      href={`https://polygonscan.com/address/${address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
-                      data-tip="View on Polygonscan"
-                    >
-                      <img
-                        src="/polygon.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
-                    </a>
-                  </Tooltip>
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
@@ -353,41 +325,31 @@ const Home = () => {
           <div className="flex flex-col gap-2 mt-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
               <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3">
-              <span className="text-center mt-1">Vanity Address Balance</span>
+                <span className="text-center mt-1">Vanity Address Balance</span>
                 {/* Etherscan Link */}
                 <Tooltip title="View on Etherscan" arrow>
-                    <a
-                      href={`https://etherscan.io/address/${vanityAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
-                      data-tip="View on Etherscan"
-                    >
-                      <img
-                        src="/etherscan.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
-                    </a>
-                  </Tooltip>
-                  {/* Polygonscan Link */}
-                  <Tooltip title="View on Polygonscan" arrow>
-                    <a
-                      href={`https://polygonscan.com/address/${vanityAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
-                      data-tip="View on Polygonscan"
-                    >
-                      <img
-                        src="/polygon.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
-                    </a>
-                  </Tooltip>
+                  <a
+                    href={`https://etherscan.io/address/${vanityAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#5692D9] mt-1.5 cursor-pointer"
+                    data-tip="View on Etherscan"
+                  >
+                    <FaEthereum />
+                  </a>
+                </Tooltip>
+                {/* Polygonscan Link */}
+                <Tooltip title="View on Polygonscan" arrow>
+                  <a
+                    href={`https://polygonscan.com/address/${vanityAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#5692D9] mt-1.5 cursor-pointer"
+                    data-tip="View on Polygonscan"
+                  >
+                    <SiPolygon />
+                  </a>
+                </Tooltip>
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
@@ -419,13 +381,23 @@ const Home = () => {
         <hr className="container m-auto sm:border sm:border-t-2 sm:border-gray-600 sm:w-full sm:my-2 sm:m-auto md:w-full md:my-4" />
       </div>
 
-      {/* arrow icon */}
-
-      <div className="container m-auto flex justify-end py-2 px-4">
-        <FiArrowRightCircle
-          className="text-white text-3xl mx-6 hover:text-gray-400 cursor-pointer"
+      {/* shop and meeting room */}
+      <div className="container m-auto flex justify-between py-2 px-4">
+        {/* shop */}
+        <Link to={"/nft/shop"}>
+          <div className="flex gap-2 rounded-3xl bg-blue-400 p-3 text-white hover:text-blue-900 cursor-pointer">
+            <FiArrowLeftCircle className="text-2xl" />
+            <span>Shop</span>
+          </div>
+        </Link>
+        {/* meeting room*/}
+        <div
+          className="flex gap-2 rounded-3xl bg-blue-400 p-3 text-white hover:text-blue-900 cursor-pointer"
           onClick={handleOpenModal(setOpenMeetingRoomModal)}
-        />
+        >
+          <span>Metting Rooms</span>
+          <FiArrowRightCircle className=" text-2xl " />
+        </div>
       </div>
 
       {/* NFT cards */}
@@ -473,11 +445,23 @@ const Home = () => {
         </>
       )}
 
-      {/* How to withdraw Modal */}
-      {openWithdrawModal &&(
+      {/* Persona Socket NFT */}
+      {openSocketNFTModal && (
         <>
-        <Withdraw open={openWithdrawModal}
-            onClose={handleCloseModal(setOpenWithdrawModal)}/>
+          <SocketNFT
+            open={openSocketNFTModal}
+            onClose={handleCloseModal(setOpenSocketNFTModal)}
+          />
+        </>
+      )}
+
+      {/* How to withdraw Modal */}
+      {openWithdrawModal && (
+        <>
+          <Withdraw
+            open={openWithdrawModal}
+            onClose={handleCloseModal(setOpenWithdrawModal)}
+          />
         </>
       )}
     </>

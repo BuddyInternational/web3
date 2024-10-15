@@ -184,15 +184,10 @@ export default function App() {
                       href={`https://etherscan.io/address/${vanityAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
+                      className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="View on Etherscan"
                     >
-                      <img
-                        src="/etherscan.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
+                      <FaEthereum />
                     </a>
                   </Tooltip>
                   {/* Polygonscan Link */}
@@ -201,15 +196,10 @@ export default function App() {
                       href={`https://polygonscan.com/address/${vanityAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1"
+                      className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="View on Polygonscan"
                     >
-                      <img
-                        src="/polygon.svg"
-                        alt=""
-                        height={"auto"}
-                        width={"21px"}
-                      />
+                      <SiPolygon />
                     </a>
                   </Tooltip>
                 </div>
