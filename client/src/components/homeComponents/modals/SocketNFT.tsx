@@ -1,11 +1,17 @@
 import { Box, DialogContent, DialogTitle, Fade, IconButton, Modal, Typography } from '@mui/material';
 import React from 'react'
 import { IoClose } from 'react-icons/io5';
+import { NFTData } from '../../../utils/Types';
+import NftCard from '../card/NftCard';
+import ModalNFTCard from '../card/ModalNFTCard';
+
 
 const SocketNFT: React.FC<{
     open: boolean;
     onClose: () => void;
-  }> = ({ open, onClose }) => {
+    NFTDetails: NFTData[];
+  }> = ({ open, onClose ,NFTDetails}) => {
+    // console.log("NFTDetails--------------",NFTDetails);
     return (
       <Modal open={open} onClose={onClose}>
         <Fade in={open}>
@@ -16,7 +22,7 @@ const SocketNFT: React.FC<{
               left: "50%",
               transform: "translate(-50%, -50%)",
               backgroundColor: "white",
-              width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
+              width: { xs: "70%", sm: "65%", md: "55%", lg: "45%", xl: "35%" },
               maxHeight: "80%",
               overflowY: "auto",
               borderRadius: "8px",
@@ -45,12 +51,9 @@ const SocketNFT: React.FC<{
               <IoClose />
             </IconButton>
             <DialogContent dividers>
-              <Typography
-                variant="h6"
-                sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}
-              >
-                This feature is coming soon.
-              </Typography>
+             {NFTDetails.map((nft,index) => (
+              <ModalNFTCard key={index} nft={nft} /> // Ensure NFTData has a unique key field
+            ))}
             </DialogContent>
           </Box>
         </Fade>

@@ -452,6 +452,7 @@ const Home = () => {
           <SocketNFT
             open={openSocketNFTModal}
             onClose={handleCloseModal(setOpenSocketNFTModal)}
+            NFTDetails={NFTdata}
           />
         </>
       )}
