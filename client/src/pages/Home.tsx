@@ -34,7 +34,7 @@ const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 
-const testWalletAddress: string = "0xFaba74f2e5557323487e337A5f93BbfaEef00310";
+// const testWalletAddress: any = process.env.TEST_WALLET_ADDRESS;
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
@@ -119,7 +119,7 @@ const Home = () => {
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
         vanityAddress
       );
-      console.log("testCDETokenBalance------------",testCDETokenBalance);
+      console.log("testCDETokenBalance------------", testCDETokenBalance);
       const formattedTestCDEBalance = Number(
         Web3.utils.fromWei(testCDETokenBalance, "wei")
       ).toFixed(4);
@@ -194,11 +194,10 @@ const Home = () => {
     }
   }, []);
 
-  
   useEffect(() => {
     fetchTokenBalance();
     fetchNFTs();
-  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs,testCDEBalance]);
+  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs, testCDEBalance]);
 
   return (
     <>
