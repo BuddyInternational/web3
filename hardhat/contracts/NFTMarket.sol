@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract NFTMarket {
-    IERC20 public paymentTestCDEToken;
-    IERC20 public rewardTestTIMToken;
+    IERC20 public testCDEToken;
+    IERC20 public testTIMToken;
     uint256 TestCDERate = 2;
     address public owner;
 
@@ -25,72 +25,103 @@ contract NFTMarket {
     mapping(address => UserHistory[]) userHistories;
 
     constructor(
-        address _paymentTestCDEToken,
-        address _rewardTestTIMToken,
+        address _testCDEToken,
+        address _testTIMToken,
         address _Owner
     ) {
-        paymentTestCDEToken = IERC20(_paymentTestCDEToken);
-        rewardTestTIMToken = IERC20(_rewardTestTIMToken);
+        testCDEToken = IERC20(_testCDEToken);
+        testTIMToken = IERC20(_testTIMToken);
         owner = _Owner;
     }
 
     // function calculate the tokenAmount
-    function _calculateTokenAmount(
-        uint256 _price
-    ) private view returns (uint256 tokenAmount) {
-        uint256 rateInDecimals = TestCDERate * 10 ** uint256(18);
+    function _calculateTokenAmount(uint256 _price)
+        private
+        view
+        returns (uint256 tokenAmount)
+    {
+        uint256 rateInDecimals = TestCDERate * 10**uint256(18);
         tokenAmount = (_price * rateInDecimals) / 1 ether;
         return tokenAmount;
     }
 
     //Funtion to transfer eth and get the test CDE token
-    function transferEthAndGetTestCDE(
+    function transferEthAndGetTestCDEOrTestTIM(
         uint256 _ethAmount,
-        address _vanityAddress
+        address _receiverAddress,
+        string memory _tokenType,
+        string memory _receiverAddressType
     ) external payable {
         // require(msg.value == _ethAmount, "Incorrect Ether amount sent");
-        uint256 tokenAmount = _calculateTokenAmount(_ethAmount);
-        // Check the allowance before transferring
-        uint256 allowance = paymentTestCDEToken.allowance(owner, address(this));
-        require(
-            allowance >= tokenAmount,
-            "Insufficient allowance for token transfer"
-        );
+        uint256 baseTokenAmount = _calculateTokenAmount(_ethAmount);
+        uint256 tokenAmount = baseTokenAmount * 10**18;
 
-        // Transfer paymentTestCDEToken to the user
-        require(
-            paymentTestCDEToken.transferFrom(
-                owner,
-                _vanityAddress,
-                tokenAmount
-            ),
-            "Token transfer failed"
-        );
+        bool isVanityAddress = keccak256(
+            abi.encodePacked(_receiverAddressType)
+        ) == keccak256(abi.encodePacked("vanityAddress"));
 
+        if (isVanityAddress) {
+            if (
+                keccak256(abi.encodePacked(_tokenType)) ==
+                keccak256(abi.encodePacked("CDE"))
+            ) {
+                tokenAmount = (tokenAmount * 104) / 100; //4% discount
+            } else if (
+                keccak256(abi.encodePacked(_tokenType)) ==
+                keccak256(abi.encodePacked("TIM"))
+            ) {
+                tokenAmount = (tokenAmount * 1095) / 1000; // 9.5% discount
+            }
+        }
+
+        // Check allowances
+        uint256 allowance;
+        if (
+            keccak256(abi.encodePacked(_tokenType)) ==
+            keccak256(abi.encodePacked("CDE"))
+        ) {
+            allowance = testCDEToken.allowance(owner, address(this));
+            require(
+                allowance >= tokenAmount,
+                "Insufficient allowance for CDE token transfer"
+            );
+            require(
+                testCDEToken.transferFrom(owner, _receiverAddress, tokenAmount),
+                "CDE token transfer failed"
+            );
+        } else if (
+            keccak256(abi.encodePacked(_tokenType)) ==
+            keccak256(abi.encodePacked("TIM"))
+        ) {
+            allowance = testTIMToken.allowance(owner, address(this));
+            require(
+                allowance >= tokenAmount,
+                "Insufficient allowance for TIM token transfer"
+            );
+            require(
+                testTIMToken.transferFrom(owner, _receiverAddress, tokenAmount),
+                "TIM token transfer failed"
+            );
+        }
         // Transfer the Ether to the owner
         (bool success, ) = payable(owner).call{value: msg.value}("");
         require(success, "fund transefer error");
     }
 
     // Function to claim Tim Token Reward
-    function claimTimTokenReward(
-        uint256 _tokenAmount,
-        address _vanityAddress
-    ) external {
+    function claimTimTokenReward(uint256 _tokenAmount, address _vanityAddress)
+        external
+    {
         // Check the allowance before transferring
-        uint256 allowance = rewardTestTIMToken.allowance(owner, address(this));
+        uint256 allowance = testTIMToken.allowance(owner, address(this));
         require(
             allowance >= _tokenAmount,
             "Insufficient allowance for token transfer"
         );
 
-        // Transfer paymentTestCDEToken to the user
+        // Transfer testCDEToken to the user
         require(
-            rewardTestTIMToken.transferFrom(
-                owner,
-                _vanityAddress,
-                _tokenAmount
-            ),
+            testTIMToken.transferFrom(owner, _vanityAddress, _tokenAmount),
             "Token transfer failed"
         );
     }
@@ -105,7 +136,7 @@ contract NFTMarket {
     ) external {
         uint256 tokenAmount = _calculateTokenAmount(price);
         require(
-            tokenAmount <= paymentTestCDEToken.balanceOf(address(this)),
+            tokenAmount <= testCDEToken.balanceOf(address(this)),
             "Insufficient Token Balance in contract"
         );
 
@@ -154,9 +185,9 @@ contract NFTMarket {
             );
         }
 
-        // Transfer paymentTestCDEToken to the user
+        // Transfer testCDEToken to the user
         require(
-            paymentTestCDEToken.transfer(vanityAddress, tokenAmount),
+            testCDEToken.transfer(vanityAddress, tokenAmount),
             "Token transfer failed"
         );
 
@@ -175,16 +206,20 @@ contract NFTMarket {
     }
 
     // Function to view user history
-    function getUserHistory(
-        address user
-    ) external view returns (UserHistory[] memory) {
+    function getUserHistory(address user)
+        external
+        view
+        returns (UserHistory[] memory)
+    {
         return userHistories[user];
     }
 
     // get the user token balance
-    function getUserTestCDETokenBalance(
-        address _userAddress
-    ) public view returns (uint256 _tokenBalance) {
-        return paymentTestCDEToken.balanceOf(_userAddress);
+    function getUserTestCDETokenBalance(address _userAddress)
+        public
+        view
+        returns (uint256 _tokenBalance)
+    {
+        return testCDEToken.balanceOf(_userAddress);
     }
 }

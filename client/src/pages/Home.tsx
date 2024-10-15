@@ -119,6 +119,7 @@ const Home = () => {
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
         vanityAddress
       );
+      console.log("testCDETokenBalance------------",testCDETokenBalance);
       const formattedTestCDEBalance = Number(
         Web3.utils.fromWei(testCDETokenBalance, "wei")
       ).toFixed(4);
@@ -193,10 +194,11 @@ const Home = () => {
     }
   }, []);
 
+  
   useEffect(() => {
     fetchTokenBalance();
     fetchNFTs();
-  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs]);
+  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs,testCDEBalance]);
 
   return (
     <>

@@ -65,6 +65,12 @@ const CDEReward: React.FC<{
     return "No discount available for Wallet Address";
   };
 
+  // Determine the text color based on the receiver
+const getDiscountColor = () => {
+  const { receiver } = inputValues;
+  return receiver === "vanityAddress" ? "green" : "red";
+};
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -90,13 +96,21 @@ const CDEReward: React.FC<{
     try {
       // Convert the price from Ether to Wei
       const amountInEther = inputValues?.amount;
+      console.log("amountInEther--------",amountInEther);
+      const tokenType = inputValues?.selectedToken;
+      console.log("tokenType---------",tokenType);
+      const receiverType = inputValues?.receiver;
+      console.log("receiverType-----------",receiverType);
+
       if (typeof amountInEther === "string") {
         const amountInWei = ethers.parseEther(amountInEther);
         console.log("amountInWei-----------", amountInWei);
 
-        const tx = await nftMarketContract.transferEthAndGetTestCDE(
+        const tx = await nftMarketContract.transferEthAndGetTestCDEOrTestTIM(
           amountInEther,
           vanityAddress,
+          tokenType,
+          receiverType,
           {
             value: 0, // Pass the Ether amount
           }
@@ -204,7 +218,7 @@ const formatAddress = (address:any) => {
                       <MenuItem value="vanityAddress">Your Vanity Address<span className="ml-2">({formatAddress(inputValues.vanityAddress)})</span></MenuItem>
                     </Select>
                     {/* Display Discount */}
-                  <Box mt={1} textAlign="left" color="green">
+                  <Box mt={1} textAlign="left" color={getDiscountColor()}>
                     {getDiscountText()}
                   </Box>
                   </FormControl>

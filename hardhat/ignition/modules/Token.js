@@ -15,5 +15,5 @@ module.exports = buildModule("TIMTokenModule", (m) => {
   return { Token };
 });
 
-// CDETokenModule#Token - 0xA260e6D2FA6f1FD7ed176Ac8Ace3eDeEe0DB3deD
-// TIMTokenModule#Token - 0xE91491568EBF8f229E6a981BFa6c25F7317823F1
+// CDETokenModule#Token - 0xDd6762eBbF55Dc89810b20d91f5E2AceDc2712FB
+// TIMTokenModule#Token - 0x6462F3d6BcB8D03E6c7ee9ee21420A3fc82468ab

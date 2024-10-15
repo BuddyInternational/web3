@@ -4,16 +4,16 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 const config = require("../config");
 
-module.exports = buildModule("NFTMarketModule", (m) => {
+module.exports = buildModule("NFTMarketModule2", (m) => {
   // Define default parameters for the contract
-  const paymentTestCDEToken = m.getParameter("paymentTestCDEToken",  config.default.paymentTestCDEToken);
-  const rewardTesrTIMToken = m.getParameter("rewardTestTIMToken",  config.default.rewardTestTIMToken);
+  const testCDEToken = m.getParameter("testCDEToken",  config.default.testCDEToken);
+  const testTIMToken = m.getParameter("testTIMToken",  config.default.testTIMToken);
   const owner = m.getParameter("owner",  config.default.tokenOwnerAddress);
 
   // Deploy the NFTMarket contract
-  const nftMarket = m.contract("NFTMarket", [paymentTestCDEToken,rewardTesrTIMToken,owner]);
+  const nftMarket = m.contract("NFTMarket", [testCDEToken,testTIMToken,owner]);
 
   return { nftMarket };
 });
 
-// NFTMarketModule#NFTMarket - 0x5E1c643C9E88Bf77679254A84A31C020b0CE7C18
+// NFTMarketModule#NFTMarket - 0xb8BB77c4e2b0E22AeBcC89A59b53a68D1f31058a

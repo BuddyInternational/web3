@@ -4,7 +4,7 @@ require("dotenv").config();
 // const nftAbi = require('./artifacts/contracts/Simple721NFT.sol/Simple721NFT.json')
 const cdeTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/CDETokenModule#Token.json");
 const timTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/TIMTokenModule#Token.json");
-// const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
+const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -41,6 +41,7 @@ app.post("/approvetimtoken", async (req, res) => {
   try {
 
     const totalSupply = await timTokenContract.totalSupply();
+    console.log("totalSupply------------",totalSupply);
     const tx = await timTokenContract.approve(spenderAddress, totalSupply);
     res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
   } catch (error) {
@@ -75,16 +76,16 @@ app.post("/approvecdetoken", async (req, res) => {
     return res.status(400).send("Missing required parameters.");
   }
 
-  //   const nftContract = new ethers.Contract(
-  //     "0xdcD5eC1cd8d5a35C8aeD722d66b768eCd01bd6dC",
-  //     nftMarketAbi.abi,
-  //     wallet
-  //   );
+    // const nftContract = new ethers.Contract(
+    //   "0x704C2fa2585214eD8F701464A792E289ae4eD420",
+    //   nftMarketAbi.abi,
+    //   wallet
+    // );
 
-  //   let a = await nftContract.owner();
+    // let a = await nftContract.owner();
 
-  //     console.log("owner--------",a);
-  //     return;
+    //   console.log("owner--------",a);
+    //   return;
   // //   const test = new ethers.Contract(a, tokenAbi.abi, wallet);
 
   try {
