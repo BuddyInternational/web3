@@ -146,8 +146,8 @@ export default function App() {
               variant="rectangular"
               width="100%"
               height={50}
-              animation="wave"
-              sx={{ bgcolor: "#132743" }}
+              // animation="wave"
+              // sx={{ bgcolor: "red" }}
             />
           ) : (
             <>

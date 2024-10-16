@@ -19,6 +19,8 @@ import Withdraw from "../components/homeComponents/modals/Withdraw";
 import { SiPolygon } from "react-icons/si";
 import { FaEthereum } from "react-icons/fa";
 import SocketNFT from "../components/homeComponents/modals/SocketNFT";
+import { HiMiniTv } from "react-icons/hi2";
+import { GiBiceps } from "react-icons/gi";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -195,8 +197,8 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // fetchTokenBalance();
-    // fetchNFTs();
+    fetchTokenBalance();
+    fetchNFTs();
   }, [address, vanityAddress, fetchTokenBalance, fetchNFTs, testCDEBalance]);
 
   return (
@@ -386,18 +388,24 @@ const Home = () => {
       <div className="container m-auto flex gap-3 sm:flex-col md:flex-row justify-between py-2 px-4">
         {/* shop */}
         <Link to={"/nft/shop"} className="flex-1 min-w-0 flex justify-start">
-          <div className="flex gap-2 items-center justify-center sm:w-full md:w-44 xl:w-48 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer">
+          <div className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer">
             <FiArrowLeftCircle className="text-2xl" />
-            <span>Shop</span>
+            <span className="flex gap-2 items-center">
+              <p>Shop</p>
+              <GiBiceps className="text-xl"/>
+            </span>
           </div>
         </Link>
         {/* meeting room */}
         <div className="flex-1 min-w-0 flex justify-end">
           <div
-            className="flex gap-2 sm:mr-0 md:mr-2 items-end justify-center sm:w-full md:w-44 xl:w-48 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
+            className="flex gap-2 sm:mr-0 md:mr-2 items-end justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
             onClick={handleOpenModal(setOpenMeetingRoomModal)}
           >
-            <span>Meeting Rooms</span>
+            <span className="flex gap-2 items-center">
+              <HiMiniTv className="text-xl"/>
+              <p>Meeting Rooms</p>
+            </span>
             <FiArrowRightCircle className="text-2xl" />
           </div>
         </div>

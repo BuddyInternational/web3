@@ -1,4 +1,5 @@
 import React from "react";
+import SupportMenu from "./SupportMenu";
 
 const Footer: React.FC = () => {
   return (
@@ -51,14 +52,7 @@ const Footer: React.FC = () => {
           >
             Feedback
           </a>
-          <a
-            href="/privacy-policy.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
-          >
-            Support
-          </a>
+          <SupportMenu />
         </div>
       </div>
     </footer>
