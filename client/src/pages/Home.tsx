@@ -195,8 +195,8 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetchTokenBalance();
-    fetchNFTs();
+    // fetchTokenBalance();
+    // fetchNFTs();
   }, [address, vanityAddress, fetchTokenBalance, fetchNFTs, testCDEBalance]);
 
   return (
@@ -303,7 +303,7 @@ const Home = () => {
           </div>
           <div className="flex flex-col gap-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
-              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 items-center">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 items-center sm:justify-center md:justify-start">
                 <span className="text-center mt-1">Wallet Address Balance</span>
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
@@ -325,7 +325,7 @@ const Home = () => {
 
           <div className="flex flex-col gap-2 mt-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
-              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3  sm:justify-center md:justify-start">
                 <span className="text-center mt-1">Vanity Address Balance</span>
                 {/* Etherscan Link */}
                 <Tooltip title="View on Etherscan" arrow>
@@ -383,21 +383,23 @@ const Home = () => {
       </div>
 
       {/* shop and meeting room */}
-      <div className="container m-auto flex justify-between py-2 px-4">
+      <div className="container m-auto flex gap-3 sm:flex-col md:flex-row justify-between py-2 px-4">
         {/* shop */}
-        <Link to={"/nft/shop"}>
-          <div className="flex gap-2 rounded-3xl bg-blue-400 p-3 text-white hover:text-blue-900 cursor-pointer">
+        <Link to={"/nft/shop"} className="flex-1 min-w-0 flex justify-start">
+          <div className="flex gap-2 items-center justify-center sm:w-full md:w-44 xl:w-48 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer">
             <FiArrowLeftCircle className="text-2xl" />
             <span>Shop</span>
           </div>
         </Link>
-        {/* meeting room*/}
-        <div
-          className="flex gap-2 rounded-3xl bg-blue-400 p-3 text-white hover:text-blue-900 cursor-pointer"
-          onClick={handleOpenModal(setOpenMeetingRoomModal)}
-        >
-          <span>Metting Rooms</span>
-          <FiArrowRightCircle className=" text-2xl " />
+        {/* meeting room */}
+        <div className="flex-1 min-w-0 flex justify-end">
+          <div
+            className="flex gap-2 sm:mr-0 md:mr-2 items-end justify-center sm:w-full md:w-44 xl:w-48 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
+            onClick={handleOpenModal(setOpenMeetingRoomModal)}
+          >
+            <span>Meeting Rooms</span>
+            <FiArrowRightCircle className="text-2xl" />
+          </div>
         </div>
       </div>
 
@@ -452,7 +454,7 @@ const Home = () => {
           <SocketNFT
             open={openSocketNFTModal}
             onClose={handleCloseModal(setOpenSocketNFTModal)}
-            NFTDetails={NFTdata}
+            // NFTDetails={NFTdata}
           />
         </>
       )}
