@@ -9,7 +9,7 @@ import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.j
 import { useVanityContext } from "../../../context/VanityContext";
 import { ERC1155ABI, ERC721ABI } from "../../../utils/ABI";
 
-const ModalNFTCard: React.FC<{ nft: NFTData; key: number }> = ({
+const ModalNFTCard: React.FC<{ nft: NFTData; key: number;}> = ({
   nft,
   key,
 }) => {
@@ -20,6 +20,7 @@ const ModalNFTCard: React.FC<{ nft: NFTData; key: number }> = ({
   const { vanityAddress } = useVanityContext();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
+   
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
@@ -30,6 +31,7 @@ const ModalNFTCard: React.FC<{ nft: NFTData; key: number }> = ({
     }
     return imageUrl;
   };
+
   // Handle copy nft contract address
   const handleCopyAddress = (index: number) => {
     navigator.clipboard.writeText(nft.contractAddress || "");
@@ -127,6 +129,7 @@ const ModalNFTCard: React.FC<{ nft: NFTData; key: number }> = ({
   };
 
   return (
+
     <div className="max-w-screen sm:w-auto md:w-auto mx-2 my-4 p-2 border border-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
       {/* Chain and NFT Address */}
       <div className="p-2 mx-5 text-sm flex sm:flex-col md:flex-row gap-2 justify-between items-center">

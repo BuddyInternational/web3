@@ -8,21 +8,25 @@ interface CardChainFilterMenusProps {
   uniqueChains: string[];
   selectedChain: string;
   setSelectedChain: (chain: string) => void;
+  component: string;
 }
 
 const CardChainFilterMenus: React.FC<CardChainFilterMenusProps> = ({
   uniqueChains,
   selectedChain,
   setSelectedChain,
+  component
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     setSelectedChain(event.target.value);
   };
+  const inputLabelColor = component === "SocketNFT" ? "#000000" : "#5692D9";
+  const selectColor = component === "SocketNFT" ? "black" : "white";
 
   return (
     <div className="">
       <FormControl sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel id="chain-select-label" sx={{ color: "#5692D9" }}>
+        <InputLabel id="chain-select-label" sx={{ color: inputLabelColor }}>
           Chain
         </InputLabel>
         <Select
@@ -34,9 +38,9 @@ const CardChainFilterMenus: React.FC<CardChainFilterMenusProps> = ({
           onChange={handleChange}
           variant="outlined"
           sx={{
-            color: "white",
+            color: selectColor,
             "& .MuiSelect-icon": {
-              color: "white",
+              color: selectColor,
             },
           }}
         >

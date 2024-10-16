@@ -127,6 +127,7 @@ const NftCard: React.FC<{ NFTDetails: NFTData[] }> = ({ NFTDetails }) => {
           uniqueChains={uniqueChains}
           selectedChain={selectedChain}
           setSelectedChain={setSelectedChain}
+          component="NFTCard"
         />
       </div>
       {/* Grid of NFTs*/}
