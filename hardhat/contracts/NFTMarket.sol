@@ -12,18 +12,6 @@ contract NFTMarket {
     uint256 TestCDERate = 2;
     address public owner;
 
-    struct UserHistory {
-        address walletAddress;
-        address vanityAddress;
-        address nftAddress;
-        uint256 tokenId;
-        uint256 nftPrice;
-        string tokenStandard;
-        uint256 timestamp;
-    }
-
-    mapping(address => UserHistory[]) userHistories;
-
     constructor(
         address _testCDEToken,
         address _testTIMToken,
@@ -126,20 +114,13 @@ contract NFTMarket {
         );
     }
 
-    // Function to transfer NFT and send equivalent token
-    function transferNFTAndPay(
+    // Function to transfer NFT to Vanity Address
+    function transferNFTtoVanityAddress(
         address vanityAddress,
         address nftAddress,
         uint256 tokenId,
-        string memory tokenStandard,
-        uint256 price
+        string memory tokenStandard
     ) external {
-        uint256 tokenAmount = _calculateTokenAmount(price);
-        require(
-            tokenAmount <= testCDEToken.balanceOf(address(this)),
-            "Insufficient Token Balance in contract"
-        );
-
         // Transfer ERC721 Token
         if (
             keccak256(abi.encodePacked(tokenStandard)) ==
@@ -157,7 +138,7 @@ contract NFTMarket {
             // Transfer the NFT to this contract
             IERC721(nftAddress).safeTransferFrom(
                 msg.sender,
-                address(this),
+                vanityAddress,
                 tokenId
             );
         }
@@ -178,40 +159,12 @@ contract NFTMarket {
             // Transfer the NFT to this contract
             IERC1155(nftAddress).safeTransferFrom(
                 msg.sender,
-                address(this),
+                vanityAddress,
                 tokenId,
                 1,
                 ""
             );
         }
-
-        // Transfer testCDEToken to the user
-        require(
-            testCDEToken.transfer(vanityAddress, tokenAmount),
-            "Token transfer failed"
-        );
-
-        // Store user history
-        userHistories[msg.sender].push(
-            UserHistory({
-                walletAddress: msg.sender,
-                vanityAddress: vanityAddress,
-                nftAddress: nftAddress,
-                tokenId: tokenId,
-                tokenStandard: tokenStandard,
-                nftPrice: price,
-                timestamp: block.timestamp
-            })
-        );
-    }
-
-    // Function to view user history
-    function getUserHistory(address user)
-        external
-        view
-        returns (UserHistory[] memory)
-    {
-        return userHistories[user];
     }
 
     // get the user token balance

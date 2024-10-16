@@ -4,7 +4,7 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 const config = require("../config");
 
-module.exports = buildModule("NFTMarketModule2", (m) => {
+module.exports = buildModule("NFTMarketModule3", (m) => {
   // Define default parameters for the contract
   const testCDEToken = m.getParameter("testCDEToken",  config.default.testCDEToken);
   const testTIMToken = m.getParameter("testTIMToken",  config.default.testTIMToken);

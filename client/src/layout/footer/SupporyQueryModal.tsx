@@ -5,14 +5,12 @@ import {
   Fade,
   IconButton,
   Modal,
-  Typography,
 } from "@mui/material";
 import React from "react";
 import { IoClose } from "react-icons/io5";
 import CommonJotform from "../../utils/CommonJotform";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../context/VanityContext";
-import Jotform from "react-jotform";
 const supportQueryFormUrl = process.env.REACT_APP_SUPPORT_QUERY_JOTFORM_LINK;
 console.log("supportQueryFormUrl-----------", supportQueryFormUrl);
 

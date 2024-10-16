@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   DialogContent,
   DialogTitle,
   Fade,
@@ -55,13 +54,6 @@ const Leadership: React.FC<{
             <IoClose />
           </IconButton>
           <DialogContent dividers>
-            {/* <Typography
-              variant="h6"
-              color="text.primary"
-              sx={{ marginTop: 2, marginBottom: 2 }}
-            >
-              Liquidating Your Full Account Token NFT
-            </Typography> */}
             <Typography
               variant="body1"
               color="text.secondary"

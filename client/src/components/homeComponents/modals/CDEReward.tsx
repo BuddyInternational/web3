@@ -44,15 +44,15 @@ const CDEReward: React.FC<{
     receiver: "walletAddress", // Default receiver
   });
 
-  // Mapping chainId to chain names
+
+  useEffect(() => {
+    // Mapping chainId to chain names
   const chainMapping:any = {
     1: "Ethereum",     
     137: "Polygon",     
     42161: "Arbitrum",  
     11155111: "Sepolia" 
   };
-
-  useEffect(() => {
     if (chainId) {
       const selectedChain = chainMapping[chainId] || "Ethereum"; 
       setInputValues(prevValues => ({

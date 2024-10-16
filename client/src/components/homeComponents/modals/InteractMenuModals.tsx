@@ -12,7 +12,6 @@ import {
 import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
 import {
-  useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../../context/VanityContext";
@@ -51,7 +50,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   onClose,
   modalContents,
 }) => {
-  const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =

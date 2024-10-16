@@ -153,6 +153,7 @@ const Home = () => {
       const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
       // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
       // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
+      // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // sepolia
       // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // polygon amoy
       const chains = [
         { chain: "0x1", name: "Ethereum" },
@@ -462,7 +463,7 @@ const Home = () => {
           <SocketNFT
             open={openSocketNFTModal}
             onClose={handleCloseModal(setOpenSocketNFTModal)}
-            // NFTDetails={NFTdata}
+            NFTDetails={NFTdata}
           />
         </>
       )}
