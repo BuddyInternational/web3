@@ -138,7 +138,7 @@ export default function App() {
     <>
       <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
         {/* connected vanity address */}
-        <div className="py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
+        <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
             <Skeleton
               variant="rectangular"
@@ -213,11 +213,12 @@ export default function App() {
           {!isConnected ? (
             <w3m-button />
           ) : (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-              }}
+            <div
+            //   sx={{
+            //     display: "flex",
+            //     gap: 2,
+            //   }}
+            className="flex gap-3 sm:flex-col md:flex-row "
             >
               <w3m-network-button />
               <Button
@@ -236,7 +237,7 @@ export default function App() {
               >
                 Disconnect Wallet
               </Button>
-            </Box>
+            </div>
           )}
         </div>
       </div>
