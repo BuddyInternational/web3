@@ -7,6 +7,7 @@ import EndorseeQuest from "../pages/EndorseeQuestReport";
 import OrderNFTApparelForm from "../components/homeComponents/card/OrderNFTApparelForm";
 import NotFound from "../utils/NotFound";
 import Shop from "../pages/Shop";
+import ContributeContent from "../pages/ContributeContent";
 
 const AllRoutes = () => {
   return (
@@ -19,6 +20,10 @@ const AllRoutes = () => {
           <Route
             path="/quest/completed/:walletAddress"
             element={<EndorseeQuest />}
+          />
+          <Route
+            path="/content/:walletAddress"
+            element={<ContributeContent />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           <Route path="/nft/shop" element={<Shop />} />

@@ -1,6 +1,8 @@
 import express from "express";
 import connection from "./config/config.js";
 import { vanityRoutes } from "./routes/vanityRoutes.js";
+import { nftRoutes } from "./routes/nftRoutes.js";
+import { socketNFTRoutes } from "./routes/socketNFTRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
@@ -14,6 +16,8 @@ app.use(cors());
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
+app.use("/api/nft/" , nftRoutes);
+app.use("/api/socket-nft/" , socketNFTRoutes);
 
 app.get("/api/ping", (req, res)=> {
   res.status(200).json({

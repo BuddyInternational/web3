@@ -4,19 +4,22 @@ import { FaCheck } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa6";
 import moment from "moment";
 import { ethers } from "ethers";
-import { useWeb3ModalProvider } from "@web3modal/ethers/react";
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react";
 import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { useVanityContext } from "../../../context/VanityContext";
 import { ERC1155ABI, ERC721ABI } from "../../../utils/ABI";
+import { saveSocketNFTAndUpdateLastTransfer } from "../../../api/socketnftAPI";
 
-const ModalNFTCard: React.FC<{ nft: NFTData; key: number;}> = ({
+const ModalNFTCard: React.FC<{ nft: NFTData; key: number;onClose: () => void;}> = ({
   nft,
   key,
+  onClose,
 }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
   const { walletProvider } = useWeb3ModalProvider();
+  const {address ,isConnected} = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
@@ -120,6 +123,27 @@ const ModalNFTCard: React.FC<{ nft: NFTData; key: number;}> = ({
       // Wait for the transaction to be confirmed
       await tx.wait();
       console.log("Transaction confirmed:", tx.hash);
+
+      // Saved In Database
+      if (isConnected && address) {
+        const savedLatestTransfer: any = await saveSocketNFTAndUpdateLastTransfer(
+          address,
+          vanityAddress,
+          {
+            nftAddress: nftData.contractAddress!,
+            name: nftData.name!,
+            chainName: nftData.chainName!,
+            mediaType: nftData.mediaType,
+            imageUrl: nftData.imageUrl!,
+            tokenId: nftData.tokenId,
+          }
+        );
+        if(savedLatestTransfer !== null){
+          console.log("Saved latest transfer to database:", savedLatestTransfer);
+        }else{
+          console.log("Error in save Latest NFT Transfer");
+        }
+      }
     } catch (error) {
       console.error("Error executing transaction:", error);
     } finally {
@@ -244,7 +268,7 @@ const ModalNFTCard: React.FC<{ nft: NFTData; key: number;}> = ({
       {/* Socket Button */}
       <div className="flex justify-end mt-1 mx-2 py-1 ">
         <button
-          className="w-full md:w-32 bg-blue-400 p-2 rounded-lg text-white hover:text-blue-900"
+          className="w-full md:w-32 bg-blue-600 p-2 rounded-lg text-white hover:bg-blue-500 hover:text-blue-950"
           onClick={() => handleButtonClick(nft)}
         >
           Socket

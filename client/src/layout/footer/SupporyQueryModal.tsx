@@ -12,7 +12,6 @@ import CommonJotform from "../../utils/CommonJotform";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../context/VanityContext";
 const supportQueryFormUrl = process.env.REACT_APP_SUPPORT_QUERY_JOTFORM_LINK;
-console.log("supportQueryFormUrl-----------", supportQueryFormUrl);
 
 const SupporyQueryModal: React.FC<{
   open: boolean;

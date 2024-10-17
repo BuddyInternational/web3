@@ -116,7 +116,6 @@ export default function App() {
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
         if (existingAddress != null) {
-          console.log("existingAddress----------", existingAddress);
           setVanityAddress(existingAddress.vanityAddress);
         } else {
           // If no vanity address exists, generate and save a new one
@@ -126,7 +125,6 @@ export default function App() {
           );
           if (!!generatedAddress?.data[0]?.address) {
             setVanityAddress(generatedAddress?.data[0]?.address);
-            console.log("Generated Vanity Address:", generatedAddress);
           }
         }
         setIsLoading(false);

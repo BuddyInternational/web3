@@ -21,6 +21,7 @@ import { FaEthereum } from "react-icons/fa";
 import SocketNFT from "../components/homeComponents/modals/SocketNFT";
 import { HiMiniTv } from "react-icons/hi2";
 import { GiBiceps } from "react-icons/gi";
+import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -52,6 +53,12 @@ const Home = () => {
   const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
   const [openSocketNFTModal, setOpenSocketNFTModal] = useState(false);
   const [openMeetingRoomModal, setOpenMeetingRoomModal] = useState(false);
+  const [socketNFTImageURL, setsocketNFTImageURL] = useState<string | null>(
+    null
+  );
+  const [socketNFTImageMediaType, setsocketNFTImageMediaType] = useState<
+    string | null
+  >(null);
   const { vanityAddress } = useVanityContext();
 
   // Handle Modal
@@ -100,7 +107,7 @@ const Home = () => {
         tokenContracts.map((contract) => contract.balanceOf(address))
       );
 
-      console.log("walletbalances--------------", walletbalances);
+      // console.log("walletbalances--------------", walletbalances);
 
       const formattedWalletBalances = walletbalances.map((balance) =>
         Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
@@ -111,7 +118,7 @@ const Home = () => {
         tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
       );
 
-      console.log("vanitybalances---------", vanitybalances);
+      // console.log("vanitybalances---------", vanitybalances);
 
       const formattedVanityBalances = vanitybalances.map((balance) =>
         Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
@@ -121,7 +128,7 @@ const Home = () => {
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
         vanityAddress
       );
-      console.log("testCDETokenBalance------------", testCDETokenBalance);
+      // console.log("testCDETokenBalance------------", testCDETokenBalance);
       const formattedTestCDEBalance = Number(
         Web3.utils.fromWei(testCDETokenBalance, "wei")
       ).toFixed(4);
@@ -198,9 +205,43 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    // fetch the Account Persona socket NFT
+    const fetchAccountPersonaNFT = async () => {
+      if (isConnected && vanityAddress) {
+        const response = await getSocketNFTLastTransferDetails(vanityAddress);
+        if (response !== null) {
+          setsocketNFTImageURL(response.imageUrl);
+          setsocketNFTImageMediaType(response.mediaType);
+        } else {
+          console.error(Response);
+        }
+      } else {
+        setsocketNFTImageURL(null);
+        setsocketNFTImageMediaType(null);
+      }
+    };
     fetchTokenBalance();
     fetchNFTs();
-  }, [address, vanityAddress, fetchTokenBalance, fetchNFTs, testCDEBalance]);
+    fetchAccountPersonaNFT();
+  }, [
+    address,
+    isConnected,
+    vanityAddress,
+    fetchTokenBalance,
+    fetchNFTs,
+    testCDEBalance,
+    socketNFTImageURL,
+  ]);
+
+  // Convert image url
+  const convertIpfsUrl = (imageUrl: string) => {
+    if (imageUrl.startsWith("ipfs://")) {
+      const ipfsHash = imageUrl.slice(7);
+      const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+      return newImageUrl;
+    }
+    return imageUrl;
+  };
 
   return (
     <>
@@ -219,13 +260,27 @@ const Home = () => {
           {/* Account Persona: [Default] */}
           <div className="flex flex-col mt-2 gap-4 sm:items-center md:items-start">
             <p className="text-md font-sans text-[#5692D9]">
-              Account Persona: [Default]
+              Account Persona:{" "}
+              {socketNFTImageURL ? "[NFT Socketed]" : " [Default]"}
             </p>
-            <img
-              src="/accountPersona.png"
-              alt="Account Persona not found"
-              className="md:w-30 sm:w-48 h-auto rounded-md"
-            />
+
+            {socketNFTImageMediaType === "video/mp4" ? (
+              <video
+                src={convertIpfsUrl(socketNFTImageURL!)}
+                controls
+                className="md:w-30 sm:w-48 h-auto rounded-xl border-8 border-solid border-[#919191]"
+              />
+            ) : (
+              <img
+                src={
+                  socketNFTImageURL
+                    ? convertIpfsUrl(socketNFTImageURL!)
+                    : "/accountPersona.png"
+                }
+                alt="Account Persona not found"
+                className="md:w-30 sm:w-48 h-auto rounded-xl border-8 border-solid border-[#919191]"
+              />
+            )}
           </div>
           {/* divider */}
           <div>
@@ -290,6 +345,12 @@ const Home = () => {
               onClick={handleOpenModal(setOpenWithdrawModal)}
             >
               How to Withdraw ?
+            </Link>
+            <Link
+              to={`/content/${address}`}
+              className="hover:text-[#5692D9] cursor-pointer underline"
+            >
+              Contribute user generated content
             </Link>
             {/* divider */}
             <div>
@@ -388,15 +449,18 @@ const Home = () => {
       {/* shop and meeting room */}
       <div className="container m-auto flex gap-3 sm:flex-col md:flex-row justify-between py-2 px-4">
         {/* shop */}
-        <Link to={"/nft/shop"} className="flex-1 min-w-0 flex justify-start">
-          <div className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer">
-            <FiArrowLeftCircle className="text-2xl" />
+        <div className="flex-1 min-w-0 flex justify-start">
+          <Link
+            to={"/nft/shop"}
+            className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
+          >
+            <FiArrowLeftCircle className="text-2xl mt-1" />
             <span className="flex gap-2 items-center">
-              <p>Shop</p>
-              <GiBiceps className="text-xl"/>
+              <p className="mt-1">Shop</p>
+              <GiBiceps className="text-xl" />
             </span>
-          </div>
-        </Link>
+          </Link>
+        </div>
         {/* meeting room */}
         <div className="flex-1 min-w-0 flex justify-end">
           <div
@@ -404,7 +468,7 @@ const Home = () => {
             onClick={handleOpenModal(setOpenMeetingRoomModal)}
           >
             <span className="flex gap-2 items-center">
-              <HiMiniTv className="text-xl"/>
+              <HiMiniTv className="text-xl" />
               <p>Meeting Rooms</p>
             </span>
             <FiArrowRightCircle className="text-2xl" />

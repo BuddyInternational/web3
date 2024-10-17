@@ -12,7 +12,7 @@ const Shop = () => {
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
       <div className="flex text-white text-center text-xl gap-2 flex-col">
-        <h1 className="text-3xl font-bold mb-4">This feature is coming soon</h1>
+        <h1 className="text-3xl font-bold mb-4">This Feature is Coming soon</h1>
       </div>
     </div>
   );
