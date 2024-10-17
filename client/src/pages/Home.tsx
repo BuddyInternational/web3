@@ -268,7 +268,7 @@ const Home = () => {
               <video
                 src={convertIpfsUrl(socketNFTImageURL!)}
                 controls
-                className="md:w-30 sm:w-48 h-auto rounded-xl border-8 border-solid border-[#919191]"
+                className="md:w-30 sm:w-48 h-auto"
               />
             ) : (
               <img
@@ -278,7 +278,7 @@ const Home = () => {
                     : "/accountPersona.png"
                 }
                 alt="Account Persona not found"
-                className="md:w-30 sm:w-48 h-auto rounded-xl border-8 border-solid border-[#919191]"
+                className="md:w-30 sm:w-48 h-auto rounded-xl"
               />
             )}
           </div>
