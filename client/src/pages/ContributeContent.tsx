@@ -2,8 +2,7 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import React, { useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
-import { create as createIPFSClient } from 'ipfs-http-client';
-
+import { create as createIPFSClient } from "ipfs-http-client";
 
 // Define mood options
 const moodOptions = [
@@ -22,27 +21,33 @@ const moodOptions = [
   { label: "Confused  🤯", value: "🤯" },
 ];
 
-const ipfs = createIPFSClient({
-  url: `https://${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}@ipfs.infura.io:5001/api/v0`
-});
-
-// const ipfs = create({
-//   host: 'ipfs.infura.io',
-//   port: 5001,
-//   protocol: 'https',
-//   headers: {
-//     Authorization: 'Basic ' + btoa(`${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}`),
-//   },
+// const ipfs = createIPFSClient({
+//   url: `https://${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}@ipfs.infura.io:5001/api/v0`,
 // });
 
-console.log("ipfs===========",ipfs);
+const ipfs = createIPFSClient({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+  headers: {
+    Authorization:
+      "Basic " +
+      btoa(
+        `${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}`
+      ),
+  },
+});
+
+console.log("ipfs===========", ipfs);
 
 const ContributeContent: React.FC = () => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
-  const [mood, setMood] = useState<string>(""); 
-  const [submissions, setSubmissions] = useState<{ mood: string; content: string ;timestamp:string}[]>([]);
+  const [mood, setMood] = useState<string>("");
+  const [submissions, setSubmissions] = useState<
+    { mood: string; content: string; timestamp: string }[]
+  >([]);
 
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -54,70 +59,78 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
-//  // Handler for submit button
-//  const handleSubmit = () => {
-//   // Add new submission to the state
-//   if (mood && content) {
-//     const timestamp = new Date().toISOString();
-//     setSubmissions([...submissions, { mood, content,timestamp }]);
-//     setContent(""); 
-//     setMood(""); 
-//   }
-//   else {
-//     alert("Please select a mood and enter content.");
-//   }
-// };
+  //  // Handler for submit button
+  //  const handleSubmit = () => {
+  //   // Add new submission to the state
+  //   if (mood && content) {
+  //     const timestamp = new Date().toISOString();
+  //     setSubmissions([...submissions, { mood, content,timestamp }]);
+  //     setContent("");
+  //     setMood("");
+  //   }
+  //   else {
+  //     alert("Please select a mood and enter content.");
+  //   }
+  // };
 
-const handleSubmit = async () => {
-  if (mood && content) {
-    try {
-      const timestamp = new Date().toISOString();
-      const submissionData = { mood, content, timestamp };
-      const buffer = Buffer.from(JSON.stringify(submissionData));
-      console.log("buffer-------------",buffer);
-      const result = await ipfs.add(buffer);
-      console.log('IPFS Hash:', result.path);
-      setSubmissions([...submissions, { mood, content, timestamp }]);
-      setContent('');
-      setMood('');
-    } catch (error) {
-      console.error('Error uploading to IPFS:', error);
-      alert('Failed to upload your submission. Please try again.');
+  const handleSubmit = async () => {
+    if (mood && content) {
+      try {
+        const timestamp = new Date().toISOString();
+        const submissionData = { mood, content, timestamp };
+        const buffer = Buffer.from(JSON.stringify(submissionData));
+        console.log("buffer-------------", buffer);
+        const result = await ipfs.add(buffer);
+        console.log("IPFS Hash:", result.path);
+        setSubmissions([...submissions, { mood, content, timestamp }]);
+        setContent("");
+        setMood("");
+      } catch (error) {
+        console.error("Error uploading to IPFS:", error);
+        alert("Failed to upload your submission. Please try again.");
+      }
+    } else {
+      alert("Please select a mood and enter content.");
     }
-  } else {
-    alert('Please select a mood and enter content.');
-  }
-};
+  };
 
   return (
     <div className="container mx-auto min-h-screen mb-2 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
       {/* Wallet and Vanity Address */}
       <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
         <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
-          <p>{address?.slice(0, 6)}...{address?.slice(-4)}</p>
+          <p>
+            {address?.slice(0, 6)}...{address?.slice(-4)}
+          </p>
         </div>
         <div className="text-center w-full max-w-xs">
           <p className="text-blue-400 cursor-pointer">Wallet Address</p>
         </div>
         <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
-          <p>{vanityAddress?.slice(0, 6)}...{vanityAddress?.slice(-4)}</p>
+          <p>
+            {vanityAddress?.slice(0, 6)}...{vanityAddress?.slice(-4)}
+          </p>
         </div>
         <div className="text-center w-full max-w-xs">
           <p className="text-blue-400 cursor-pointer">Vanity Address</p>
         </div>
       </div>
 
-
       {/* Mood Dropdown */}
       <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
-        <label htmlFor="mood" className="text-md font-semibold mb-2 text-blue-400 block">Select Mood</label>
+        <label
+          htmlFor="mood"
+          className="text-md font-semibold mb-2 text-blue-400 block"
+        >
+          Select Mood
+        </label>
         <select
           id="mood"
           className="w-full p-3 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
           value={mood}
           onChange={handleMoodChange}
         >
-         <option value="">Select a mood...</option>
+          <option value="">Select a mood...</option>
           {moodOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -154,12 +167,16 @@ const handleSubmit = async () => {
 
       {/* Your Contributions */}
       <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
-        <p className="text-md font-semibold mb-4 text-blue-400">Your Contributions</p>
+        <p className="text-md font-semibold mb-4 text-blue-400">
+          Your Contributions
+        </p>
         {/* Displaying submissions in accordion */}
         {submissions.length > 0 ? (
           <Contributions submissions={submissions} />
         ) : (
-          <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">No contributions yet.</p>
+          <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">
+            No contributions yet.
+          </p>
         )}
       </div>
     </div>

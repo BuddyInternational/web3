@@ -208,7 +208,7 @@ export default function App() {
                       className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="CDE"
                     >
-                      <img src="/CDE.png" className="h-4 w-auto" />
+                      <img src="/CDE.svg" className="h-4 w-auto" />
                     </a>
                   </Tooltip>
                 </div>
