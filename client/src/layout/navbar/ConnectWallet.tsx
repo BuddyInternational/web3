@@ -1,4 +1,4 @@
-import { Box, Button, Skeleton, Tooltip } from "@mui/material";
+import { Button, Skeleton, Tooltip } from "@mui/material";
 import {
   createWeb3Modal,
   defaultConfig,
@@ -208,7 +208,7 @@ export default function App() {
                       className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="CDE"
                     >
-                      <img src="/CDE.svg" className="h-4 w-auto" />
+                      <img src="/CDE.svg" className="h-4 w-auto" alt="CDE"/>
                     </a>
                   </Tooltip>
                 </div>

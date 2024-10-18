@@ -1,29 +1,29 @@
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
 import { create as createIPFSClient } from "ipfs-http-client";
+import { getUserContent, saveContentDetails } from "../api/userContentAPI";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
+import { MdKeyboardBackspace } from "react-icons/md";
 
 // Define mood options
 const moodOptions = [
-  { label: "Happy  😊", value: "😊" },
-  { label: "Sad  😢", value: "😢" },
-  { label: "Angry  😠", value: "😠" },
-  { label: "Excited  🎉", value: "🎉" },
-  { label: "Thoughtful  🤔", value: "🤔" },
-  { label: "Surprised  😲", value: "😲" },
-  { label: "Relaxed  😌", value: "😌" },
-  { label: "Nervous  😬", value: "😬" },
-  { label: "Curious  🤨", value: "🤨" },
-  { label: "Confident  😎", value: "😎" },
-  { label: "Grateful  🙏", value: "🙏" },
-  { label: "Inspired  ✨", value: "✨" },
-  { label: "Confused  🤯", value: "🤯" },
+  { label: "Happy  😊", value: "Happy 😊" },
+  { label: "Sad  😢", value: "Sad 😢" },
+  { label: "Angry  😠", value: " Angry 😠" },
+  { label: "Excited  🎉", value: "Excited 🎉" },
+  { label: "Thoughtful  🤔", value: "Thoughtful 🤔" },
+  { label: "Surprised  😲", value: "Surprised 😲" },
+  { label: "Relaxed  😌", value: "Relaxed 😌" },
+  { label: "Nervous  😬", value: " Nervous😬" },
+  { label: "Curious  🤨", value: "Curious 🤨" },
+  { label: "Confident  😎", value: "Confident 😎" },
+  { label: "Grateful  🙏", value: "Grateful 🙏" },
+  { label: "Inspired  ✨", value: "Inspired ✨" },
+  { label: "Confused  🤯", value: "Confused 🤯" },
 ];
-
-// const ipfs = createIPFSClient({
-//   url: `https://${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}@ipfs.infura.io:5001/api/v0`,
-// });
 
 const ipfs = createIPFSClient({
   host: "ipfs.infura.io",
@@ -38,16 +38,15 @@ const ipfs = createIPFSClient({
   },
 });
 
-console.log("ipfs===========", ipfs);
-
 const ContributeContent: React.FC = () => {
-  const { address } = useWeb3ModalAccount();
+  const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [submissions, setSubmissions] = useState<
-    { mood: string; content: string; timestamp: string }[]
+    { mood: string; content: string; generateContentDate: string }[]
   >([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -59,127 +58,158 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
-  //  // Handler for submit button
-  //  const handleSubmit = () => {
-  //   // Add new submission to the state
-  //   if (mood && content) {
-  //     const timestamp = new Date().toISOString();
-  //     setSubmissions([...submissions, { mood, content,timestamp }]);
-  //     setContent("");
-  //     setMood("");
-  //   }
-  //   else {
-  //     alert("Please select a mood and enter content.");
-  //   }
-  // };
-
   const handleSubmit = async () => {
     if (mood && content) {
+      setLoading(true);
       try {
         const timestamp = new Date().toISOString();
         const submissionData = { mood, content, timestamp };
         const buffer = Buffer.from(JSON.stringify(submissionData));
-        console.log("buffer-------------", buffer);
         const result = await ipfs.add(buffer);
         console.log("IPFS Hash:", result.path);
-        setSubmissions([...submissions, { mood, content, timestamp }]);
-        setContent("");
-        setMood("");
-      } catch (error) {
-        console.error("Error uploading to IPFS:", error);
-        alert("Failed to upload your submission. Please try again.");
+        const contentDetails = {
+          mood,
+          content,
+          ipfsHash: result.path,
+          generateContentDate: timestamp,
+        };
+
+        // Call the API to save content details
+        const response = await saveContentDetails(
+          address!,
+          vanityAddress,
+          contentDetails
+        );
+
+        if (response) {
+          toast.success("Content saved successfully");
+          setContent("");
+          setMood("");
+        }
+      } catch (error: any) {
+        toast.error("Error uploading to IPFS:", error);
+      } finally {
+        setLoading(false);
       }
     } else {
-      alert("Please select a mood and enter content.");
+      toast.error("Please select a Mood & Enter content.");
     }
   };
 
+  useEffect(() => {
+    const fetchUserContent = async () => {
+      if (address && isConnected) {
+        const userContent = await getUserContent(address!);
+        if (userContent && userContent.data) {
+          setSubmissions(userContent.data.contentDetails || []);
+        }
+      }
+    };
+
+    fetchUserContent();
+  }, [address, isConnected, submissions]);
+
   return (
-    <div className="container mx-auto min-h-screen mb-2 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
-      {/* Wallet and Vanity Address */}
-      <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
-        <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
-          <p>
-            {address?.slice(0, 6)}...{address?.slice(-4)}
-          </p>
-        </div>
-        <div className="text-center w-full max-w-xs">
-          <p className="text-blue-400 cursor-pointer">Wallet Address</p>
-        </div>
-        <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
-          <p>
-            {vanityAddress?.slice(0, 6)}...{vanityAddress?.slice(-4)}
-          </p>
-        </div>
-        <div className="text-center w-full max-w-xs">
-          <p className="text-blue-400 cursor-pointer">Vanity Address</p>
-        </div>
-      </div>
-
-      {/* Mood Dropdown */}
-      <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
-        <label
-          htmlFor="mood"
-          className="text-md font-semibold mb-2 text-blue-400 block"
-        >
-          Select Mood
-        </label>
-        <select
-          id="mood"
-          className="w-full p-3 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
-          value={mood}
-          onChange={handleMoodChange}
-        >
-          <option value="">Select a mood...</option>
-          {moodOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Content Section */}
-      <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
-        <p className="text-md font-semibold mb-4 text-blue-400">Content</p>
-        <textarea
-          className="w-full h-40 p-4 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
-          placeholder="Please Enter Your Content..."
-          value={content}
-          onChange={handleContentChange}
-        ></textarea>
-      </div>
-
-      {/* Disclaimers Section */}
-      <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 ">
-        <p className="mb-2">1) If used, rewarded.</p>
-        <p className="mb-2">2) 10 USD fees.</p>
-        <p className="mb-4">3) On-chain message is required.</p>
-      </div>
-
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
+    <>
+      <Link
+        to="/"
+        className="container m-auto text-blue-500 hover:underline flex items-center mb-4"
       >
-        Submit
-      </button>
-
-      {/* Your Contributions */}
-      <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
-        <p className="text-md font-semibold mb-4 text-blue-400">
-          Your Contributions
-        </p>
-        {/* Displaying submissions in accordion */}
-        {submissions.length > 0 ? (
-          <Contributions submissions={submissions} />
-        ) : (
-          <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">
-            No contributions yet.
-          </p>
+        <MdKeyboardBackspace className="text-3xl text-white mr-2" />
+      </Link>
+      <div className="container mx-auto min-h-screen  mb-2 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
+        {/* Display Loader */}
+        {loading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="loader border-8 border-t-8 border-gray-400 border-t-white rounded-full w-20 h-20 animate-spin"></div>
+          </div>
         )}
+
+        {/* Wallet and Vanity Address */}
+        <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
+          <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
+            <p>
+              {address?.slice(0, 6)}...{address?.slice(-4)}
+            </p>
+          </div>
+          <div className="text-center w-full max-w-xs">
+            <p className="text-blue-400 cursor-pointer">Wallet Address</p>
+          </div>
+          <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">
+            <p>
+              {vanityAddress?.slice(0, 6)}...{vanityAddress?.slice(-4)}
+            </p>
+          </div>
+          <div className="text-center w-full max-w-xs">
+            <p className="text-blue-400 cursor-pointer">Vanity Address</p>
+          </div>
+        </div>
+
+        {/* Mood Dropdown */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
+          <label
+            htmlFor="mood"
+            className="text-md font-semibold mb-2 text-blue-400 block"
+          >
+            Select Mood
+          </label>
+          <select
+            id="mood"
+            className="w-full p-3 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
+            value={mood}
+            onChange={handleMoodChange}
+          >
+            <option value="">Select a mood...</option>
+            {moodOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Content Section */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
+          <p className="text-md font-semibold mb-4 text-blue-400">Content</p>
+          <textarea
+            className="w-full h-40 p-4 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
+            placeholder="Please Enter Your Content..."
+            value={content}
+            onChange={handleContentChange}
+          ></textarea>
+        </div>
+
+        {/* Disclaimers Section */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 ">
+          <p className="mb-2">1) If used, rewarded.</p>
+          <p className="mb-2">2) 10 USD fees.</p>
+          <p className="mb-4">3) On-chain message is required.</p>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={handleSubmit}
+          className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
+        >
+          Submit
+        </button>
+
+        {/* Your Contributions */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
+          <p className="text-md font-semibold mb-4 text-blue-400">
+            Your Contributions
+          </p>
+          {/* Displaying submissions in accordion */}
+          {submissions.length > 0 ? (
+            <Contributions submissions={submissions} />
+          ) : (
+            <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">
+              No contributions yet.
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

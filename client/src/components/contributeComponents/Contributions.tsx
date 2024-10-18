@@ -1,6 +1,5 @@
 import * as React from "react";
 import Accordion from "@mui/material/Accordion";
-import AccordionActions from "@mui/material/AccordionActions";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -10,7 +9,7 @@ import { Typography } from "@mui/material";
 interface Submission {
   mood: string;
   content: string;
-  timestamp: string;
+  generateContentDate: string;
 }
 
 interface ContributionsProps {
@@ -18,7 +17,6 @@ interface ContributionsProps {
 }
 
 const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
-  console.log("submissions--------------", submissions);
 
   return (
     <div className="border-2 border-blue-400 rounded-md">
@@ -34,12 +32,24 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
           >
             <div className="flex sm:flex-col md:flex-row sm:justify-center md:justify-between w-full gap-2">
               <div className="flex-1 sm:text-center md:text-left">
-                <Typography variant="body2" color="inherit">
-                  {new Date(submission.timestamp).toLocaleString()}
+                <Typography
+                  variant="body2"
+                  color="inherit"
+                  sx={{
+                    margin: { sm: "auto", md: "auto" },
+                  }}
+                >
+                  {new Date(submission.generateContentDate).toLocaleString()}
                 </Typography>
               </div>
               <div className="flex-1 text-center">
-                <Typography variant="body2" color="inherit">
+                <Typography
+                  variant="body2"
+                  color="inherit"
+                  sx={{
+                    margin: { sm: "auto", md: "auto" },
+                  }}
+                >
                   {submission.mood}
                 </Typography>
               </div>
@@ -47,16 +57,16 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
                 <Button
                   variant="outlined"
                   color="primary"
-                  size="small" 
+                  size="small"
                   sx={{
-                    display: { sm: "block", md: "inline-block" }, 
-                    padding: { sm: "4px 8px", md: "4px 8px" }, 
-                    fontSize: { sm: "0.75rem", md: "0.875rem" }, 
-                    margin: {sm : "auto" ,md:"0px"},
+                    display: { sm: "block", md: "inline-block" },
+                    padding: { sm: "4px 8px", md: "4px 8px" },
+                    fontSize: { sm: "0.75rem", md: "0.875rem" },
+                    margin: { sm: "auto", md: "0px" },
                   }}
-                  onClick={() => {
-                    return alert("Submit Application");
-                  }}
+                  // onClick={() => {
+                  //   return alert("Submit Application");
+                  // }}
                 >
                   Submit Application
                 </Button>
