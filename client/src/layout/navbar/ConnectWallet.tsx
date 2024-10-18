@@ -200,6 +200,17 @@ export default function App() {
                       <SiPolygon />
                     </a>
                   </Tooltip>
+                  <Tooltip title="CDE" arrow>
+                    <a
+                      href={`/#`}
+                      // target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1 cursor-pointer"
+                      data-tip="CDE"
+                    >
+                      <img src="/CDE.png" className="h-4 w-auto" />
+                    </a>
+                  </Tooltip>
                 </div>
                 <div>
                   <hr className="border-t border-gray-600 w-full mt-2" />
@@ -214,11 +225,11 @@ export default function App() {
             <w3m-button />
           ) : (
             <div
-            //   sx={{
-            //     display: "flex",
-            //     gap: 2,
-            //   }}
-            className="flex gap-3 sm:flex-col md:flex-row "
+              //   sx={{
+              //     display: "flex",
+              //     gap: 2,
+              //   }}
+              className="flex gap-3 sm:flex-col md:flex-row "
             >
               <w3m-network-button />
               <Button

@@ -220,8 +220,8 @@ const Home = () => {
         setsocketNFTImageMediaType(null);
       }
     };
-    fetchTokenBalance();
-    fetchNFTs();
+    // fetchTokenBalance();
+    // fetchNFTs();
     fetchAccountPersonaNFT();
   }, [
     address,
@@ -415,6 +415,17 @@ const Home = () => {
                     <SiPolygon />
                   </a>
                 </Tooltip>
+                <Tooltip title="CDE" arrow>
+                    <a
+                      href={`/#`}
+                      // target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1 cursor-pointer"
+                      data-tip="CDE"
+                    >
+                      <img src="/CDE.png" className="h-4 w-auto" />
+                    </a>
+                  </Tooltip>
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
