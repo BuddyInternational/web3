@@ -5,6 +5,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
+import { toast } from "react-toastify";
 
 interface Submission {
   mood: string;
@@ -17,7 +18,6 @@ interface ContributionsProps {
 }
 
 const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
-
   return (
     <div className="border-2 border-blue-400 rounded-md">
       {submissions.map((submission, index) => (
@@ -31,17 +31,6 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
             id={`panel${index}-header`}
           >
             <div className="flex sm:flex-col md:flex-row sm:justify-center md:justify-between w-full gap-2">
-              <div className="flex-1 sm:text-center md:text-left">
-                <Typography
-                  variant="body2"
-                  color="inherit"
-                  sx={{
-                    margin: { sm: "auto", md: "auto" },
-                  }}
-                >
-                  {new Date(submission.generateContentDate).toLocaleString()}
-                </Typography>
-              </div>
               <div className="flex-1 text-center">
                 <Typography
                   variant="body2"
@@ -51,6 +40,17 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
                   }}
                 >
                   {submission.mood}
+                </Typography>
+              </div>
+              <div className="flex-1 sm:text-center md:text-left">
+                <Typography
+                  variant="body2"
+                  color="inherit"
+                  sx={{
+                    margin: { sm: "auto", md: "auto" },
+                  }}
+                >
+                  {new Date(submission.generateContentDate).toLocaleString()}
                 </Typography>
               </div>
               <div className="flex-1 sm:text-center md:text-right">
@@ -64,9 +64,9 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
                     fontSize: { sm: "0.75rem", md: "0.875rem" },
                     margin: { sm: "auto", md: "0px" },
                   }}
-                  // onClick={() => {
-                  //   return alert("Submit Application");
-                  // }}
+                  onClick={() => {
+                    return toast.warning("This Feature is Disble Right Now!");
+                  }}
                 >
                   Submit Application
                 </Button>

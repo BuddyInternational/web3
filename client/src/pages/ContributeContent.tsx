@@ -117,7 +117,7 @@ const ContributeContent: React.FC = () => {
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
-      <div className="container mx-auto min-h-screen  mb-2 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
+      <div className="container mx-auto min-h-screen py-10 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
         {/* Display Loader */}
         {loading && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -180,11 +180,21 @@ const ContributeContent: React.FC = () => {
         </div>
 
         {/* Disclaimers Section */}
-        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 ">
-          <p className="mb-2">1) If used, rewarded.</p>
-          <p className="mb-2">2) 10 USD fees.</p>
-          <p className="mb-4">3) On-chain message is required.</p>
-        </div>
+        <ol className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 list-decimal list-inside my-3">
+          <li className="my-3">
+            If your contributed content is used, you will be rewarded with the
+            tokens.
+          </li>
+          <li className="my-5">
+            $10 USD worth of fees will be deducted when the on-chain message is
+            propagated through the network once you submit your contribution.
+          </li>
+          <li className="my-3">
+            <strong>Message:</strong> The user with Wallet Address "{address}"
+            and Vanity Wallet "{vanityAddress}" has submitted a new contribution
+            to the network.
+          </li>
+        </ol>
 
         {/* Submit Button */}
         <button
