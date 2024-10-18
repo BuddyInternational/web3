@@ -220,8 +220,8 @@ const Home = () => {
         setsocketNFTImageMediaType(null);
       }
     };
-    // fetchTokenBalance();
-    // fetchNFTs();
+    fetchTokenBalance();
+    fetchNFTs();
     fetchAccountPersonaNFT();
   }, [
     address,
