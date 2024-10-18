@@ -24,6 +24,7 @@
     "craco": "^0.0.3",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
+    "ipfs-http-client": "^60.0.1",
     "material-react-table": "^3.0.1",
     "moment": "^2.30.1",
     "moralis": "^2.27.2",

@@ -2,6 +2,8 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import React, { useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
+import { create as createIPFSClient } from 'ipfs-http-client';
+
 
 // Define mood options
 const moodOptions = [
@@ -20,6 +22,21 @@ const moodOptions = [
   { label: "Confused  🤯", value: "🤯" },
 ];
 
+const ipfs = createIPFSClient({
+  url: `https://${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}@ipfs.infura.io:5001/api/v0`
+});
+
+// const ipfs = create({
+//   host: 'ipfs.infura.io',
+//   port: 5001,
+//   protocol: 'https',
+//   headers: {
+//     Authorization: 'Basic ' + btoa(`${process.env.REACT_APP_INFURA_PROJECT_ID}:${process.env.REACT_APP_INFURA_PROJECT_SECRET}`),
+//   },
+// });
+
+console.log("ipfs===========",ipfs);
+
 const ContributeContent: React.FC = () => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
@@ -37,17 +54,38 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
- // Handler for submit button
- const handleSubmit = () => {
-  // Add new submission to the state
+//  // Handler for submit button
+//  const handleSubmit = () => {
+//   // Add new submission to the state
+//   if (mood && content) {
+//     const timestamp = new Date().toISOString();
+//     setSubmissions([...submissions, { mood, content,timestamp }]);
+//     setContent(""); 
+//     setMood(""); 
+//   }
+//   else {
+//     alert("Please select a mood and enter content.");
+//   }
+// };
+
+const handleSubmit = async () => {
   if (mood && content) {
-    const timestamp = new Date().toISOString();
-    setSubmissions([...submissions, { mood, content,timestamp }]);
-    setContent(""); 
-    setMood(""); 
-  }
-  else {
-    alert("Please select a mood and enter content.");
+    try {
+      const timestamp = new Date().toISOString();
+      const submissionData = { mood, content, timestamp };
+      const buffer = Buffer.from(JSON.stringify(submissionData));
+      console.log("buffer-------------",buffer);
+      const result = await ipfs.add(buffer);
+      console.log('IPFS Hash:', result.path);
+      setSubmissions([...submissions, { mood, content, timestamp }]);
+      setContent('');
+      setMood('');
+    } catch (error) {
+      console.error('Error uploading to IPFS:', error);
+      alert('Failed to upload your submission. Please try again.');
+    }
+  } else {
+    alert('Please select a mood and enter content.');
   }
 };
 
@@ -102,8 +140,8 @@ const ContributeContent: React.FC = () => {
       {/* Disclaimers Section */}
       <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 ">
         <p className="mb-2">1) If used, rewarded.</p>
-        <p className="mb-2">2) If used, fees apply.</p>
-        <p className="mb-4">3) On-chain message passing is required.</p>
+        <p className="mb-2">2) 10 USD fees.</p>
+        <p className="mb-4">3) On-chain message is required.</p>
       </div>
 
       {/* Submit Button */}
