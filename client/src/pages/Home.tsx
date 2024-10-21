@@ -189,8 +189,6 @@ const Home = () => {
       }
       // console.log("address--------",address);
       if(address){
-
-      
       // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
       // const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
       // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
@@ -370,7 +368,7 @@ const Home = () => {
               className="hover:text-[#5692D9] cursor-pointer underline"
               onClick={handleOpenModal(setOpenCDERewardModal)}
             >
-              Wrap or purchase your CDE for a discount off the market price!
+              Purchase and/or Wrap your CDE for % off Market Price!
             </Link>
             <Link
               to={`/quest/completed/${address}`}

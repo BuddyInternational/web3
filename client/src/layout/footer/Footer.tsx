@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import SupportMenu from "./SupportMenu";
 import { FaHeart } from "react-icons/fa";
+import VendorRewardModal from "./modals/VendorRewardModal";
 
 const Footer: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Function to handle opening the modal Transient Vendor Rewards
+  const handleOpenModal = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    event.preventDefault(); 
+    setIsModalOpen(true);
+  };
+
+  // Function to handle closing the modal Transient Vendor Rewards
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <footer className="bg-[#00000044] text-white py-8">
       <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
@@ -45,6 +58,15 @@ const Footer: React.FC = () => {
             Terms of Use
           </a>
           <a
+            href="/#"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
+            onClick={handleOpenModal}
+          >
+            Transient Vendor Rewards 
+          </a>
+          <a
             href="/privacy-policy.pdf"
             target="_blank"
             rel="noopener noreferrer"
@@ -62,6 +84,8 @@ const Footer: React.FC = () => {
           </a>
           <SupportMenu />
         </div>
+        {/* VendorReward Modal */}
+      <VendorRewardModal open={isModalOpen} onClose={handleCloseModal} />
       </div>
     </footer>
   );

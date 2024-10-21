@@ -8,9 +8,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { IoClose } from "react-icons/io5";
-import CommonJotform from "../../utils/CommonJotform";
+import CommonJotform from "../../../utils/CommonJotform";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-import { useVanityContext } from "../../context/VanityContext";
+import { useVanityContext } from "../../../context/VanityContext";
 const supportQueryFormUrl = process.env.REACT_APP_SUPPORT_QUERY_JOTFORM_LINK;
 
 const SupporyQueryModal: React.FC<{

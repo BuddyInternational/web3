@@ -3,7 +3,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { IoMdCall } from "react-icons/io";
 import { FaWpforms } from "react-icons/fa";
-import SupporyQueryModal from "./SupporyQueryModal";
+import SupporyQueryModal from "./modals/SupporyQueryModal";
 import { Typography } from "@mui/material";
 
 const SupportMenu: React.FC = () => {

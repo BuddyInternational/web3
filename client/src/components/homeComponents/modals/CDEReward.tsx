@@ -176,7 +176,7 @@ const CDEReward: React.FC<{
               sx={{ m: 0, p: 2, textAlign: "center" }}
               id="customized-dialog-title"
             >
-              Wrap or purchase your CDE for a discount off the market price!
+               Purchase and/or Wrap your CDE for % off Market Price!
             </DialogTitle>
             <IconButton
               aria-label="close"
