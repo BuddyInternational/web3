@@ -22,6 +22,7 @@ import SocketNFT from "../components/homeComponents/modals/SocketNFT";
 import { HiMiniTv } from "react-icons/hi2";
 import { GiBiceps } from "react-icons/gi";
 import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
+import { toast } from "react-toastify";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -220,8 +221,8 @@ const Home = () => {
         setsocketNFTImageMediaType(null);
       }
     };
-    // fetchTokenBalance();
-    // fetchNFTs();
+    fetchTokenBalance();
+    fetchNFTs();
     fetchAccountPersonaNFT();
   }, [
     address,
@@ -241,6 +242,14 @@ const Home = () => {
       return newImageUrl;
     }
     return imageUrl;
+  };
+
+  // navigate the user generated content page if user connected
+  const handleClick = (e: any) => {
+    if (!isConnected || !address) {
+      e.preventDefault();
+      toast.warning("Please connect your wallet to generate the content.");
+    }
   };
 
   return (
@@ -349,9 +358,11 @@ const Home = () => {
             <Link
               to={`/content/${address}`}
               className="hover:text-[#5692D9] cursor-pointer underline"
+              onClick={handleClick}
             >
               Contribute user generated content
             </Link>
+
             {/* divider */}
             <div>
               <hr className="sm:border-t sm:border-gray-600 sm:w-11/12 sm:my-4 md:border-t-0 md:w-0 md:my-0 md:m-0" />
