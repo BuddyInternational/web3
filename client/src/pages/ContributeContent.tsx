@@ -2,7 +2,7 @@ import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
 import { create as createIPFSClient } from "ipfs-http-client";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { ethers } from "ethers";
+import { FaCheck, FaRegCopy } from "react-icons/fa";
 
 // Define mood options
 const moodOptions = [
@@ -52,6 +53,10 @@ const ContributeContent: React.FC = () => {
     { mood: string; content: string; generateContentDate: string }[]
   >([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
+  const [isVanityAddressCopied, setIsVanityAddressCopied] = useState(false);
+  const copyAddressTimeoutRef: any = useRef(null);
+  const copyVanityAddressTimeoutRef: any = useRef(null);
   const ethersProvider = new ethers.BrowserProvider(
     walletProvider as ethers.Eip1193Provider
   );
@@ -266,9 +271,47 @@ const ContributeContent: React.FC = () => {
             propagated through the network once you submit your contribution.
           </li>
           <li className="my-3">
-            <strong>Message:</strong> The user with Wallet Address "{address}"
-            and Vanity Wallet "{vanityAddress}" has submitted a new contribution
-            to the network.
+            <strong>Message:</strong> The user with Wallet Address "{address}"{" "}
+            <strong className="inline-flex items-center mx-1">
+              {isWalletAddressCopied ? (
+                <FaCheck className="text-green-500 cursor-pointer" />
+              ) : (
+                <FaRegCopy
+                  onClick={() => {
+                    navigator.clipboard.writeText(address || "");
+                    setIsWalletAddressCopied(true);
+                    clearTimeout(copyAddressTimeoutRef.current);
+                    copyAddressTimeoutRef.current = setTimeout(() => {
+                      setIsWalletAddressCopied(false);
+                    }, 1000);
+                  }}
+                  className="text-[#5692D9] font-thin cursor-pointer"
+                  data-tip="Copy Wallet Address"
+                  data-tip-content=".tooltip"
+                />
+              )}
+            </strong>
+            and Vanity Wallet "{vanityAddress}"{" "}
+            <strong className="inline-flex items-center mx-1">
+              {isVanityAddressCopied ? (
+                <FaCheck className=" text-green-500 cursor-pointer" />
+              ) : (
+                <FaRegCopy
+                  onClick={() => {
+                    navigator.clipboard.writeText(vanityAddress || "");
+                    setIsVanityAddressCopied(true);
+                    clearTimeout(copyVanityAddressTimeoutRef.current);
+                    copyVanityAddressTimeoutRef.current = setTimeout(() => {
+                      setIsVanityAddressCopied(false);
+                    }, 1000);
+                  }}
+                  className="text-[#5692D9] font-thin cursor-pointer"
+                  data-tip="Copy Vanity Address"
+                  data-tip-content=".tooltip"
+                />
+              )}
+            </strong>{" "}
+            has submitted a new contribution to the network.
           </li>
         </ol>
 

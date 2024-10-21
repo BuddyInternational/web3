@@ -30,6 +30,35 @@ const tokenAddresses: any = {
   CDE2: process.env.REACT_APP_TOKEN2_ADDRESS,
   TIM: process.env.REACT_APP_TOKEN3_ADDRESS,
 };
+
+const tokenDetails = {
+  [process.env.REACT_APP_TOKEN1_ADDRESS!]: {
+    name: "CDE®v1",
+    symbol: "CDE",
+  },
+  [process.env.REACT_APP_TOKEN2_ADDRESS!]: {
+    name: "CDE®v2",
+    symbol: "CDE",
+  },
+  [process.env.REACT_APP_TOKEN3_ADDRESS!]: {
+    name: (
+      <span style={{ display: "flex", alignItems: "center" }}>
+        TIM
+        <img
+          src="/TIM.svg"
+          alt="TIM Logo"
+          style={{
+            height: "0.8em",
+            marginLeft: "1px",
+            verticalAlign: "middle",
+          }}
+        />
+      </span>
+    ),
+    symbol: "TIM",
+  },
+};
+
 const TestCDEAddress: any =
   process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS;
 
@@ -38,13 +67,13 @@ const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 
-// const testWalletAddress: any = process.env.TEST_WALLET_ADDRESS;
+const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const [balances, setBalances] = useState<any>({
-    wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-    vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
+    wallet: [],
+    vanity: [],
   });
   const [testCDEBalance, setTestCDEBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
@@ -84,8 +113,8 @@ const Home = () => {
     try {
       if (!isConnected && !address && !vanityAddress) {
         setBalances({
-          wallet: { CDE1: 0, CDE2: 0, TIM: 0 },
-          vanity: { CDE1: 0, CDE2: 0, TIM: 0 },
+          wallet: [],
+          vanity: [],
         });
         setTestCDEBalance(0);
         return;
@@ -110,9 +139,13 @@ const Home = () => {
 
       // console.log("walletbalances--------------", walletbalances);
 
-      const formattedWalletBalances = walletbalances.map((balance) =>
-        Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
-      );
+      const formattedWalletBalances = walletbalances.map((balance, idx) => ({
+        name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
+          .name,
+        symbol:
+          tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
+        balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
+      }));
 
       // vanity address balance
       const vanitybalances = await Promise.all(
@@ -121,9 +154,13 @@ const Home = () => {
 
       // console.log("vanitybalances---------", vanitybalances);
 
-      const formattedVanityBalances = vanitybalances.map((balance) =>
-        Number(Web3.utils.fromWei(balance, "ether")).toFixed(4)
-      );
+      const formattedVanityBalances = vanitybalances.map((balance, idx) => ({
+        name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
+          .name,
+        symbol:
+          tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
+        balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
+      }));
 
       // test CDE address balance
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
@@ -135,16 +172,8 @@ const Home = () => {
       ).toFixed(4);
 
       setBalances({
-        wallet: {
-          CDE1: Number(formattedWalletBalances[0]),
-          CDE2: Number(formattedWalletBalances[1]),
-          TIM: Number(formattedWalletBalances[2]),
-        },
-        vanity: {
-          CDE1: Number(formattedVanityBalances[0]),
-          CDE2: Number(formattedVanityBalances[1]),
-          TIM: Number(formattedVanityBalances[2]),
-        },
+        wallet: formattedWalletBalances,
+        vanity: formattedVanityBalances,
       });
       setTestCDEBalance(Number(formattedTestCDEBalance));
     } catch (error) {
@@ -158,7 +187,8 @@ const Home = () => {
       if (!Moralis.Core.isStarted) {
         await Moralis.start({ apiKey: api_key });
       }
-      const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
+      // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
+      const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
       // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
       // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
       // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // sepolia
@@ -333,7 +363,7 @@ const Home = () => {
               className="hover:text-[#5692D9] cursor-pointer underline"
               onClick={handleOpenModal(setOpenCDERewardModal)}
             >
-              Wrap Your CDE & TIM Token
+              Wrap or purchase your CDE for a discount off the market price!
             </Link>
             <Link
               to={`/quest/completed/${address}`}
@@ -383,16 +413,17 @@ const Home = () => {
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
-            {Object.keys(balances.wallet).map((token, idx) => (
+
+            {balances.wallet.map((token: any, idx: number) => (
               <div
                 key={idx}
                 className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
               >
-                <span className="text-[#5692D9] mr-2">
-                  {token} Token Balance:
+                <span className="text-[#5692D9] mr-2 flex gap-1">
+                  <p>{token.name}</p> <p>Token Balance:</p>
                 </span>{" "}
                 <span>
-                  {balances.wallet[token]} {token}
+                  {token.balance} {token.symbol}
                 </span>
               </div>
             ))}
@@ -440,16 +471,17 @@ const Home = () => {
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
-            {Object.keys(balances.vanity).map((token, idx) => (
+
+            {balances.vanity.map((token: any, idx: number) => (
               <div
                 key={idx}
                 className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
               >
-                <span className="text-[#5692D9] mr-2">
-                  {token} Token Balance:
+                <span className="text-[#5692D9] mr-2 flex gap-1">
+                  <p>{token.name}</p> <p>Token Balance:</p>
                 </span>{" "}
                 <span>
-                  {balances.vanity[token]} {token}
+                  {token.balance} {token.symbol}
                 </span>
               </div>
             ))}

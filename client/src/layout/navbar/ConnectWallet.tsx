@@ -208,7 +208,7 @@ export default function App() {
                       className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="CDE"
                     >
-                      <img src="/CDE.svg" className="h-4 w-auto" alt="CDE"/>
+                      <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                     </a>
                   </Tooltip>
                 </div>
@@ -224,13 +224,7 @@ export default function App() {
           {!isConnected ? (
             <w3m-button />
           ) : (
-            <div
-              //   sx={{
-              //     display: "flex",
-              //     gap: 2,
-              //   }}
-              className="flex gap-3 sm:flex-col md:flex-row "
-            >
+            <div className="flex gap-3 sm:flex-col md:flex-row items-center ">
               <w3m-network-button />
               <Button
                 variant="contained"

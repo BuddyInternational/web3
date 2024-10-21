@@ -27,8 +27,8 @@ const CDEReward: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-  const { address,chainId } = useWeb3ModalAccount();
-  console.log("chainId========",chainId);
+  const { address, chainId } = useWeb3ModalAccount();
+  console.log("chainId========", chainId);
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
@@ -44,24 +44,22 @@ const CDEReward: React.FC<{
     receiver: "walletAddress", // Default receiver
   });
 
-
   useEffect(() => {
     // Mapping chainId to chain names
-  const chainMapping:any = {
-    1: "Ethereum",     
-    137: "Polygon",     
-    42161: "Arbitrum",  
-    11155111: "Sepolia" 
-  };
+    const chainMapping: any = {
+      1: "Ethereum",
+      137: "Polygon",
+      42161: "Arbitrum",
+      11155111: "Sepolia",
+    };
     if (chainId) {
-      const selectedChain = chainMapping[chainId] || "Ethereum"; 
-      setInputValues(prevValues => ({
+      const selectedChain = chainMapping[chainId] || "Ethereum";
+      setInputValues((prevValues) => ({
         ...prevValues,
         selectedChain,
       }));
     }
   }, [chainId]);
-
 
   // Updated handleChange function
   const handleChange = (
@@ -178,15 +176,15 @@ const CDEReward: React.FC<{
               sx={{ m: 0, p: 2, textAlign: "center" }}
               id="customized-dialog-title"
             >
-              Wrap your ETH for CDE
+              Wrap or purchase your CDE for a discount off the market price!
             </DialogTitle>
             <IconButton
               aria-label="close"
               onClick={onClose}
               sx={(theme) => ({
                 position: "absolute",
-                right: 16,
-                top: 16,
+                right: 12,
+                top: 10,
                 fontSize: "20px",
                 border: "1px solid gray",
                 borderRadius: "10px",
@@ -198,7 +196,7 @@ const CDEReward: React.FC<{
               <form onSubmit={handleSubmit}>
                 <Box display="flex" flexDirection="column" gap={6}>
                   {/* Chain Dropdown */}
-                  
+
                   <FormControl fullWidth variant="outlined">
                     <InputLabel>Chain</InputLabel>
                     <Select
@@ -206,7 +204,7 @@ const CDEReward: React.FC<{
                       value={inputValues.selectedChain}
                       onChange={handleChange}
                       label="Chain"
-                      inputProps={{ readOnly: true }} 
+                      inputProps={{ readOnly: true }}
                       disabled
                     >
                       <MenuItem value="Ethereum">Ethereum</MenuItem>
