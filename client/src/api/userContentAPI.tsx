@@ -9,6 +9,8 @@ interface ContentDetails {
   content?: string;
   ipfsHash?: string;
   generateContentDate: string;
+  isSubbmited: boolean;
+  submissionDate:  string;
 }
 
 // Define Response interfaces
@@ -54,3 +56,39 @@ export const getUserContent = async (walletAddress: string) => {
     return null;
   }
 };
+
+// Function to Delete the User Content
+export const deleteUserContent = async (walletAddress: string,ipfsHash:string) => {
+  try {
+    const response:any = await axios.delete(
+      `${server_api_base_url}/api/user-content/deleteContentDetail/${walletAddress}/${ipfsHash}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting content detail:", error);
+    return null;
+  }
+}
+
+// Function to update a specific content detail
+export const updateContentDetail = async (
+  walletAddress: string,
+  ipfsHash: string,
+  isSubbmited: boolean,
+  submissionDate: string
+) => {
+  try {
+    const response: any = await axios.put(
+      `${server_api_base_url}/api/user-content/updateContentDetail/${walletAddress}/${ipfsHash}`,
+      {
+        isSubbmited,
+        submissionDate,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating content detail:", error);
+    return null;
+  }
+};
+

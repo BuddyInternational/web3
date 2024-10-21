@@ -1,7 +1,4 @@
-import {
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from "@web3modal/ethers/react";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
@@ -10,7 +7,6 @@ import { getUserContent, saveContentDetails } from "../api/userContentAPI";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
-import { ethers } from "ethers";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
 
 // Define mood options
@@ -45,21 +41,24 @@ const ipfs = createIPFSClient({
 
 const ContributeContent: React.FC = () => {
   const { address, isConnected } = useWeb3ModalAccount();
-  const { walletProvider } = useWeb3ModalProvider();
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [submissions, setSubmissions] = useState<
-    { mood: string; content: string; generateContentDate: string }[]
+    {
+      mood: string;
+      content: string;
+      generateContentDate: string;
+      ipfsHash: string;
+      isSubbmited: boolean;
+      submissionDate: string;
+    }[]
   >([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
   const [isVanityAddressCopied, setIsVanityAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const copyVanityAddressTimeoutRef: any = useRef(null);
-  const ethersProvider = new ethers.BrowserProvider(
-    walletProvider as ethers.Eip1193Provider
-  );
 
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -71,63 +70,6 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
-  // Notify gullybuddy.eth (example implementation)
-  async function notifyGullyBuddy(sender: any, content: any) {
-    console.log(
-      `Notifying gullybuddy.eth. Sender: ${sender}, Content: ${content}`
-    );
-
-    // Resolve the ENS name to Ethereum address
-    const gullyBuddyAddress = await resolveENSName("gullybuddy.eth");
-    console.log("ENS Name :", gullyBuddyAddress);
-
-    if (gullyBuddyAddress) {
-      console.log(`Resolved address for gullybuddy.eth: ${gullyBuddyAddress}`);
-
-      // Send a notification via transaction (example)
-      await sendNotificationTransaction(gullyBuddyAddress, content);
-    } else {
-      console.error("Failed to resolve gullybuddy.eth");
-    }
-  }
-
-  // Resolve ENS Name to Ethereum address
-  async function resolveENSName(ensName: string) {
-    try {
-      const ensAddress = await ethersProvider.resolveName(ensName);
-      console.log("ENS Domain address----------", ensAddress);
-      return ensAddress;
-    } catch (error) {
-      console.error(`Error resolving ENS name ${ensName}:`, error);
-      return null;
-    }
-  }
-
-  const sendNotificationTransaction = async (
-    toAddress: string,
-    messageContent: string
-  ) => {
-    console.log("messageContent============", messageContent);
-    try {
-      const signer = await ethersProvider.getSigner();
-      console.log("Signer: ", signer);
-
-      // Convert the message content into a BytesLike value and then to a hex string
-      const encodedMessage = ethers.hexlify(ethers.toUtf8Bytes(messageContent));
-
-      // Create a transaction with the hex-encoded message as the data
-      const tx = await signer.sendTransaction({
-        to: toAddress,
-        value: 0,
-        data: encodedMessage, // Now using the hex-encoded message
-      });
-
-      await tx.wait();
-      console.log("Notification transaction sent to gullybuddy.eth:", tx);
-    } catch (error) {
-      console.error("Error sending notification transaction:", error);
-    }
-  };
   //save the content in Databse and also send onChain notification
   const handleSubmit = async () => {
     if (mood && content) {
@@ -143,6 +85,8 @@ const ContributeContent: React.FC = () => {
           content,
           ipfsHash: result.path,
           generateContentDate: timestamp,
+          isSubbmited: false,
+          submissionDate: '',
         };
 
         // Call the API to save content details
@@ -156,16 +100,6 @@ const ContributeContent: React.FC = () => {
           toast.success("Content saved successfully");
           setContent("");
           setMood("");
-
-          // Notify gullybuddy.eth
-          try {
-            const sender = address!; // Assuming sender is the current user's address
-            const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-            await notifyGullyBuddy(sender, message);
-            toast.success("Notification sent to gullybuddy.eth");
-          } catch (error: any) {
-            toast.error("Error sending notification:", error);
-          }
         }
       } catch (error: any) {
         toast.error("Error uploading to IPFS:", error);
@@ -188,7 +122,7 @@ const ContributeContent: React.FC = () => {
     };
 
     fetchUserContent();
-  }, [address, isConnected, submissions]);
+  }, [address, isConnected, submissions,setSubmissions]);
 
   return (
     <>
