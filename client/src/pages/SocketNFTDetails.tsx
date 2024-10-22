@@ -5,7 +5,7 @@ import NftCard from "../components/homeComponents/card/NftCard";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useVanityContext } from "../context/VanityContext";
 import Moralis from "moralis";
-import { NFTData } from "../utils/Types";
+import { NFTDetails } from "../utils/Types";
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
@@ -13,7 +13,7 @@ const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const SocketNFTDetails = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
-  const [socketNFTdata, setSocketNFTdata] = useState<NFTData[]>([]);
+  const [socketNFTdata, setSocketNFTdata] = useState<NFTDetails[]>([]);
 
   // Fetch Socket NFTs from all chains using moralis
   const fetchSocketNFTs = useCallback(async () => {
@@ -53,6 +53,9 @@ const SocketNFTDetails = () => {
                 timeLastUpdated: nft.last_metadata_sync,
                 floorPrice: nft?.floor_price,
                 floorPriceUsd: nft?.floor_price_usd,
+                lastclaimedAt: null, 
+                totalClaimedRewardCount: 0, 
+                totalClaimedRewardHash: [],
               }))
             )
         );

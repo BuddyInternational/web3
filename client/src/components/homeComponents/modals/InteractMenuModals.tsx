@@ -12,17 +12,21 @@ import {
 import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
 import {
+  useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../../context/VanityContext";
 import { ethers } from "ethers";
-import nftMarketAbi from '../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
+import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import { getClaimDetails, updateNFTClaimDetails } from "../../../api/nftAPI";
+import { NFTDetails } from "../../../utils/Types";
 
 interface ModalContents {
   title: string;
   description: string;
   videoUrl?: string;
   content: any;
+  selectedNFT: NFTDetails;
 }
 
 interface CustomModalProps {
@@ -50,28 +54,50 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   onClose,
   modalContents,
 }) => {
+  const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-
+  const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [lastClaimedAt, setLastClaimedAt] = useState<Date | null>(null);
+  const [timeUntilNextClaim, setTimeUntilNextClaim] = useState(0);
+  const [canClaim, setCanClaim] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Helper to calculate the time difference until the next reward can be claimed
+  const calculateTimeUntilNextClaim = (lastClaimed: Date) => {
+    const now = new Date();
+    const timeDiff = now.getTime() - new Date(lastClaimed).getTime();
+    const secondsSinceLastClaim = timeDiff / 1000;
+    console.log("secondsSinceLastClaim--------", secondsSinceLastClaim);
+    const secondsIn24Hours = 86400; // 24 hours in seconds 86400
+
+    if (secondsSinceLastClaim < secondsIn24Hours) {
+      setTimeUntilNextClaim(secondsIn24Hours - secondsSinceLastClaim);
+      setCanClaim(false); // Cannot claim yet
+    } else {
+      setTimeUntilNextClaim(0);
+      setCanClaim(true); // Can claim reward
+    }
+  };
+
   const claimRewards = async () => {
+    setLoading(true);
     // Check if window.ethereum is available
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
+      setLoading(false); // Reset loading on error
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
       walletProvider as ethers.Eip1193Provider
     );
     const signer = await ethersProvider.getSigner();
-    console.log("signer-------------", signer);
     const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress!,
       nftMarketAbi.abi,
@@ -80,21 +106,64 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     try {
       // alert("Claim rewards called");
       const claimTokenAmount = ethers.parseUnits("10", 18);
-      console.log("claimTokenAmount---------",claimTokenAmount);
-        const tx = await nftMarketContract.claimTimTokenReward(
-          claimTokenAmount,
-          vanityAddress,
-          // { gasLimit: 500000 }
-        );
-        console.log("Transaction sent:", tx);
-        // Wait for the transaction to be confirmed
-        await tx.wait();
-        console.log("Transaction confirmed:", tx.hash);  
-      
+      const tx = await nftMarketContract.claimTimTokenReward(
+        claimTokenAmount,
+        vanityAddress
+      );
+      console.log("Transaction sent:", tx);
+      await tx.wait();
+      console.log("Transaction confirmed:", tx.hash);
+
+      // Now update the NFT claim details in the database
+      const response = await updateNFTClaimDetails(
+        address!,
+        modalContents.selectedNFT.tokenId,
+        modalContents.selectedNFT.contractAddress!,
+        new Date(),
+        [tx.hash]
+      );
+
+      if (response) {
+        setLastClaimedAt(new Date());
+        setCanClaim(false);
+        setTimeLeft(30);
+        onClose();
+      }
     } catch (error) {
       console.log("Error Claiming Rewards", error);
+    } finally {
+      setLoading(false); 
     }
   };
+
+  // Effect to fetch the last claim date from the database when the modal opens
+  useEffect(() => {
+    const fetchLastClaimedAt = async () => {
+      const claimDetails: any = await getClaimDetails(
+        address!,
+        modalContents.selectedNFT.tokenId,
+        modalContents.selectedNFT.contractAddress!
+      );
+      if (claimDetails !== null && claimDetails.lastclaimedAt) {
+        const lastClaimedDate = new Date(claimDetails.lastclaimedAt);
+        setLastClaimedAt(lastClaimedDate);
+        calculateTimeUntilNextClaim(lastClaimedDate);
+      } else {
+        setLastClaimedAt(null);
+        setCanClaim(true);
+      }
+    };
+
+    if (open && modalContents.selectedNFT.contractAddress) {
+      fetchLastClaimedAt();
+    }
+  }, [
+    open,
+    address,
+    modalContents.selectedNFT.contractAddress,
+    modalContents.selectedNFT.tokenId,
+    setLastClaimedAt,
+  ]);
 
   // Effect to handle the timer based on isPlaying state
   useEffect(() => {
@@ -120,13 +189,24 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
 
   // Reset the timer when the modal is opened
   useEffect(() => {
-    if (open) {
+    if (open && canClaim) {
       setTimeLeft(30);
       setIsPlaying(false); // Ensure the timer doesn't start automatically
     } else {
       setIsPlaying(false); // Pause the timer when modal is closed
     }
-  }, [open]);
+  }, [open, canClaim]);
+
+  // Effect to count down timeUntilNextClaim
+  useEffect(() => {
+    if (timeUntilNextClaim > 0) {
+      const interval = setInterval(() => {
+        setTimeUntilNextClaim((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [timeUntilNextClaim]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -191,16 +271,22 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                 <Button
                   variant="contained"
                   onClick={claimRewards}
-                  disabled={timeLeft > 0}
+                  disabled={timeLeft > 0 || !canClaim} // Disable based on 30s timer or 24h rule
                   sx={{
                     width: "100%",
                     m: 3,
                     p: 1,
                   }}
                 >
-                  Claim Reward {timeLeft > 0 && "in "}
-                  {timeLeft > 0 && timeLeft}
-                  {timeLeft > 0 && " Seconds"}
+                  {timeUntilNextClaim > 0
+                    ? `Next Claim Reward After ${Math.floor(
+                        timeUntilNextClaim / 3600
+                      )}h ${Math.floor(
+                        (timeUntilNextClaim % 3600) / 60
+                      )}m ${Math.floor(timeUntilNextClaim % 60)}s`
+                    : timeLeft > 0
+                    ? `Claim Reward in ${timeLeft} Seconds`
+                    : "Claim Reward"}
                 </Button>
               </Box>
             ) : modalContents.content ? (
@@ -215,6 +301,11 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
               </Typography>
             )}
           </DialogContent>
+          {loading && (
+              <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-80 z-50">
+                <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-16 h-16 animate-spin"></div>
+              </div>
+            )}
         </Box>
       </Fade>
     </Modal>

@@ -1,42 +1,96 @@
 import axios from "axios";
+import { NFTDetails } from "../utils/Types";
 
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
-// export const saveNFTDetails = async (nftData: {
-//   walletAddress: string;
-//   vanityAddress: string;
-//   nftAddress: string;
-//   nftName: string;
-//   chainName: string;
-//   imageUri: string;
-//   tokenId: string;
-//   tokenType: string;
-//   priceInEther: number;
-//   priceInUSD: number;
-//   lastclaimedAt: Date;
-//   totalClaimedRewardCount: number;
-//   totalClaimedRewardHash: string;
-// }) => {
-//   try {
-//     const response = await axios.post(
-//       `${server_api_base_url}/api/nft/saveNftDetails`,
-//       nftData
-//     );
-//     console.log("nft details response================", response.data);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error Saving NFT details:", error);
-//     return null;
-//   }
-// };
-
 // Function to save NFT details
-// export const saveNFTDetails = async (nfts: any[], walletAddress: string, vanityAddress: string) => {
-//   try {
-//     const response = await axios.post(`${server_api_base_url}/api/nft/`, { nfts, walletAddress, vanityAddress });
-//     return response.data; // Return the response data
-//   } catch (error) {
-//     throw new Error(error.response?.data?.error || 'Error saving NFT details');
-//   }
-// };
+export const saveNFTDetails = async (
+  nfts: NFTDetails[],
+  walletAddress: string,
+  vanityAddress: string
+) => {
+  try {
+    const response = await axios.post(
+      `${server_api_base_url}/api/nft/saveNftDetails`,
+      { nfts, walletAddress, vanityAddress }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error saving NFT details:",
+      error.response?.data?.error || error.message
+    );
+  }
+};
+
+// Function to fetch NFT details
+export const getNFTDetails = async (walletAddress: string) => {
+  try {
+    const response = await axios.get(
+      `${server_api_base_url}/api/nft/getNFTDetails/${walletAddress}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching NFT details:",
+      error.response?.data?.message || error.message
+    );
+  }
+};
+
+// Function to update NFT claim details
+export const updateNFTClaimDetails = async (
+  walletAddress: string,
+  tokenId: string,
+  contractAddress: string,
+  lastclaimedAt: Date,
+  totalClaimedRewardHash: string[]
+) => {
+  try {
+    const response = await axios.post(
+      `${server_api_base_url}/api/nft/updateNftClaimDetails`,
+      {
+        walletAddress,
+        tokenId,
+        contractAddress,
+        lastclaimedAt,
+        totalClaimedRewardHash,
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error updating NFT claim details:",
+      error.response?.data?.error || error.message
+    );
+  }
+};
+
+// Function to get Claim Details
+export const getClaimDetails = async (
+  walletAddress: string,
+  tokenId: string,
+  contractAddress: string
+) => {
+  console.log(
+    "walletAddress================",
+    walletAddress,
+    tokenId,
+    contractAddress
+  );
+  try {
+    const response = await axios.get(
+      `${server_api_base_url}/api/nft/getNFTClaimDetails/${walletAddress}/${tokenId}/${contractAddress}`
+    );
+    console.log("response-------------",response);
+    if(response){
+      return response.data;
+    }
+    else{
+      return null;
+    }
+  } catch (error: any) {
+    console.error("Error fetching claim details:", error);
+  }
+};

@@ -4,7 +4,7 @@ import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
 import Web3 from "web3";
-import { NFTData } from "../utils/Types";
+import { NFTData, NFTDetails } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
 import NftCard from "../components/homeComponents/card/NftCard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
@@ -23,6 +23,7 @@ import { HiMiniTv } from "react-icons/hi2";
 import { GiBiceps } from "react-icons/gi";
 import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
 import { toast } from "react-toastify";
+import { getNFTDetails, saveNFTDetails } from "../api/nftAPI";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -76,7 +77,7 @@ const Home = () => {
     vanity: [],
   });
   const [testCDEBalance, setTestCDEBalance] = useState(0);
-  const [NFTdata, setNFTdata] = useState<NFTData[]>([]);
+  const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
@@ -210,7 +211,7 @@ const Home = () => {
               format: "decimal",
               mediaItems: true,
               normalizeMetadata: true,
-              limit: 5,
+              limit: 10,
               address: address!,
             })
             .then((res) =>
@@ -226,17 +227,43 @@ const Home = () => {
                 timeLastUpdated: nft.last_metadata_sync,
                 floorPrice: nft?.floor_price,
                 floorPriceUsd: nft?.floor_price_usd,
+                lastclaimedAt: null, 
+                totalClaimedRewardCount: 0, 
+                totalClaimedRewardHash: [],
               }))
             )
         );
 
-        const combinedNFTs = (await Promise.all(nftPromises)).flat();
+        const combinedNFTs: NFTDetails[] = (await Promise.all(nftPromises)).flat();
         setNFTdata(combinedNFTs);
+        // Fetch existing NFTs from the database to check for duplicates
+        let existingNFTs: NFTDetails[] = await getNFTDetails(address);
+
+        // Ensure existingNFTs is an array
+      if (!Array.isArray(existingNFTs)) {
+        console.error("existingNFTs is not an array. Setting it to an empty array.");
+        existingNFTs = [];
+      }
+
+      for (const nft of combinedNFTs) {
+        const exists = existingNFTs.some(
+          (existingNft) =>
+            existingNft.tokenId === nft.tokenId &&
+          existingNft.contractAddress === nft.contractAddress
+        );
+
+        if (!exists) {
+          const result = await saveNFTDetails([nft], address, vanityAddress);
+          if (result) {
+            console.log("NFTs saved successfully:", result);
+          }
+        }
+      }
       }
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address]);
+  }, [address,vanityAddress]);
 
   useEffect(() => {
     // fetch the Account Persona socket NFT

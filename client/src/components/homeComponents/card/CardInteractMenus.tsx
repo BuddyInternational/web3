@@ -6,6 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InteractMenuModals from "../modals/InteractMenuModals";
 import OrderNFTApparel from "../content/OrderNFTApparel";
+import { NFTDetails } from "../../../utils/Types";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -50,7 +51,11 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-const CardInteractMenus = () => {
+interface CardInteractMenusProps {
+  selectedNFT: NFTDetails; 
+}
+
+const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -59,7 +64,8 @@ const CardInteractMenus = () => {
     description: string;
     videoUrl: string;
     content: any;
-  }>({ title: "", description: "", videoUrl: "", content: "" });
+    selectedNFT: NFTDetails;
+  }>({ title: "", description: "", videoUrl: "", content: "" ,selectedNFT: selectedNFT});
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -71,9 +77,10 @@ const CardInteractMenus = () => {
     title: string,
     description: string,
     videoUrl: string,
-    content: any
+    content: any,
+    selectedNFT : NFTDetails
   ) => {
-    setModalContent({ title, description, videoUrl, content });
+    setModalContent({ title, description, videoUrl, content,selectedNFT });
     setOpenModal(true);
     setAnchorEl(null);
   };
@@ -89,6 +96,7 @@ const CardInteractMenus = () => {
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
       videoUrl: "https://youtu.be/ym1zJGAW3WE",
+      slectedNFT: selectedNFT,
     },
     {
       label: "View Reputation",
@@ -136,7 +144,8 @@ const CardInteractMenus = () => {
                   item.title,
                   item.description!,
                   item.videoUrl!,
-                  item.content
+                  item.content,
+                  item.slectedNFT!
                 )
               }
             >
