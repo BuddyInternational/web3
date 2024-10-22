@@ -188,51 +188,51 @@ const Home = () => {
         await Moralis.start({ apiKey: api_key });
       }
       // console.log("address--------",address);
-      if(address){
-      // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
-      // const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
-      // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
-      // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
-      // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // sepolia
-      // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // polygon amoy
-      const chains = [
-        { chain: "0x1", name: "Ethereum" },
-        { chain: "0x89", name: "Polygon" },
-        { chain: "0xa4b1", name: "Arbitrum" },
-        { chain: "0xaa36a7", name: "Sepolia" },
-        { chain: "0x13882", name: "Polygon Amoy" },
-      ];
+      if (address) {
+        // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
+        // const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
+        // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
+        // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
+        // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // sepolia
+        // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // polygon amoy
+        const chains = [
+          { chain: "0x1", name: "Ethereum" },
+          { chain: "0x89", name: "Polygon" },
+          { chain: "0xa4b1", name: "Arbitrum" },
+          { chain: "0xaa36a7", name: "Sepolia" },
+          { chain: "0x13882", name: "Polygon Amoy" },
+        ];
 
-      const nftPromises = chains.map((chain) =>
-        Moralis.EvmApi.nft
-          .getWalletNFTs({
-            chain: chain.chain,
-            format: "decimal",
-            mediaItems: true,
-            normalizeMetadata: true,
-            limit: 5,
-            address: address!,
-          })
-          .then((res) =>
-            res.raw.result.map((nft: any) => ({
-              chainName: chain.name,
-              contractAddress: nft.token_address,
-              tokenId: nft.token_id,
-              name: nft.name,
-              tokenType: nft.contract_type,
-              tokenUri: nft.token_uri,
-              imageUrl: nft.media?.original_media_url,
-              mediaType: nft.media?.mimetype,
-              timeLastUpdated: nft.last_metadata_sync,
-              floorPrice: nft?.floor_price,
-              floorPriceUsd: nft?.floor_price_usd,
-            }))
-          )
-      );
+        const nftPromises = chains.map((chain) =>
+          Moralis.EvmApi.nft
+            .getWalletNFTs({
+              chain: chain.chain,
+              format: "decimal",
+              mediaItems: true,
+              normalizeMetadata: true,
+              limit: 5,
+              address: address!,
+            })
+            .then((res) =>
+              res.raw.result.map((nft: any) => ({
+                chainName: chain.name,
+                contractAddress: nft.token_address,
+                tokenId: nft.token_id,
+                name: nft.name,
+                tokenType: nft.contract_type,
+                tokenUri: nft.token_uri,
+                imageUrl: nft.media?.original_media_url,
+                mediaType: nft.media?.mimetype,
+                timeLastUpdated: nft.last_metadata_sync,
+                floorPrice: nft?.floor_price,
+                floorPriceUsd: nft?.floor_price_usd,
+              }))
+            )
+        );
 
-      const combinedNFTs = (await Promise.all(nftPromises)).flat();
-      setNFTdata(combinedNFTs);
-    }
+        const combinedNFTs = (await Promise.all(nftPromises)).flat();
+        setNFTdata(combinedNFTs);
+      }
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
@@ -254,7 +254,7 @@ const Home = () => {
         setsocketNFTImageMediaType(null);
       }
     };
-    if(address && isConnected && vanityAddress){
+    if (address && isConnected && vanityAddress) {
       fetchTokenBalance();
       fetchNFTs();
       fetchAccountPersonaNFT();
@@ -284,6 +284,14 @@ const Home = () => {
     if (!isConnected || !address) {
       e.preventDefault();
       toast.warning("Please connect your wallet to generate the content.");
+    }
+  };
+
+  // navigate the view socket nft if user connected
+  const handleClickSocketNFT = (e: any) => {
+    if (!isConnected || !address || !vanityAddress) {
+      e.preventDefault();
+      toast.warning("Please connect your wallet to view Socketd NFTs.");
     }
   };
 
@@ -325,6 +333,13 @@ const Home = () => {
                 className="md:w-30 sm:w-48 h-auto rounded-xl"
               />
             )}
+            <Link
+              to={`/nft/socketNFT/${vanityAddress}`}
+              className="hover:text-[#5692D9] cursor-pointer underline text-white"
+              onClick={handleClickSocketNFT}
+            >
+              Get List of Socketed NFTs
+            </Link>
           </div>
           {/* divider */}
           <div>

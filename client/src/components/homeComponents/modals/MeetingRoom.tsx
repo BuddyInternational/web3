@@ -83,7 +83,7 @@ const MeetingRoom: React.FC<{
               18883795590
               <br />
               <br />
-              Terms of use | All rights Reserved Gully Buddy International.
+              Terms of use | Gully Buddy International ® All Rights Reserved .
             </Typography>
           </DialogContent>
         </Box>

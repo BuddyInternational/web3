@@ -8,6 +8,7 @@ import OrderNFTApparelForm from "../components/homeComponents/card/OrderNFTAppar
 import NotFound from "../utils/NotFound";
 import Shop from "../pages/Shop";
 import ContributeContent from "../pages/ContributeContent";
+import SocketNFTDetails from "../pages/SocketNFTDetails";
 
 const AllRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const AllRoutes = () => {
             element={<ContributeContent />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
+          <Route path="/nft/socketNFT/:vanityAddress" element={<SocketNFTDetails />} />
           <Route path="/nft/shop" element={<Shop />} />
           {/* Add 404 page */}
           {/* <Route path="*" element={<PageNotFound />} /> */}
