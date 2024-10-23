@@ -207,6 +207,7 @@ export default function App() {
                       rel="noopener noreferrer"
                       className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="CDE"
+                      onClick={()=>{ alert("Prestige this Account");}}
                     >
                       <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                     </a>

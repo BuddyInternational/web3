@@ -325,7 +325,7 @@ const Home = () => {
   const handleClickSocketNFT = (e: any) => {
     if (!isConnected || !address || !vanityAddress) {
       e.preventDefault();
-      toast.warning("Please connect your wallet to view Socketd NFTs.");
+      toast.warning("Please connect your wallet to view Socketed NFTs.");
     }
   };
 
@@ -372,7 +372,7 @@ const Home = () => {
               className="hover:text-[#5692D9] cursor-pointer underline text-white"
               onClick={handleClickSocketNFT}
             >
-              Get List of Socketed NFTs
+              Get List of [Socketed NFTs]
             </Link>
           </div>
           {/* divider */}
@@ -528,6 +528,7 @@ const Home = () => {
                     rel="noopener noreferrer"
                     className="text-[#5692D9] mt-1 cursor-pointer"
                     data-tip="CDE"
+                    onClick={()=>{ alert("Prestige this Account");}}
                   >
                     <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                   </a>
