@@ -53,3 +53,12 @@ export interface NFTDetails {
   totalClaimedRewardHash: string[];
 }
 
+export interface ContentSubmission {
+  mood: string;
+  content: string;
+  ipfsHash?: string;
+  generateContentDate: string;
+  submissionHash: string;
+  isSubbmited: boolean;
+  submissionDate: string;
+}

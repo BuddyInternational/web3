@@ -4,7 +4,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
-import {  Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import { ethers } from "ethers";
 import {
@@ -16,85 +16,18 @@ import {
   deleteUserContent,
   updateContentDetail,
 } from "../../api/userContentAPI";
-
-interface Submission {
-  mood: string;
-  content: string;
-  ipfsHash?: string;
-  generateContentDate: string;
-  isSubbmited: boolean;
-  submissionDate: string;
-}
+import { ContentSubmission } from "../../utils/Types";
+import {  useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 
 interface ContributionsProps {
-  submissions: Submission[];
+  submissions: ContentSubmission[];
 }
+
 
 const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
-  const { walletProvider } = useWeb3ModalProvider();
-  const ethersProvider = new ethers.BrowserProvider(
-    walletProvider as ethers.Eip1193Provider
-  );
-
-  //Notify GullyBuddy
-  const notifyGullyBuddy = async (sender: any, content: any) => {
-    console.log(
-      `Notifying gullybuddy.eth. Sender: ${sender}, Content: ${content}`
-    );
-
-    const gullyBuddyAddress = await resolveENSName("gullybuddy.eth");
-    console.log("ENS Name :", gullyBuddyAddress);
-
-    if (gullyBuddyAddress) {
-      console.log(`Resolved address for gullybuddy.eth: ${gullyBuddyAddress}`);
-      const transactionResult = await sendNotificationTransaction(
-        gullyBuddyAddress,
-        content
-      );
-      return transactionResult;
-    } else {
-      console.error("Failed to resolve gullybuddy.eth");
-      return false;
-    }
-  };
-
-  const resolveENSName = async (ensName: string) => {
-    try {
-      const ensAddress = await ethersProvider.resolveName(ensName);
-      console.log("ENS Domain address----------", ensAddress);
-      return ensAddress;
-    } catch (error) {
-      console.error(`Error resolving ENS name ${ensName}:`, error);
-      return null;
-    }
-  };
-
-  const sendNotificationTransaction = async (
-    toAddress: string,
-    messageContent: string
-  ) => {
-    console.log("messageContent============", messageContent);
-    try {
-      const signer = await ethersProvider.getSigner();
-      console.log("Signer: ", signer);
-      const encodedMessage = ethers.hexlify(ethers.toUtf8Bytes(messageContent));
-
-      const tx = await signer.sendTransaction({
-        to: toAddress,
-        value: 0,
-        data: encodedMessage,
-      });
-
-      await tx.wait();
-      console.log("Notification transaction sent to gullybuddy.eth:", tx);
-      return true;
-    } catch (error) {
-      console.error("Error sending notification transaction:", error);
-      return false;
-    }
-  };
+  const { notifyGullyBuddy } = useGullyBuddyNotifier();
 
   // submit user content onchain
   const handleSubmit = async (ipfsHash: string) => {
@@ -103,14 +36,15 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
       // Send notification
       const notificationResult = await notifyGullyBuddy(sender, message);
-      if (notificationResult) {
-        toast.success("Notification sent to gullybuddy.eth");
+      if (notificationResult && notificationResult.hash) {
+        toast.success("Notification sent to Buddyinternational.eth");
         // Update the content detail
         const updateResponse = await updateContentDetail(
           address!,
           ipfsHash,
           true,
-          new Date().toISOString()
+          new Date().toISOString(),
+          notificationResult.hash
         );
 
         if (updateResponse) {
@@ -177,8 +111,10 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
                     sx={{
                       marginBottom: { xs: 1, md: 0 },
                       marginRight: { md: 1 },
-                    }} 
-                    onClick={()=>{handleSubmit(submission?.ipfsHash!)}}
+                    }}
+                    onClick={() => {
+                      handleSubmit(submission?.ipfsHash!);
+                    }}
                   >
                     Submit Application
                   </Button>
@@ -200,6 +136,22 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
             <Typography variant="body2" color="inherit">
               {submission.content}
             </Typography>
+            {submission.isSubbmited && submission.submissionHash && (
+              <Typography
+                variant="body2"
+                color="inherit"
+                style={{ marginTop: "8px" }}
+              >
+                <a
+                  href={`https://etherscan.io/tx/${submission.submissionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#1976d2", textDecoration: "underline" }}
+                >
+                  Check Your OnChain Message
+                </a>
+              </Typography>
+            )}
           </AccordionDetails>
         </Accordion>
       ))}

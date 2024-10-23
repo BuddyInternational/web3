@@ -1,17 +1,9 @@
 import axios, { AxiosResponse } from "axios";
+import { ContentSubmission } from "../utils/Types";
 
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
-// Define Content interface
-interface ContentDetails {
-  mood: string;
-  content?: string;
-  ipfsHash?: string;
-  generateContentDate: string;
-  isSubbmited: boolean;
-  submissionDate:  string;
-}
 
 // Define Response interfaces
 interface SaveUserContentResponse {
@@ -23,7 +15,7 @@ interface SaveUserContentResponse {
 export const saveContentDetails = async (
   walletAddress: string,
   vanityAddress: string,
-  contentDetails: ContentDetails
+  contentDetails: ContentSubmission
 ): Promise<SaveUserContentResponse | null> => {
   try {
     const response: AxiosResponse<SaveUserContentResponse> = await axios.post(
@@ -50,7 +42,12 @@ export const getUserContent = async (walletAddress: string) => {
         params: { walletAddress },
       }
     );
-    return response.data;
+    if(response){
+      return response.data;
+    }
+    else{
+      return null;
+    }
   } catch (error) {
     console.error("Error fetching user Content details:", error);
     return null;
@@ -75,7 +72,8 @@ export const updateContentDetail = async (
   walletAddress: string,
   ipfsHash: string,
   isSubbmited: boolean,
-  submissionDate: string
+  submissionDate: string,
+  submissionHash: string
 ) => {
   try {
     const response: any = await axios.put(
@@ -83,6 +81,7 @@ export const updateContentDetail = async (
       {
         isSubbmited,
         submissionDate,
+        submissionHash
       }
     );
     return response.data;
@@ -91,4 +90,5 @@ export const updateContentDetail = async (
     return null;
   }
 };
+
 

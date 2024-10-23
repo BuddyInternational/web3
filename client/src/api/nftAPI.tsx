@@ -15,12 +15,17 @@ export const saveNFTDetails = async (
       `${server_api_base_url}/api/nft/saveNftDetails`,
       { nft, walletAddress, vanityAddress }
     );
-    return response.data;
+    if (response) {
+      return response.data;
+    } else {
+      return null;
+    }
   } catch (error: any) {
     console.error(
       "Error saving NFT details:",
       error.response?.data?.error || error.message
     );
+    return null;
   }
 };
 
@@ -36,6 +41,7 @@ export const getNFTDetails = async (walletAddress: string) => {
       "Error fetching NFT details:",
       error.response?.data?.message || error.message
     );
+    return null;
   }
 };
 
@@ -64,6 +70,7 @@ export const updateNFTClaimDetails = async (
       "Error updating NFT claim details:",
       error.response?.data?.error || error.message
     );
+    return null;
   }
 };
 
@@ -77,11 +84,10 @@ export const getClaimDetails = async (
     const response = await axios.get(
       `${server_api_base_url}/api/nft/getNFTClaimDetails/${walletAddress}/${tokenId}/${contractAddress}`
     );
-    console.log("response-------------",response);
-    if(response){
+    console.log("response-------------", response);
+    if (response) {
       return response.data;
-    }
-    else{
+    } else {
       return null;
     }
   } catch (error: any) {

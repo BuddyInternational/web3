@@ -17,6 +17,7 @@ const UserContentSchema = new mongoose.Schema(
       ipfsHash : {type: String},
       generateContentDate: { type: Date },
       isSubbmited : {type: Boolean},
+      submissionHash : {type: String},
       submissionDate : {type: Date}
     }],
   },

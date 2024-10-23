@@ -1,11 +1,14 @@
-import { UserContentData } from '../models/userContent.js';
+import { UserContentData } from "../models/userContent.js";
 
 //  save user content data
 export const saveUserContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
-    let userContent = await UserContentData.findOne({ walletAddress, vanityAddress });
+    let userContent = await UserContentData.findOne({
+      walletAddress,
+      vanityAddress,
+    });
 
     if (!userContent) {
       // Create new user content if it doesn't exist
@@ -22,13 +25,13 @@ export const saveUserContent = async (req, res) => {
     // Save the updated/created document to the database
     const savedContent = await userContent.save();
     return res.status(201).json({
-      message: 'Content saved successfully!',
+      message: "Content saved successfully!",
       contentData: savedContent,
     });
   } catch (error) {
-    console.error('Error saving content:', error);
+    console.error("Error saving content:", error);
     return res.status(500).json({
-      message: 'Error saving content',
+      message: "Error saving content",
       error,
     });
   }
@@ -42,20 +45,21 @@ export const getUserContent = async (req, res) => {
     // Fetch content data based on wallet address
     const userContent = await UserContentData.findOne({ walletAddress });
 
-    if (!userContent) {
-      return res.status(404).json({
-        message: 'Content not found for this wallet address',
+    // if (!userContent) {
+    //   return res.status(404).json({
+    //     message: 'Content not found for this wallet address',
+    //   });
+    // }
+    if (userContent) {
+      return res.status(200).json({
+        message: "Content fetched successfully!",
+        data: userContent,
       });
     }
-
-    return res.status(200).json({
-      message: 'Content fetched successfully!',
-      data: userContent,
-    });
   } catch (error) {
-    console.error('Error fetching content:', error);
+    console.error("Error fetching content:", error);
     return res.status(500).json({
-      message: 'Error fetching content',
+      message: "Error fetching content",
       error,
     });
   }
@@ -64,42 +68,45 @@ export const getUserContent = async (req, res) => {
 // Update specific content detail
 export const updateContentDetail = async (req, res) => {
   try {
-    const { walletAddress, ipfsHash } = req.params; 
-    const { isSubbmited, submissionDate } = req.body;
+    const { walletAddress, ipfsHash } = req.params;
+    const { isSubbmited, submissionDate, submissionHash } = req.body;
 
     // Find the user content by wallet address
     const userContent = await UserContentData.findOne({ walletAddress });
 
     if (!userContent) {
       return res.status(404).json({
-        message: 'Content not found for this wallet address',
+        message: "Content not found for this wallet address",
       });
     }
 
     // Find the content detail and update using ipfsHash
-    const contentDetail = userContent.contentDetails.find(detail => detail.ipfsHash === ipfsHash);
+    const contentDetail = userContent.contentDetails.find(
+      (detail) => detail.ipfsHash === ipfsHash
+    );
 
     if (!contentDetail) {
       return res.status(404).json({
-        message: 'Content detail not found',
+        message: "Content detail not found",
       });
     }
 
     // Update the specific fields
     contentDetail.isSubbmited = isSubbmited;
     contentDetail.submissionDate = submissionDate;
+    contentDetail.submissionHash = submissionHash;
 
     // Save to the database
     const updatedContent = await userContent.save();
 
     return res.status(200).json({
-      message: 'Content detail updated successfully!',
+      message: "Content detail updated successfully!",
       data: updatedContent,
     });
   } catch (error) {
-    console.error('Error updating content detail:', error);
+    console.error("Error updating content detail:", error);
     return res.status(500).json({
-      message: 'Error updating content detail',
+      message: "Error updating content detail",
       error,
     });
   }
@@ -115,27 +122,27 @@ export const deleteContentDetail = async (req, res) => {
 
     if (!userContent) {
       return res.status(404).json({
-        message: 'Content not found for this wallet address',
+        message: "Content not found for this wallet address",
       });
     }
 
     // Filter out the content detail to delete using ipfsHash
-    userContent.contentDetails = userContent.contentDetails.filter(detail => detail.ipfsHash !== ipfsHash);
+    userContent.contentDetails = userContent.contentDetails.filter(
+      (detail) => detail.ipfsHash !== ipfsHash
+    );
 
     // Save to the database
     const updatedContent = await userContent.save();
 
     return res.status(200).json({
-      message: 'Content detail deleted successfully!',
+      message: "Content detail deleted successfully!",
       data: updatedContent,
     });
   } catch (error) {
-    console.error('Error deleting content detail:', error);
+    console.error("Error deleting content detail:", error);
     return res.status(500).json({
-      message: 'Error deleting content detail',
+      message: "Error deleting content detail",
       error,
     });
   }
 };
-
-

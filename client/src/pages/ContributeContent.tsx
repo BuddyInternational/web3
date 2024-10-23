@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
+import { ContentSubmission } from "../utils/Types";
 
 // Define mood options
 const moodOptions = [
@@ -44,16 +45,7 @@ const ContributeContent: React.FC = () => {
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
-  const [submissions, setSubmissions] = useState<
-    {
-      mood: string;
-      content: string;
-      generateContentDate: string;
-      ipfsHash: string;
-      isSubbmited: boolean;
-      submissionDate: string;
-    }[]
-  >([]);
+  const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
   const [isVanityAddressCopied, setIsVanityAddressCopied] = useState(false);
@@ -85,6 +77,7 @@ const ContributeContent: React.FC = () => {
           content,
           ipfsHash: result.path,
           generateContentDate: timestamp,
+          submissionHash:"",
           isSubbmited: false,
           submissionDate: "",
         };
@@ -204,49 +197,6 @@ const ContributeContent: React.FC = () => {
             $10 USD worth of fees will be deducted when the on-chain message is
             propagated through the network once you submit your contribution.
           </li>
-          {/* <li className="my-3">
-            <strong>Message:</strong> The user with Wallet Address "{address}"{" "}
-            <strong className="inline-flex items-center mx-1">
-              {isWalletAddressCopied ? (
-                <FaCheck className="text-green-500 cursor-pointer" />
-              ) : (
-                <FaRegCopy
-                  onClick={() => {
-                    navigator.clipboard.writeText(address || "");
-                    setIsWalletAddressCopied(true);
-                    clearTimeout(copyAddressTimeoutRef.current);
-                    copyAddressTimeoutRef.current = setTimeout(() => {
-                      setIsWalletAddressCopied(false);
-                    }, 1000);
-                  }}
-                  className="text-[#5692D9] font-thin cursor-pointer"
-                  data-tip="Copy Wallet Address"
-                  data-tip-content=".tooltip"
-                />
-              )}
-            </strong>
-            and Vanity Wallet "{vanityAddress}"{" "}
-            <strong className="inline-flex items-center mx-1">
-              {isVanityAddressCopied ? (
-                <FaCheck className=" text-green-500 cursor-pointer" />
-              ) : (
-                <FaRegCopy
-                  onClick={() => {
-                    navigator.clipboard.writeText(vanityAddress || "");
-                    setIsVanityAddressCopied(true);
-                    clearTimeout(copyVanityAddressTimeoutRef.current);
-                    copyVanityAddressTimeoutRef.current = setTimeout(() => {
-                      setIsVanityAddressCopied(false);
-                    }, 1000);
-                  }}
-                  className="text-[#5692D9] font-thin cursor-pointer"
-                  data-tip="Copy Vanity Address"
-                  data-tip-content=".tooltip"
-                />
-              )}
-            </strong>{" "}
-            has submitted a new contribution to the network.
-          </li> */}
           <li className="my-3">
             <strong>Message:</strong> The user with Wallet Address "
             <strong className="mx-1 md:hidden sm:inline">

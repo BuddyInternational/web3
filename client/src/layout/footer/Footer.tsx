@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SupportMenu from "./SupportMenu";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaRegCopy } from "react-icons/fa";
 import VendorRewardModal from "./modals/VendorRewardModal";
 
 const Footer: React.FC = () => {
@@ -69,28 +69,33 @@ const Footer: React.FC = () => {
                   <FaHeart className="text-red-600 mt-0.3" />
                 </span>
                 <span>to:</span>
-                <div className="relative inline-block ml-1">
+                <div className="relative ml-1 flex gap-1">
                   {/* Full address for larger screens */}
                   <span
-                    className="md:inline sm:hidden cursor-pointer text-blue-600 hover:text-blue-400"
-                    onClick={handleCopyAddress}
+                    className="md:inline sm:hidden cursor-pointer text-blue-500 hover:text-blue-400"
                   >
                     {donateAddress}
                   </span>
 
                   {/* Shortened address for small screens */}
                   <span
-                    className="sm:inline md:hidden cursor-pointer text-blue-600 hover:text-blue-400"
-                    onClick={handleCopyAddress}
+                    className="sm:inline md:hidden cursor-pointer text-blue-500 hover:text-blue-400"
                   >
                     {`${donateAddress.slice(0, 6)}...${donateAddress.slice(
                       -4
                     )}`}
                   </span>
+                  {/* Copy icon */}
+                  <span
+                    className="m-auto cursor-pointer text-blue-500 hover:text-blue-400"
+                    onClick={handleCopyAddress}
+                  >
+                    <FaRegCopy /> 
+                  </span>
 
                   {/* Tooltip */}
                   <div
-                    className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs rounded bg-gray-800 text-white ${
+                    className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-0 px-2 py-1 text-xs rounded bg-gray-800 text-white ${
                       copied ? "opacity-100" : "opacity-0"
                     } transition-opacity duration-300`}
                   >
