@@ -6,14 +6,14 @@ const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 // Function to save NFT details
 export const saveNFTDetails = async (
-  nfts: NFTDetails[],
+  nft: NFTDetails,
   walletAddress: string,
   vanityAddress: string
 ) => {
   try {
     const response = await axios.post(
       `${server_api_base_url}/api/nft/saveNftDetails`,
-      { nfts, walletAddress, vanityAddress }
+      { nft, walletAddress, vanityAddress }
     );
     return response.data;
   } catch (error: any) {
@@ -73,12 +73,6 @@ export const getClaimDetails = async (
   tokenId: string,
   contractAddress: string
 ) => {
-  console.log(
-    "walletAddress================",
-    walletAddress,
-    tokenId,
-    contractAddress
-  );
   try {
     const response = await axios.get(
       `${server_api_base_url}/api/nft/getNFTClaimDetails/${walletAddress}/${tokenId}/${contractAddress}`

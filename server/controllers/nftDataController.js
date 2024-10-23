@@ -2,35 +2,36 @@ import { NFTData } from "../models/nftData.js";
 
 // Save NFT detail in database
 export const saveNFTDetails = async (req, res) => {
-  const { nfts, walletAddress, vanityAddress } = req.body;
-
-  if (!nfts || !walletAddress || !vanityAddress) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
   try {
-    // Check if the wallet address already exists in the database
-    let nftData = await NFTData.findOne({ walletAddress });
-    if (nftData) {
-      // Combine new NFTs with existing NFTs, avoiding duplicates
-      const existingNftIds = new Set(nftData.nfts.map((nft) => nft.tokenId));
+    const { walletAddress, vanityAddress, nft } = req.body; // Expecting a single nft to push
 
-      // Filter out duplicates and append new NFTs
-      const uniqueNfts = nfts.filter((nft) => !existingNftIds.has(nft.tokenId));
+    // Check if a record already exists with the provided wallet address
+    let nftDetail = await NFTData.findOne({ walletAddress });
 
-      // Push new unique NFTs to the existing nfts array
-      nftData.nfts.push(...uniqueNfts);
-      await nftData.save();
+    if (!nftDetail) {
+      // If it doesn't exist, create a new record
+      nftDetail = new NFTData({
+        walletAddress,
+        vanityAddress,
+        nfts: [nft], // Start with the new NFT in the array
+      });
+      await nftDetail.save();
+      return res.status(201).json(nftDetail);
     } else {
-      // Create a new record if it doesn't exist
-      nftData = new NFTData({ walletAddress, vanityAddress, nfts });
-      await nftData.save();
-    }
+      // // If it exists, check if the NFT already exists in the nfts array
+      // const nftExists = nftDetail.nfts.some(existingNft => existingNft.tokenId === nft.tokenId && existingNft.contractAddress === nft.contractAddress);
 
-    res.status(201).json({ message: "NFT data saved successfully", nftData });
+      // if (nftExists) {
+      //   return res.status(400).json({ message: 'NFT with the same token ID and contract address already exists in the wallet.' });
+      // } else {
+        // If it does not exist, push the new NFT into the existing nfts array
+        nftDetail.nfts.push(nft);
+        await nftDetail.save();
+        return res.status(200).json(nftDetail);
+      // }
+    }
   } catch (error) {
-    console.error("Error saving NFTs:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ message: 'Error creating or updating NFT detail.', error });
   }
 };
 
@@ -116,6 +117,7 @@ export const updateNFTClaimDetails = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 // fetch the NFT Claim Detail
 export const getNFTClaimDetails = async (req, res) => {
   const { walletAddress, tokenId, contractAddress } = req.params;

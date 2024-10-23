@@ -54,7 +54,7 @@ export const getSocketNFTLastTransferDetails = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching last transfer details:", error);
+    // console.error("Error fetching last transfer details:", error);
     return null;
   }
 };

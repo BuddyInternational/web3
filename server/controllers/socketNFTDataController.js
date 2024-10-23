@@ -47,13 +47,14 @@ export const getSocketNFTLastTransferDetails = async (req, res) => {
         { lastTransferDetails: 1 }
       );
 
-      if (!socketNFT) {
-        return res.status(404).json({
-          message: "No NFT details found for this wallet and vanity address.",
-        });
+      // if (!socketNFT) {
+      //   return res.status(404).json({
+      //     message: "No NFT details found for this wallet and vanity address.",
+      //   });
+      // }
+      if (socketNFT) {
+        return res.status(200).json(socketNFT.lastTransferDetails);
       }
-
-      return res.status(200).json(socketNFT.lastTransferDetails);
     }
   } catch (error) {
     console.error("Error fetching latest transfer details:", error);

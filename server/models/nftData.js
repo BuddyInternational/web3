@@ -5,6 +5,7 @@ const nftDetailSchema = new mongoose.Schema(
     walletAddress: {
       type: String,
       required: true,
+      unique: true,
     },
     vanityAddress: {
       type: String,

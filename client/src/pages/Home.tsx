@@ -260,7 +260,7 @@ const Home = () => {
           );
 
           if (!exists) {
-            const result = await saveNFTDetails([nft], address, vanityAddress);
+            const result = await saveNFTDetails(nft, address, vanityAddress);
             if (result) {
               console.log("NFTs saved successfully:", result);
             }
@@ -280,9 +280,7 @@ const Home = () => {
         if (response !== null) {
           setsocketNFTImageURL(response.imageUrl);
           setsocketNFTImageMediaType(response.mediaType);
-        } else {
-          console.error(Response);
-        }
+        } 
       } else {
         setsocketNFTImageURL(null);
         setsocketNFTImageMediaType(null);
@@ -474,7 +472,7 @@ const Home = () => {
               );
               const walletBalance = walletToken
                 ? walletToken.balance
-                : "0.0000";
+                : "0";
 
               return (
                 <div
@@ -544,7 +542,7 @@ const Home = () => {
               );
               const vanityBalance = vanityToken
                 ? vanityToken.balance
-                : "0.0000";
+                : "0";
 
               return (
                 <div
