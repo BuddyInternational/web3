@@ -58,7 +58,7 @@ const MeetingRoom: React.FC<{
             <Typography variant="body1" color="text.secondary"sx={{ marginTop: 2,marginBottom:2}}>
               Meeting Room (Endorsed) :{" "}
               <Link to="/#" className="underline text-blue-400">
-                The Layer Operators
+                The Layer Operators ®
               </Link>
             </Typography>
 

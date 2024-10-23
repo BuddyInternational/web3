@@ -82,9 +82,14 @@ const SocketNFTDetails = () => {
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
       {/* Socket NFT cards */}
+      {socketNFTdata && socketNFTdata.length > 0 && vanityAddress !== '0x0000000000000000000000000000000000000000' ?(
+
       <div className="mt-3">
-        <NftCard NFTDetails={socketNFTdata} />
+        <NftCard NFTDetails={socketNFTdata} CardType={"vanityNFT"} />
       </div>
+      ):(
+        <p className="text-2xl text-white m-auto my-6">You don’t have any socketed NFTs at the moment. Explore and add some NFTs to see them here!</p>
+      )}
     </div>
   );
 };

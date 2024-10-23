@@ -4,7 +4,7 @@ import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
 import Web3 from "web3";
-import { NFTData, NFTDetails } from "../utils/Types";
+import { NFTDetails } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
 import NftCard from "../components/homeComponents/card/NftCard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
@@ -12,7 +12,7 @@ import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
 import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
-import testCDETokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
+import testTokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
 import Leadership from "../components/homeComponents/modals/Leadership";
 import { Tooltip } from "@mui/material";
 import Withdraw from "../components/homeComponents/modals/Withdraw";
@@ -62,13 +62,15 @@ const tokenDetails = {
 
 const TestCDEAddress: any =
   process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS;
+const TestTIMAddress: any =
+  process.env.REACT_APP_TESTTIM_TOKEN_CONTRACT_ADDRESS;
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 
-const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
+// const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
@@ -77,6 +79,7 @@ const Home = () => {
     vanity: [],
   });
   const [testCDEBalance, setTestCDEBalance] = useState(0);
+  const [testTIMBalance, setTestTIMBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
@@ -118,6 +121,7 @@ const Home = () => {
           vanity: [],
         });
         setTestCDEBalance(0);
+        setTestTIMBalance(0);
         return;
       }
 
@@ -126,19 +130,22 @@ const Home = () => {
         (token) => new Contract(tokenAddresses[token], ERC20ABI, provider)
       );
 
-      const testCDEProvider = new ethers.JsonRpcProvider(sepolia_rpc_url);
+      const testTokenProvider = new ethers.JsonRpcProvider(sepolia_rpc_url);
       const testCDETokenContract = new Contract(
         TestCDEAddress,
-        testCDETokenAbi.abi,
-        testCDEProvider
+        testTokenAbi.abi,
+        testTokenProvider
+      );
+      const testTIMTokenContract = new Contract(
+        TestTIMAddress,
+        testTokenAbi.abi,
+        testTokenProvider
       );
 
-      // wallet address balance
+      // ************************  wallet address balance *********************************
       const walletbalances = await Promise.all(
         tokenContracts.map((contract) => contract.balanceOf(address))
       );
-
-      // console.log("walletbalances--------------", walletbalances);
 
       const formattedWalletBalances = walletbalances.map((balance, idx) => ({
         name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
@@ -148,12 +155,10 @@ const Home = () => {
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
       }));
 
-      // vanity address balance
+      // ************************** vanity address balance  ********************************
       const vanitybalances = await Promise.all(
         tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
       );
-
-      // console.log("vanitybalances---------", vanitybalances);
 
       const formattedVanityBalances = vanitybalances.map((balance, idx) => ({
         name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
@@ -163,20 +168,31 @@ const Home = () => {
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
       }));
 
-      // test CDE address balance
+      // ************************ Test CDE address balance  ************************************
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
         vanityAddress
       );
-      // console.log("testCDETokenBalance------------", testCDETokenBalance);
       const formattedTestCDEBalance = Number(
         Web3.utils.fromWei(testCDETokenBalance, "wei")
       ).toFixed(4);
+
+      // ***********************  Test TIM address balance  *********************************
+      const testTIMTokenBalance = await testTIMTokenContract.balanceOf(
+        vanityAddress
+      );
+      const formattedTestTIMBalance = Number(
+        Web3.utils.fromWei(testTIMTokenBalance, "ether")
+      ).toFixed(4);
+
+      // set all token Balance
 
       setBalances({
         wallet: formattedWalletBalances,
         vanity: formattedVanityBalances,
       });
       setTestCDEBalance(Number(formattedTestCDEBalance));
+      setTestTIMBalance(Number(formattedTestTIMBalance));
+
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
@@ -272,6 +288,7 @@ const Home = () => {
     }
   }, [address, vanityAddress]);
 
+  // fetch the NFT and Token Details
   useEffect(() => {
     // fetch the Account Persona socket NFT
     const fetchAccountPersonaNFT = async () => {
@@ -298,6 +315,7 @@ const Home = () => {
     fetchTokenBalance,
     fetchNFTs,
     testCDEBalance,
+    testTIMBalance,
     socketNFTImageURL,
   ]);
 
@@ -565,6 +583,12 @@ const Home = () => {
               </span>{" "}
               <span>{testCDEBalance} TCDE</span>
             </div>
+            <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+              <span className="text-[#5692D9] mr-2">
+                Test TIM Token Balance:
+              </span>{" "}
+              <span>{testTIMBalance} TTIM</span>
+            </div>
           </div>
         </div>
       </div>
@@ -606,7 +630,7 @@ const Home = () => {
 
       {/* NFT cards */}
       <div className="mt-3">
-        <NftCard NFTDetails={NFTdata} />
+        <NftCard NFTDetails={NFTdata} CardType={"walletNFT"}/>
       </div>
 
       {/* Gully Buddies Membership Rewards Modal */}

@@ -9,7 +9,10 @@ import { IoMdQrScanner } from "react-icons/io";
 import CardInteractMenus from "./CardInteractMenus";
 import CardChainFilterMenus from "./CardChainFilterMenus";
 
-const NftCard: React.FC<{ NFTDetails: NFTDetails[] }> = ({ NFTDetails }) => {
+const NftCard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = ({
+  NFTDetails,
+  CardType,
+}) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
@@ -139,21 +142,21 @@ const NftCard: React.FC<{ NFTDetails: NFTDetails[] }> = ({ NFTDetails }) => {
       >
         {slicedNFTDetails?.map((nft, index) => {
           const selectedNFT: NFTDetails = {
-            chainName: nft.chainName || '', 
-            contractAddress: nft.contractAddress || '',
-            tokenId: nft.tokenId || '',
-            name: nft.name || 'Unknown',
-            tokenType: nft.tokenType || 'ERC721',
-            tokenUri: nft.tokenUri || '',
-            imageUrl: nft.imageUrl || '',
-            mediaType: nft.mediaType || '',
+            chainName: nft.chainName || "",
+            contractAddress: nft.contractAddress || "",
+            tokenId: nft.tokenId || "",
+            name: nft.name || "Unknown",
+            tokenType: nft.tokenType || "ERC721",
+            tokenUri: nft.tokenUri || "",
+            imageUrl: nft.imageUrl || "",
+            mediaType: nft.mediaType || "",
             timeLastUpdated: nft.timeLastUpdated || new Date().toISOString(),
             floorPrice: nft.floorPrice || null,
             floorPriceUsd: nft.floorPriceUsd || 0,
             priceCurrency: nft.priceCurrency || null,
-            lastclaimedAt: nft.lastclaimedAt || null, 
-            totalClaimedRewardCount: nft.totalClaimedRewardCount || 0, 
-            totalClaimedRewardHash: nft.totalClaimedRewardHash || [], 
+            lastclaimedAt: nft.lastclaimedAt || null,
+            totalClaimedRewardCount: nft.totalClaimedRewardCount || 0,
+            totalClaimedRewardHash: nft.totalClaimedRewardHash || [],
           };
           return (
             <div
@@ -276,9 +279,11 @@ const NftCard: React.FC<{ NFTDetails: NFTDetails[] }> = ({ NFTDetails }) => {
                   </p>
                 </div>
               </div>
-              <div className="flex justify-end items-end mt-auto mr-2 mb-2">
-                <CardInteractMenus selectedNFT={selectedNFT} />
-              </div>
+              {CardType === "walletNFT" && (
+                <div className="flex justify-end items-end mt-auto mr-2 mb-2">
+                  <CardInteractMenus selectedNFT={selectedNFT} />
+                </div>
+              )}
             </div>
           );
         })}

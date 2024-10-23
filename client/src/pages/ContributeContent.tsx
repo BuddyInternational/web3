@@ -86,7 +86,7 @@ const ContributeContent: React.FC = () => {
           ipfsHash: result.path,
           generateContentDate: timestamp,
           isSubbmited: false,
-          submissionDate: '',
+          submissionDate: "",
         };
 
         // Call the API to save content details
@@ -122,7 +122,7 @@ const ContributeContent: React.FC = () => {
     };
 
     fetchUserContent();
-  }, [address, isConnected, submissions,setSubmissions]);
+  }, [address, isConnected, submissions, setSubmissions]);
 
   return (
     <>
@@ -204,7 +204,7 @@ const ContributeContent: React.FC = () => {
             $10 USD worth of fees will be deducted when the on-chain message is
             propagated through the network once you submit your contribution.
           </li>
-          <li className="my-3">
+          {/* <li className="my-3">
             <strong>Message:</strong> The user with Wallet Address "{address}"{" "}
             <strong className="inline-flex items-center mx-1">
               {isWalletAddressCopied ? (
@@ -245,6 +245,68 @@ const ContributeContent: React.FC = () => {
                 />
               )}
             </strong>{" "}
+            has submitted a new contribution to the network.
+          </li> */}
+          <li className="my-3">
+            <strong>Message:</strong> The user with Wallet Address "
+            <strong className="mx-1 md:hidden sm:inline">
+              {/* Sliced version for small screens */}
+              {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ""} "
+            </strong>
+            <strong className="mx-1 sm:hidden md:inline">
+              {/* Full version for medium and larger screens */}
+              {address} "
+            </strong>
+            <strong className="inline-flex items-center mx-1">
+              {isWalletAddressCopied ? (
+                <FaCheck className="text-green-500 cursor-pointer" />
+              ) : (
+                <FaRegCopy
+                  onClick={() => {
+                    navigator.clipboard.writeText(address || "");
+                    setIsWalletAddressCopied(true);
+                    clearTimeout(copyAddressTimeoutRef.current);
+                    copyAddressTimeoutRef.current = setTimeout(() => {
+                      setIsWalletAddressCopied(false);
+                    }, 1000);
+                  }}
+                  className="text-[#5692D9] font-thin cursor-pointer"
+                  data-tip="Copy Wallet Address"
+                  data-tip-content=".tooltip"
+                />
+              )}
+            </strong>
+            and Vanity Wallet "
+            <strong className="sm:inline md:hidden">
+              {/* Sliced version for small screens */}
+              {vanityAddress
+                ? `${vanityAddress.slice(0, 6)}...${vanityAddress.slice(-4)}`
+                : ""}{" "}
+              "
+            </strong>
+            <strong className="sm:hidden md:inline">
+              {/* Full version for medium and larger screens */}
+              {vanityAddress} "
+            </strong>
+            <strong className="inline-flex items-center mx-1">
+              {isVanityAddressCopied ? (
+                <FaCheck className=" text-green-500 cursor-pointer" />
+              ) : (
+                <FaRegCopy
+                  onClick={() => {
+                    navigator.clipboard.writeText(vanityAddress || "");
+                    setIsVanityAddressCopied(true);
+                    clearTimeout(copyVanityAddressTimeoutRef.current);
+                    copyVanityAddressTimeoutRef.current = setTimeout(() => {
+                      setIsVanityAddressCopied(false);
+                    }, 1000);
+                  }}
+                  className="text-[#5692D9] font-thin cursor-pointer"
+                  data-tip="Copy Vanity Address"
+                  data-tip-content=".tooltip"
+                />
+              )}
+            </strong>
             has submitted a new contribution to the network.
           </li>
         </ol>

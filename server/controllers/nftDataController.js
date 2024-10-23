@@ -3,7 +3,7 @@ import { NFTData } from "../models/nftData.js";
 // Save NFT detail in database
 export const saveNFTDetails = async (req, res) => {
   try {
-    const { walletAddress, vanityAddress, nft } = req.body; // Expecting a single nft to push
+    const { walletAddress, vanityAddress, nft } = req.body; 
 
     // Check if a record already exists with the provided wallet address
     let nftDetail = await NFTData.findOne({ walletAddress });
@@ -13,22 +13,20 @@ export const saveNFTDetails = async (req, res) => {
       nftDetail = new NFTData({
         walletAddress,
         vanityAddress,
-        nfts: [nft], // Start with the new NFT in the array
+        nfts: [nft], 
       });
       await nftDetail.save();
       return res.status(201).json(nftDetail);
     } else {
-      // // If it exists, check if the NFT already exists in the nfts array
-      // const nftExists = nftDetail.nfts.some(existingNft => existingNft.tokenId === nft.tokenId && existingNft.contractAddress === nft.contractAddress);
+      // If it exists, check if the NFT already exists in the nfts array
+      const nftExists = nftDetail.nfts.some(existingNft => existingNft.tokenId === nft.tokenId && existingNft.contractAddress === nft.contractAddress);
 
-      // if (nftExists) {
-      //   return res.status(400).json({ message: 'NFT with the same token ID and contract address already exists in the wallet.' });
-      // } else {
+      if (!nftExists) {
         // If it does not exist, push the new NFT into the existing nfts array
         nftDetail.nfts.push(nft);
         await nftDetail.save();
         return res.status(200).json(nftDetail);
-      // }
+      }
     }
   } catch (error) {
     return res.status(500).json({ message: 'Error creating or updating NFT detail.', error });
