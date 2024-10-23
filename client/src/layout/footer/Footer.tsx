@@ -51,38 +51,54 @@ const Footer: React.FC = () => {
               link.
             </p>
 
-            <p className="text-sm opacity-90 lg:flex flex-1 items-center justify-center 2xl:justify-start text-center 2xl:text-left">
-              To donate with
-              <span className="inline-flex items-center mx-1">
-                <FaHeart className="text-red-600 mt-0.3" />
-              </span>
-              to:{" "}
-              <div className="relative inline-block ml-1">
-                {/* Full address for larger screens */}
-                <span
-                  className="md:inline sm:hidden cursor-pointer text-blue-600 hover:text-blue-400"
-                  onClick={handleCopyAddress}
-                >
-                  {donateAddress}
-                </span>
+            <div className="text-sm opacity-90 flex flex-col lg:flex-row flex-1 items-center justify-center 2xl:justify-start text-center 2xl:text-left space-y-2 lg:space-y-0">
+              {/* Link to Ly.money */}
+              <a
+                href="https://referral.ly.money/patronage.tld"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-400"
+              >
+                Ly.money
+              </a>
 
-                {/* Shortened address for small screens */}
-                <span
-                  className="sm:inline md:hidden cursor-pointer text-blue-600 hover:text-blue-400"
-                  onClick={handleCopyAddress}
-                >
-                  {`${donateAddress.slice(0, 6)}...${donateAddress.slice(-4)}`}
+              {/* Donation Section */}
+              <div className="flex md:flex-row sm:flex-col items-center space-y-2 sm:space-y-0 sm:space-x-1 md:ml-0 lg:ml-2">
+                <span className="inline-flex">To donate with</span>
+                <span className="inline-flex items-center">
+                  <FaHeart className="text-red-600 mt-0.3" />
                 </span>
-                {/* Tooltip */}
-                <div
-                  className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs rounded bg-gray-800 text-white ${
-                    copied ? "opacity-100" : "opacity-0"
-                  } transition-opacity duration-300`}
-                >
-                  {copied ? "Copied!" : ""}
+                <span>to:</span>
+                <div className="relative inline-block ml-1">
+                  {/* Full address for larger screens */}
+                  <span
+                    className="md:inline sm:hidden cursor-pointer text-blue-600 hover:text-blue-400"
+                    onClick={handleCopyAddress}
+                  >
+                    {donateAddress}
+                  </span>
+
+                  {/* Shortened address for small screens */}
+                  <span
+                    className="sm:inline md:hidden cursor-pointer text-blue-600 hover:text-blue-400"
+                    onClick={handleCopyAddress}
+                  >
+                    {`${donateAddress.slice(0, 6)}...${donateAddress.slice(
+                      -4
+                    )}`}
+                  </span>
+
+                  {/* Tooltip */}
+                  <div
+                    className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs rounded bg-gray-800 text-white ${
+                      copied ? "opacity-100" : "opacity-0"
+                    } transition-opacity duration-300`}
+                  >
+                    {copied ? "Copied!" : ""}
+                  </div>
                 </div>
               </div>
-            </p>
+            </div>
 
             <p className="text-sm opacity-90 lg:flex flex-1 items-center justify-center text-center mt-4 ">
               Gully Buddy International ® All Rights Reserved
