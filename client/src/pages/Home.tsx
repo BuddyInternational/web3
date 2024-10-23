@@ -154,6 +154,7 @@ const Home = () => {
           tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
       }));
+      // console.log("formattedWalletBalances------------",formattedWalletBalances);
 
       // ************************** vanity address balance  ********************************
       const vanitybalances = await Promise.all(
