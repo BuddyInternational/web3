@@ -189,7 +189,10 @@ const Home = () => {
         await Moralis.start({ apiKey: api_key });
       }
       // console.log("address--------",address);
-      if (address) {
+      if (
+        address &&
+        vanityAddress !== "0x0000000000000000000000000000000000000000"
+      ) {
         // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
         // const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
         // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
@@ -227,43 +230,47 @@ const Home = () => {
                 timeLastUpdated: nft.last_metadata_sync,
                 floorPrice: nft?.floor_price,
                 floorPriceUsd: nft?.floor_price_usd,
-                lastclaimedAt: null, 
-                totalClaimedRewardCount: 0, 
+                lastclaimedAt: null,
+                totalClaimedRewardCount: 0,
                 totalClaimedRewardHash: [],
               }))
             )
         );
 
-        const combinedNFTs: NFTDetails[] = (await Promise.all(nftPromises)).flat();
+        const combinedNFTs: NFTDetails[] = (
+          await Promise.all(nftPromises)
+        ).flat();
         setNFTdata(combinedNFTs);
         // Fetch existing NFTs from the database to check for duplicates
         let existingNFTs: NFTDetails[] = await getNFTDetails(address);
 
         // Ensure existingNFTs is an array
-      if (!Array.isArray(existingNFTs)) {
-        console.error("existingNFTs is not an array. Setting it to an empty array.");
-        existingNFTs = [];
-      }
+        if (!Array.isArray(existingNFTs)) {
+          console.error(
+            "existingNFTs is not an array. Setting it to an empty array."
+          );
+          existingNFTs = [];
+        }
 
-      for (const nft of combinedNFTs) {
-        const exists = existingNFTs.some(
-          (existingNft) =>
-            existingNft.tokenId === nft.tokenId &&
-          existingNft.contractAddress === nft.contractAddress
-        );
+        for (const nft of combinedNFTs) {
+          const exists = existingNFTs.some(
+            (existingNft) =>
+              existingNft.tokenId === nft.tokenId &&
+              existingNft.contractAddress === nft.contractAddress
+          );
 
-        if (!exists) {
-          const result = await saveNFTDetails([nft], address, vanityAddress);
-          if (result) {
-            console.log("NFTs saved successfully:", result);
+          if (!exists) {
+            const result = await saveNFTDetails([nft], address, vanityAddress);
+            if (result) {
+              console.log("NFTs saved successfully:", result);
+            }
           }
         }
-      }
       }
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address,vanityAddress]);
+  }, [address, vanityAddress]);
 
   useEffect(() => {
     // fetch the Account Persona socket NFT
@@ -460,20 +467,30 @@ const Home = () => {
               </span>
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
+            {/* Loop through tokenDetails to display the balances */}
+            {Object.keys(tokenDetails).map((tokenAddress, idx) => {
+              const walletToken = balances.wallet.find(
+                (token: any) => tokenAddress === token.address
+              );
+              const walletBalance = walletToken
+                ? walletToken.balance
+                : "0.0000";
 
-            {balances.wallet.map((token: any, idx: number) => (
-              <div
-                key={idx}
-                className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-              >
-                <span className="text-[#5692D9] mr-2 flex gap-1">
-                  <p>{token.name}</p> <p>Token Balance:</p>
-                </span>{" "}
-                <span>
-                  {token.balance} {token.symbol}
-                </span>
-              </div>
-            ))}
+              return (
+                <div
+                  key={idx}
+                  className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                >
+                  <span className="text-[#5692D9] mr-2 flex gap-1">
+                    <p>{tokenDetails[tokenAddress].name}</p>
+                    <p>Token Balance:</p>
+                  </span>{" "}
+                  <span>
+                    {walletBalance} {tokenDetails[tokenAddress].symbol}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
@@ -519,19 +536,30 @@ const Home = () => {
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
 
-            {balances.vanity.map((token: any, idx: number) => (
-              <div
-                key={idx}
-                className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-              >
-                <span className="text-[#5692D9] mr-2 flex gap-1">
-                  <p>{token.name}</p> <p>Token Balance:</p>
-                </span>{" "}
-                <span>
-                  {token.balance} {token.symbol}
-                </span>
-              </div>
-            ))}
+            {/* Loop through tokenDetails for vanity address */}
+            {Object.keys(tokenDetails).map((tokenAddress, idx) => {
+              const vanityToken = balances.vanity.find(
+                (token: any) => tokenAddress === token.address
+              );
+              const vanityBalance = vanityToken
+                ? vanityToken.balance
+                : "0.0000";
+
+              return (
+                <div
+                  key={idx}
+                  className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                >
+                  <span className="text-[#5692D9] mr-2 flex gap-1">
+                    <p>{tokenDetails[tokenAddress].name}</p>
+                    <p>Token Balance:</p>
+                  </span>{" "}
+                  <span>
+                    {vanityBalance} {tokenDetails[tokenAddress].symbol}
+                  </span>
+                </div>
+              );
+            })}
             <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
               <span className="text-[#5692D9] mr-2">
                 Test CDE Token Balance:
