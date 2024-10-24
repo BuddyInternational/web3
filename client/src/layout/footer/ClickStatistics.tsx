@@ -85,6 +85,68 @@ const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
 const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
 
 const ClickStatistics: React.FC = () => {
+  // Static Data (replace API call with this)
+  const staticData = {
+    clickStatistics: {
+      datasets: [
+        {
+          data: [
+            { x: "2024-09-24T00:00:00.000Z", y: "3" },
+            { x: "2024-09-25T00:00:00.000Z", y: "0" },
+            { x: "2024-09-26T00:00:00.000Z", y: "0" },
+            { x: "2024-09-27T00:00:00.000Z", y: "0" },
+            { x: "2024-09-28T00:00:00.000Z", y: "0" },
+            { x: "2024-09-29T00:00:00.000Z", y: "0" },
+            { x: "2024-09-30T00:00:00.000Z", y: "1" },
+            { x: "2024-10-01T00:00:00.000Z", y: "0" },
+            { x: "2024-10-02T00:00:00.000Z", y: "0" },
+            { x: "2024-10-03T00:00:00.000Z", y: "0" },
+            { x: "2024-10-04T00:00:00.000Z", y: "0" },
+            { x: "2024-10-05T00:00:00.000Z", y: "0" },
+            { x: "2024-10-06T00:00:00.000Z", y: "0" },
+            { x: "2024-10-07T00:00:00.000Z", y: "0" },
+            { x: "2024-10-08T00:00:00.000Z", y: "0" },
+            { x: "2024-10-09T00:00:00.000Z", y: "1" },
+            { x: "2024-10-10T00:00:00.000Z", y: "0" },
+            { x: "2024-10-11T00:00:00.000Z", y: "1" },
+            { x: "2024-10-12T00:00:00.000Z", y: "1" },
+            { x: "2024-10-13T00:00:00.000Z", y: "0" },
+            { x: "2024-10-14T00:00:00.000Z", y: "0" },
+            { x: "2024-10-15T00:00:00.000Z", y: "0" },
+            { x: "2024-10-16T00:00:00.000Z", y: "0" },
+            { x: "2024-10-17T00:00:00.000Z", y: "0" },
+            { x: "2024-10-18T00:00:00.000Z", y: "0" },
+            { x: "2024-10-19T00:00:00.000Z", y: "0" },
+            { x: "2024-10-20T00:00:00.000Z", y: "0" },
+            { x: "2024-10-21T00:00:00.000Z", y: "0" },
+            { x: "2024-10-22T00:00:00.000Z", y: "0" },
+            { x: "2024-10-23T00:00:00.000Z", y: "2" },
+            { x: "2024-10-24T00:00:00.000Z", y: "4" },
+          ],
+        },
+      ],
+    },
+    os: [
+      { os: "iOS", score: 7 },
+      { os: "Linux", score: 3 },
+      { os: "Mac OS X", score: 2 },
+      { os: "Windows", score: 1 },
+    ],
+    country: [
+      { countryName: "United States", country: "US", score: 9 },
+      { countryName: "India", country: "IN", score: 3 },
+      { countryName: "Japan", country: "JP", score: 1 },
+    ],
+    city: [
+      { name: "Surat", countryCode: "IN", score: 3 },
+      { name: "Washington", countryCode: "US", score: 3 },
+      { name: "Boston", countryCode: "US", score: 3 },
+      { name: "Boardman", countryCode: "US", score: 2 },
+      { name: "Tokyo", countryCode: "JP", score: 1 },
+      { name: "Philadelphia", countryCode: "US", score: 1 },
+    ],
+  };
+
   const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
   const [osData, setOsData] = useState<OSData[]>([]);
   const [countryData, setCountryData] = useState<
@@ -94,6 +156,22 @@ const ClickStatistics: React.FC = () => {
   CityData[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+
+
+  useEffect(() => {
+    // Set static data instead of fetching
+    const clickData = staticData.clickStatistics.datasets[0].data;
+    const osData = staticData.os;
+    const countryData = staticData.country;
+    const cityData = staticData.city;
+
+    setClickData(clickData);
+    setOsData(osData);
+    setCountryData(countryData);
+    setCityData(cityData);
+    setLoading(false);
+  }, []);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -127,46 +205,6 @@ const ClickStatistics: React.FC = () => {
   //   fetchData();
   // }, []);
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const options: AxiosRequestConfig = {
-          method: 'GET',
-          url: `/statistics/link/${LINK_ID}?period=last30&tz=UTC`,
-          headers: { 
-            accept: '*/*', 
-            Authorization: LINK_STATISTICS_API_KEY 
-          },
-        };
-
-        // Make the API call
-        const response: AxiosResponse<APIResponse> = await axios.request(options);
-        console.log('API Response:', response);
-
-        // Check if response contains valid data
-        if (response.data) {
-          const { clickStatistics, os, country, city } = response.data;
-
-          if (clickStatistics && clickStatistics.datasets && clickStatistics.datasets.length > 0) {
-            setClickData(clickStatistics.datasets[0].data);
-          }
-
-          setOsData(os || []);
-          setCountryData(country || []);
-          setCityData(city || []);
-        }
-
-        setLoading(false); // Stop loading spinner after data fetch
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false); // Ensure loading stops on error as well
-      }
-    };
-
-    // Call the function to fetch data
-    fetchData();
-  }, [LINK_ID, LINK_STATISTICS_API_KEY]); // Dependency array includes the API values
 
   const labels = clickData.map((item) => new Date(item.x).toLocaleDateString());
   const dataPoints = clickData.map((item) => parseInt(item.y));
