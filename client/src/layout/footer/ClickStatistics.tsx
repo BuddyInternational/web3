@@ -43,6 +43,10 @@ interface APIResponse {
   city: { city: string; score: number; name: string; countryCode: string }[];
 }
 
+// API KEY
+const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
+const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
+
 const ClickStatistics: React.FC = () => {
   const [clickData, setClickData] = useState<ClickData[]>([]);
   const [osData, setOsData] = useState<{ os: string; score: number }[]>([]);
@@ -59,8 +63,8 @@ const ClickStatistics: React.FC = () => {
       try {
         const options = {
           method: "GET",
-          url: "/statistics/link/lnk_4Azm_2OK3WCVZe661lZUjyrNiJ?period=last30&tz=UTC",
-          headers: { accept: "*/*", Authorization: "sk_2vc0aXbXhUWSbtMj" },
+          url: `/statistics/link/${LINK_ID}?period=last30&tz=UTC`,
+          headers: { accept: "*/*", Authorization: LINK_STATISTICS_API_KEY },
         };
 
         const response = await axios.request<APIResponse>(options);
