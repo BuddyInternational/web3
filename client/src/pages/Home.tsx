@@ -94,6 +94,24 @@ const Home = () => {
     string | null
   >(null);
   const { vanityAddress } = useVanityContext();
+  // State to manage the currently selected vanity address
+  const [currentVanityAddress, setCurrentVanityAddress] = useState(""); // Initially set to empty or a default value
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+  // Array of vanity addresses
+  const vanityAddresses = [
+    "0x1234567890abcdef1234567890abcdef12345678",
+    "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef",
+  ];
+
+  const handleDropdownToggle = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleAddressSelect = (address: string) => {
+    setCurrentVanityAddress(address);
+    setDropdownOpen(false);
+  };
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -193,7 +211,6 @@ const Home = () => {
       });
       setTestCDEBalance(Number(formattedTestCDEBalance));
       setTestTIMBalance(Number(formattedTestTIMBalance));
-
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
@@ -298,7 +315,7 @@ const Home = () => {
         if (response !== null) {
           setsocketNFTImageURL(response.imageUrl);
           setsocketNFTImageMediaType(response.mediaType);
-        } 
+        }
       } else {
         setsocketNFTImageURL(null);
         setsocketNFTImageMediaType(null);
@@ -489,9 +506,7 @@ const Home = () => {
               const walletToken = balances.wallet.find(
                 (token: any) => tokenAddress === token.address
               );
-              const walletBalance = walletToken
-                ? walletToken.balance
-                : "0";
+              const walletBalance = walletToken ? walletToken.balance : "0";
 
               return (
                 <div
@@ -512,8 +527,17 @@ const Home = () => {
 
           <div className="flex flex-col gap-2 mt-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
-              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3  sm:justify-center md:justify-start">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 sm:justify-center md:justify-start">
                 <span className="text-center mt-1">Vanity Address Balance</span>
+
+                {/* Dropdown Toggle Button */}
+                <button
+                  onClick={handleDropdownToggle}
+                  className="text-[#5692D9] mt-1 cursor-pointer"
+                >
+                  ▼
+                </button>
+
                 {/* Etherscan Link */}
                 <Tooltip title="View on Etherscan" arrow>
                   <a
@@ -526,6 +550,7 @@ const Home = () => {
                     <FaEthereum />
                   </a>
                 </Tooltip>
+
                 {/* Polygonscan Link */}
                 <Tooltip title="View on Polygonscan" arrow>
                   <a
@@ -538,19 +563,38 @@ const Home = () => {
                     <SiPolygon />
                   </a>
                 </Tooltip>
+
                 <Tooltip title="CDE" arrow>
                   <a
                     href={`/#`}
-                    // target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#5692D9] mt-1 cursor-pointer"
                     data-tip="CDE"
-                    onClick={()=>{ alert("Prestige this Account");}}
+                    onClick={() => {
+                      alert("Prestige this Account");
+                    }}
                   >
                     <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                   </a>
                 </Tooltip>
               </span>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div className="relative mt-2 bg-white border border-gray-300 rounded-md shadow-md">
+                  <ul className="max-h-40 overflow-y-auto">
+                    {vanityAddresses.map((address) => (
+                      <li
+                        key={address}
+                        className="cursor-pointer hover:bg-gray-200 p-2"
+                        onClick={() => handleAddressSelect(address)}
+                      >
+                        {address}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
 
@@ -559,9 +603,7 @@ const Home = () => {
               const vanityToken = balances.vanity.find(
                 (token: any) => tokenAddress === token.address
               );
-              const vanityBalance = vanityToken
-                ? vanityToken.balance
-                : "0";
+              const vanityBalance = vanityToken ? vanityToken.balance : "0";
 
               return (
                 <div
@@ -631,7 +673,7 @@ const Home = () => {
 
       {/* NFT cards */}
       <div className="mt-3">
-        <NftCard NFTDetails={NFTdata} CardType={"walletNFT"}/>
+        <NftCard NFTDetails={NFTdata} CardType={"walletNFT"} />
       </div>
 
       {/* Gully Buddies Membership Rewards Modal */}

@@ -68,16 +68,19 @@ const ClickStatistics: React.FC = () => {
         };
 
         const response = await axios.request<APIResponse>(options);
-        const clickData = response.data.clickStatistics.datasets[0].data;
-        const osData = response.data.os;
-        const countryData = response.data.country;
-        const cityData = response.data.city;
-
-        setClickData(clickData);
-        setOsData(osData);
-        setCountryData(countryData);
-        setCityData(cityData);
-        setLoading(false);
+        console.log("response--------",response);
+        if(response){
+          const clickData = response.data.clickStatistics.datasets[0].data;
+          const osData = response.data.os;
+          const countryData = response.data.country;
+          const cityData = response.data.city;
+  
+          setClickData(clickData);
+          setOsData(osData);
+          setCountryData(countryData);
+          setCityData(cityData);
+          setLoading(false);
+        }
       } catch (error) {
         console.error("Error fetching data", error);
         setLoading(false);
