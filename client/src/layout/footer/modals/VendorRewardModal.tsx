@@ -9,6 +9,7 @@ import {
   } from "@mui/material";
   import React from "react";
   import { IoClose } from "react-icons/io5";
+import ClickStatistics from "../ClickStatistics";
   
   const VendorRewardModal: React.FC<{
     open: boolean;
@@ -24,7 +25,8 @@ import {
               left: "50%",
               transform: "translate(-50%, -50%)",
               backgroundColor: "white",
-              width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
+              // width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "50%" },
+              width: { xs: "90%", sm: "80%", md: "70%", lg: "60%", xl: "50%" },
               maxHeight: "80%",
               overflowY: "auto",
               borderRadius: "8px",
@@ -53,12 +55,13 @@ import {
               <IoClose />
             </IconButton>
             <DialogContent dividers>
-              <Typography
+              {/* <Typography
                 variant="h6"
                 sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}
               >
                 This feature is coming soon.
-              </Typography>
+              </Typography> */}
+              <ClickStatistics />
             </DialogContent>
           </Box>
         </Fade>
