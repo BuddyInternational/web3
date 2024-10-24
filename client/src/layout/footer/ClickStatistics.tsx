@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -25,22 +25,59 @@ ChartJS.register(
   ArcElement
 );
 
-interface ClickData {
-  x: string;
-  y: string;
+// interface ClickData {
+//   x: string;
+//   y: string;
+// }
+
+// interface APIResponse {
+//   clickStatistics: {
+//     datasets: [
+//       {
+//         data: ClickData[];
+//       }
+//     ];
+//   };
+//   os: { os: string; score: number }[];
+//   country: { countryName: string; score: number }[];
+//   city: { city: string; score: number; name: string; countryCode: string }[];
+// }
+
+interface ClickDataPoint {
+  x: string; // Date string, like "2024-09-24T00:00:00.000Z"
+  y: string; // Number of clicks
+}
+
+interface Dataset {
+  data: ClickDataPoint[];
+}
+
+interface ClickStatistics {
+  datasets: Dataset[];
+}
+
+interface OSData {
+  os: string;
+  score: number;
+}
+
+interface CountryData {
+  countryName: string;
+  country: string;
+  score: number;
+}
+
+interface CityData {
+  name: string;
+  countryCode: string;
+  score: number;
 }
 
 interface APIResponse {
-  clickStatistics: {
-    datasets: [
-      {
-        data: ClickData[];
-      }
-    ];
-  };
-  os: { os: string; score: number }[];
-  country: { countryName: string; score: number }[];
-  city: { city: string; score: number; name: string; countryCode: string }[];
+  clickStatistics: ClickStatistics;
+  os: OSData[];
+  country: CountryData[];
+  city: CityData[];
 }
 
 // API KEY
@@ -48,47 +85,88 @@ const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
 const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
 
 const ClickStatistics: React.FC = () => {
-  const [clickData, setClickData] = useState<ClickData[]>([]);
-  const [osData, setOsData] = useState<{ os: string; score: number }[]>([]);
+  const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
+  const [osData, setOsData] = useState<OSData[]>([]);
   const [countryData, setCountryData] = useState<
-    { countryName: string; score: number }[]
+  CountryData[]
   >([]);
   const [cityData, setCityData] = useState<
-    { city: string; score: number; name: string; countryCode: string }[]
+  CityData[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const options = {
+  //         method: "GET",
+  //         url: `/statistics/link/${LINK_ID}?period=last30&tz=UTC`,
+  //         headers: { accept: "*/*", Authorization: LINK_STATISTICS_API_KEY },
+  //       };
+
+  //       const response = await axios.request<APIResponse>(options);
+  //       console.log("response--------",response);
+  //       if(response){
+  //         const clickData = response.data.clickStatistics.datasets[0].data;
+  //         const osData = response.data.os;
+  //         const countryData = response.data.country;
+  //         const cityData = response.data.city;
+  
+  //         setClickData(clickData);
+  //         setOsData(osData);
+  //         setCountryData(countryData);
+  //         setCityData(cityData);
+  //         setLoading(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data", error);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const options = {
-          method: "GET",
+        const options: AxiosRequestConfig = {
+          method: 'GET',
           url: `/statistics/link/${LINK_ID}?period=last30&tz=UTC`,
-          headers: { accept: "*/*", Authorization: LINK_STATISTICS_API_KEY },
+          headers: { 
+            accept: '*/*', 
+            Authorization: LINK_STATISTICS_API_KEY 
+          },
         };
 
-        const response = await axios.request<APIResponse>(options);
-        console.log("response--------",response);
-        if(response){
-          const clickData = response.data.clickStatistics.datasets[0].data;
-          const osData = response.data.os;
-          const countryData = response.data.country;
-          const cityData = response.data.city;
-  
-          setClickData(clickData);
-          setOsData(osData);
-          setCountryData(countryData);
-          setCityData(cityData);
-          setLoading(false);
+        // Make the API call
+        const response: AxiosResponse<APIResponse> = await axios.request(options);
+        console.log('API Response:', response);
+
+        // Check if response contains valid data
+        if (response.data) {
+          const { clickStatistics, os, country, city } = response.data;
+
+          if (clickStatistics && clickStatistics.datasets && clickStatistics.datasets.length > 0) {
+            setClickData(clickStatistics.datasets[0].data);
+          }
+
+          setOsData(os || []);
+          setCountryData(country || []);
+          setCityData(city || []);
         }
+
+        setLoading(false); // Stop loading spinner after data fetch
       } catch (error) {
-        console.error("Error fetching data", error);
-        setLoading(false);
+        console.error('Error fetching data:', error);
+        setLoading(false); // Ensure loading stops on error as well
       }
     };
 
+    // Call the function to fetch data
     fetchData();
-  }, []);
+  }, [LINK_ID, LINK_STATISTICS_API_KEY]); // Dependency array includes the API values
 
   const labels = clickData.map((item) => new Date(item.x).toLocaleDateString());
   const dataPoints = clickData.map((item) => parseInt(item.y));
