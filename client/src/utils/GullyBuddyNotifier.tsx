@@ -1,12 +1,17 @@
 import { useWeb3ModalProvider } from "@web3modal/ethers/react";
 import { ethers } from "ethers";
-import { toast } from "react-toastify";
 
 const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
 
 // Custom Hook to manage notification
 export const useGullyBuddyNotifier = () => {
   const { walletProvider } = useWeb3ModalProvider();
+
+  // Ensure walletProvider is defined before using it
+  if (!walletProvider) {
+    console.error("Wallet provider is not initialized.");
+    return { notifyGullyBuddy: () => Promise.reject("Provider not initialized") };
+  }
 
   const ethersProvider = new ethers.BrowserProvider(
     walletProvider as ethers.Eip1193Provider
@@ -17,6 +22,13 @@ export const useGullyBuddyNotifier = () => {
     console.log(
       `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
     );
+
+    // // Check the network
+    // const network = await ethersProvider.getNetwork();
+    // if (network.chainId !== BigInt(1)) { // Ethereum Mainnet
+    //   toast.warning("Please switch to Ethereum Mainnet Network");
+    //   return false;
+    // }
 
     const gullyBuddyAddress = await resolveENSName(domain!);
     console.log("ENS Name :", gullyBuddyAddress);
@@ -32,7 +44,7 @@ export const useGullyBuddyNotifier = () => {
       return transactionResult;
     } else {
       console.error("Failed to resolve Buddyinternational.eth");
-      toast.warning("Please switch to Ethereum Mainnet Network");
+      // toast.warning("Please switch to Ethereum Mainnet Network");
       return false;
     }
   };

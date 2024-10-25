@@ -24,7 +24,12 @@ export const checkExistingVanityAddress = async (
       await axios.get(`${server_api_base_url}/api/vanity/checkVanityAddress`, {
         params: { walletAddress },
       });
-    return response.data;
+      if(response){
+        return response.data;
+      }
+      else{
+        return null;
+      }
   } catch (error) {
     console.error("Error checking existing vanity address:", error);
     return null;

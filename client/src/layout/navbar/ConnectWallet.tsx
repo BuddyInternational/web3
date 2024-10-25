@@ -4,6 +4,7 @@ import {
   defaultConfig,
   useDisconnect,
   useWeb3ModalAccount,
+  useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaRegCopy, FaEthereum } from "react-icons/fa";
@@ -13,6 +14,9 @@ import {
 } from "../../api/vanityAPI";
 import { useVanityContext } from "../../context/VanityContext";
 import { SiPolygon } from "react-icons/si";
+import { toast } from "react-toastify";
+import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
+import { ethers } from "ethers";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -108,11 +112,29 @@ export default function App() {
   const copyAddressTimeoutRef: any = useRef(null);
   const { vanityAddress, setVanityAddress } = useVanityContext();
   const [isLoading, setIsLoading] = useState(false);
+  const { notifyGullyBuddy } = useGullyBuddyNotifier();
+  const { walletProvider } = useWeb3ModalProvider();
 
   useEffect(() => {
     const handleWalletConnect = async () => {
       if (isConnected && address) {
         setIsLoading(true);
+        // Create ethers provider using the current wallet provider
+        const ethersProvider = new ethers.BrowserProvider(walletProvider!);
+
+        // Check the current network
+        const network = await ethersProvider.getNetwork();
+        const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
+        if (!isMainnet) {
+          // User is not on Mainnet, show a warning
+          toast.warning(
+            "Please switch to the Ethereum Mainnet to generate a vanity address."
+          );
+          disconnect(); // Disconnect from the wallet
+          setIsLoading(false);
+          return;
+        }
+
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
         if (existingAddress != null) {
@@ -125,8 +147,27 @@ export default function App() {
           );
           if (!!generatedAddress?.data[0]?.address) {
             setVanityAddress(generatedAddress?.data[0]?.address);
+            try {
+              const sender = address!;
+              const message = `
+              User with Wallet Address **${address}** has generated a new Vanity Address: **${
+                generatedAddress?.data[0]?.address || "N/A"
+              }**.
+            `; // Send notification
+              console.log("message----------------", message);
+              const notificationResult = await notifyGullyBuddy(
+                sender,
+                message
+              );
+              if (notificationResult && notificationResult.hash) {
+                toast.success("Notification sent to Buddyinternational.eth");
+              }
+            } catch (error: any) {
+              toast.error("Error sending notification:", error);
+            }
           }
         }
+
         setIsLoading(false);
       }
     };
@@ -207,7 +248,9 @@ export default function App() {
                       rel="noopener noreferrer"
                       className="text-[#5692D9] mt-1 cursor-pointer"
                       data-tip="CDE"
-                      onClick={()=>{ alert("Prestige this Account");}}
+                      onClick={() => {
+                        alert("Prestige this Account");
+                      }}
                     >
                       <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                     </a>
