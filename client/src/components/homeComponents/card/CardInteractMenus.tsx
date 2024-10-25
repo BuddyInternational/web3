@@ -103,12 +103,14 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
       onClick: handleOpenModal,
       title: "View Reputation",
       description: "This feature is coming soon.",
+      slectedNFT: selectedNFT,
     },
     {
       label: "Order This NFTs Apparel",
       onClick: handleOpenModal,
       title: "Gully Buddy Retail Ambassador Apparels",
       content: <OrderNFTApparel />,
+      slectedNFT: selectedNFT,
     },
   ];
 

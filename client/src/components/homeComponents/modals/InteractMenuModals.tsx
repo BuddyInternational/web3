@@ -144,7 +144,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
         modalContents.selectedNFT.tokenId,
         modalContents.selectedNFT.contractAddress!
       );
-      console.log("claimDetails===============",claimDetails);
       if (claimDetails !== null && claimDetails?.lastclaimedAt) {
         const lastClaimedDate = new Date(claimDetails.lastclaimedAt);
         setLastClaimedAt(lastClaimedDate);
@@ -155,13 +154,13 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       }
     };
 
-    if (open && modalContents.selectedNFT.contractAddress) {
+    if (open && modalContents.selectedNFT.contractAddress!) {
       fetchLastClaimedAt();
     }
   }, [
     open,
     address,
-    modalContents.selectedNFT.contractAddress,
+    modalContents.selectedNFT.contractAddress!,
     modalContents.selectedNFT.tokenId,
     setLastClaimedAt,
   ]);
