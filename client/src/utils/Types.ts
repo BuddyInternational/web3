@@ -62,3 +62,12 @@ export interface ContentSubmission {
   isSubbmited: boolean;
   submissionDate: string;
 }
+
+export interface City {
+  city: string;
+  country: string;
+  state: string;
+  lat: string;
+  lng: string;
+}
+

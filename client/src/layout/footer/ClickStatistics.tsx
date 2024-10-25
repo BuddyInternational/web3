@@ -14,6 +14,9 @@ import {
 } from "chart.js";
 import { Skeleton } from "@mui/material";
 import ImageCarousel from "./ImageCarousel";
+import Map from "./GoogleMap";
+import { APIProvider } from "@vis.gl/react-google-maps";
+import GoogleMap from "./GoogleMap";
 
 ChartJS.register(
   CategoryScale,
@@ -84,6 +87,7 @@ interface APIResponse {
 // API KEY
 const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
 const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
+const google_map_api_key = process.env.REACT_APP_GOOGLE_MAP_API;
 
 const ClickStatistics: React.FC = () => {
   // Static Data (replace API call with this)
@@ -397,6 +401,12 @@ const ClickStatistics: React.FC = () => {
             />
           </div>
         </div>
+      </div>
+
+      <div className="">
+      <APIProvider apiKey={google_map_api_key!}>
+    <GoogleMap />
+  </APIProvider>
       </div>
       <div className="my-4">
         <ImageCarousel />

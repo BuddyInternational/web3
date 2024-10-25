@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -19,6 +19,7 @@ const ImageCarousel: React.FC = () => {
     { src: '/v5.png', alt: 'Carousel Item 5' },
     { src: '/v6.jpeg', alt: 'Carousel Item 6' },
   ];
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <div className="w-full h-96 sm:h-52 md:h-72 lg:h-80 xl:h-[400px]">
@@ -31,6 +32,7 @@ const ImageCarousel: React.FC = () => {
           delay: 2500, // Delay between transitions in milliseconds
           disableOnInteraction: false, // Allows autoplay to continue after user interactions
         }}
+        onSlideChange={(swiper:any) => setActiveIndex(swiper.activeIndex)}
         breakpoints={{
           // Custom breakpoints according to your Tailwind configuration
           320: {
@@ -56,7 +58,10 @@ const ImageCarousel: React.FC = () => {
             <img
               src={image.src}
               alt={image.alt}
-              className="object-cover rounded-lg w-full h-60"
+              // className="object-cover rounded-lg w-full h-60"
+              className={`object-cover rounded-lg w-full h-60 transition duration-500${
+                index === activeIndex ? 'opacity-80' : 'opacity-0'
+              }`}
             />
           </SwiperSlide>
         ))}

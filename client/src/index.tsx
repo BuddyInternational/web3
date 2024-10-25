@@ -5,6 +5,9 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { VanityProvider } from "./context/VanityContext";
 
+// Disable right-click globally
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
