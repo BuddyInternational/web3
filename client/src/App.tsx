@@ -3,8 +3,8 @@ import "./App.css";
 import ConnectWallet from "./layout/navbar/ConnectWallet";
 import Footer from "./layout/footer/Footer";
 import AllRoutes from "./routes/AllRoutes";
-import { ToastContainer } from 'react-toastify';
-  import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App: React.FC = () => {
   return (

@@ -13,6 +13,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Skeleton } from "@mui/material";
+import ImageCarousel from "./ImageCarousel";
 
 ChartJS.register(
   CategoryScale,
@@ -351,8 +352,8 @@ const ClickStatistics: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 bg-white">
-      <h1 className="text-2xl font-bold mb-4 text-center">Click Statistics</h1>
+    <div className="container mx-auto p-4 bg-white my-2">
+      <h1 className="text-2xl font-bold mb-4 text-center">Retail QR Scan</h1>
 
       {/* Line Chart for Clicks Over Time */}
       <div
@@ -362,13 +363,13 @@ const ClickStatistics: React.FC = () => {
       </div>
 
       {/* Grid Layout for Pie Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
         {/* Pie Chart for Devices */}
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-bold text-center mb-4">
             Device Breakdown
           </h2>
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-md">
             <Pie data={osChartData} options={{ maintainAspectRatio: false }} />
           </div>
         </div>
@@ -378,7 +379,7 @@ const ClickStatistics: React.FC = () => {
           <h2 className="text-xl font-bold text-center mb-4">
             Country Breakdown
           </h2>
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-md">
             <Pie
               data={countryChartData}
               options={{ maintainAspectRatio: false }}
@@ -389,7 +390,7 @@ const ClickStatistics: React.FC = () => {
         {/* Pie Chart for Cities */}
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-bold text-center mb-4">City Breakdown</h2>
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-md">
             <Pie
               data={cityChartData}
               options={{ maintainAspectRatio: false }}
@@ -397,9 +398,12 @@ const ClickStatistics: React.FC = () => {
           </div>
         </div>
       </div>
+      <div className="my-4">
+        <ImageCarousel />
+      </div>
 
       {/* CSV Download Button */}
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-4 sm:mt-28 md:mt-12">
         <button
           onClick={downloadCsv}
           className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"

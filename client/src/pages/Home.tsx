@@ -14,7 +14,7 @@ import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
 import testTokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
 import Leadership from "../components/homeComponents/modals/Leadership";
-import { Tooltip } from "@mui/material";
+import { Menu, MenuItem, Tooltip, IconButton } from "@mui/material";
 import Withdraw from "../components/homeComponents/modals/Withdraw";
 import { SiPolygon } from "react-icons/si";
 import { FaEthereum } from "react-icons/fa";
@@ -24,6 +24,7 @@ import { GiBiceps } from "react-icons/gi";
 import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
 import { toast } from "react-toastify";
 import { getNFTDetails, saveNFTDetails } from "../api/nftAPI";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -94,23 +95,20 @@ const Home = () => {
     string | null
   >(null);
   const { vanityAddress } = useVanityContext();
-  // State to manage the currently selected vanity address
-  const [currentVanityAddress, setCurrentVanityAddress] = useState(""); // Initially set to empty or a default value
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const isDropdownOpen = Boolean(anchorEl);
 
-  // Array of vanity addresses
-  const vanityAddresses = [
-    "0x1234567890abcdef1234567890abcdef12345678",
-    "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef",
-  ];
+  const handleDropdownToggle = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  const handleDropdownToggle = () => {
-    setDropdownOpen(!isDropdownOpen);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   const handleAddressSelect = (address: string) => {
-    setCurrentVanityAddress(address);
-    setDropdownOpen(false);
+    console.log("Selected Address:", address);
+    handleClose();
   };
 
   // Handle Modal
@@ -192,7 +190,7 @@ const Home = () => {
         vanityAddress
       );
       const formattedTestCDEBalance = Number(
-        Web3.utils.fromWei(testCDETokenBalance, "wei")
+        Web3.utils.fromWei(testCDETokenBalance, "ether")
       ).toFixed(4);
 
       // ***********************  Test TIM address balance  *********************************
@@ -365,6 +363,7 @@ const Home = () => {
 
   return (
     <>
+    {/* second Navbar */}
       <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3 ">
         {/* Start section */}
         <div className="flex flex-col gap-8 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
@@ -527,16 +526,8 @@ const Home = () => {
 
           <div className="flex flex-col gap-2 mt-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
-              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 sm:justify-center md:justify-start">
+              <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 sm:justify-center md:justify-start items-center">
                 <span className="text-center mt-1">Vanity Address Balance</span>
-
-                {/* Dropdown Toggle Button */}
-                <button
-                  onClick={handleDropdownToggle}
-                  className="text-[#5692D9] mt-1 cursor-pointer"
-                >
-                  ▼
-                </button>
 
                 {/* Etherscan Link */}
                 <Tooltip title="View on Etherscan" arrow>
@@ -564,37 +555,59 @@ const Home = () => {
                   </a>
                 </Tooltip>
 
+                {/* CDE Link */}
                 <Tooltip title="CDE" arrow>
                   <a
                     href={`/#`}
                     rel="noopener noreferrer"
                     className="text-[#5692D9] mt-1 cursor-pointer"
                     data-tip="CDE"
-                    onClick={() => {
-                      alert("Prestige this Account");
-                    }}
+                    onClick={() => alert("Prestige this Account")}
                   >
                     <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                   </a>
                 </Tooltip>
+
+                {/* Dropdown Toggle Button */}
+                <IconButton
+                  aria-label="more"
+                  aria-controls={isDropdownOpen ? "long-menu" : undefined}
+                  aria-haspopup="true"
+                  onClick={handleDropdownToggle}
+                  className="text-[#5692D9] mt-1 cursor-pointer"
+                >
+                  <IoMdArrowDropdown />
+                </IconButton>
               </span>
 
-              {/* Dropdown Menu */}
-              {isDropdownOpen && (
-                <div className="relative mt-2 bg-white border border-gray-300 rounded-md shadow-md">
-                  <ul className="max-h-40 overflow-y-auto">
-                    {vanityAddresses.map((address) => (
-                      <li
-                        key={address}
-                        className="cursor-pointer hover:bg-gray-200 p-2"
-                        onClick={() => handleAddressSelect(address)}
-                      >
-                        {address}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* Material-UI Dropdown */}
+              <Menu
+                id="long-menu"
+                anchorEl={anchorEl}
+                open={isDropdownOpen}
+                onClose={handleClose}
+                slotProps={{
+                  paper: {
+                    style: {
+                      maxHeight: 200,
+                      width: "20ch",
+                      marginTop: "8px",
+                    },
+                  },
+                }}
+              >
+                {/* {vanityAddresses.map((address) => (
+          <MenuItem
+            key={address}
+            onClick={() => handleAddressSelect(address)}
+          >
+            {address}
+          </MenuItem>
+        ))} */}
+                {/* Disabled option */}
+                <MenuItem disabled>Prestige this Account</MenuItem>
+              </Menu>
+
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
 
