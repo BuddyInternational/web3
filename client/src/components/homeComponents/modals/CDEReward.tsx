@@ -123,10 +123,10 @@ const CDEReward: React.FC<{
 
       if (typeof amountInEther === "string") {
         const amountInWei = ethers.parseEther(amountInEther);
-        console.log("amountInWei-----------", amountInWei);
+        console.log("amountInWei-----------", Number(amountInWei));
 
         const tx = await nftMarketContract.transferEthAndGetTestCDEOrTestTIM(
-          amountInEther,
+          amountInWei,
           vanityAddress,
           tokenType,
           receiverType,

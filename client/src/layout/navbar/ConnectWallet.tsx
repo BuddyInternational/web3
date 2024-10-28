@@ -45,6 +45,13 @@ const chains = [
     rpcUrl: "https://arb1.arbitrum.io/rpc",
   },
   {
+    chainId: 8453,
+    name: "Base Mainnet",
+    currency: "ETH",
+    explorerUrl: "https://base.blockscout.com/",
+    rpcUrl: "https://mainnet.base.org",
+  },
+  {
     chainId: 11155111,
     name: "Sepolia Testnet",
     currency: "SepoliaETH",
@@ -64,6 +71,13 @@ const chains = [
     currency: "HETH",
     explorerUrl: "",
     rpcUrl: "http://localhost:8545",
+  },
+  {
+    chainId: 	84532,
+    name: "Base Sepolia",
+    currency: "ETH",
+    explorerUrl: "https://sepolia-explorer.base.org",
+    rpcUrl: "https://sepolia.base.org",
   },
 ];
 

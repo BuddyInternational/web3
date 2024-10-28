@@ -25,6 +25,10 @@ const moodOptions = [
   { label: "Grateful  🙏", value: "Grateful 🙏" },
   { label: "Inspired  ✨", value: "Inspired ✨" },
   { label: "Confused  🤯", value: "Confused 🤯" },
+  { label: "News 📰", value: "News 📰" },
+  { label: "Citation 📑", value: "Citation 📑" },
+  { label: "Developer 💻", value: "Developer 💻" },
+  { label: "Board/Governance 👥", value: "Board/Governance 👥" },
 ];
 
 const ipfs = createIPFSClient({
