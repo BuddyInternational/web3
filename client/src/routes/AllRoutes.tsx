@@ -2,6 +2,7 @@ import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import Home from "../pages/Home";
 import EndorseeQuestForm from "../components/EndorseeQuestComponents/forms/EndorseeQuestForm";
 import Form2 from "../components/EndorseeQuestComponents/forms/Form2";
+import Sponsorship from "../components/EndorseeQuestComponents/forms/Sponsorship";
 import EndorseeQuest from "../pages/EndorseeQuestReport";
 // import PageNotFound from "../utils/PageNotFound";
 import OrderNFTApparelForm from "../components/homeComponents/card/OrderNFTApparelForm";
@@ -18,6 +19,7 @@ const AllRoutes = () => {
           <Route path="/" element={<Home />} />
           <Route path="/endorsee/quest" element={<EndorseeQuestForm />} />
           <Route path="/jotform2" element={<Form2 />} />
+          <Route path="/sponsorship" element={<Sponsorship />} />
           <Route
             path="/quest/completed/:walletAddress"
             element={<EndorseeQuest />}

@@ -433,7 +433,7 @@ const Home = () => {
               Jotform 2
             </Link>
             <Link
-              to="/jotform2"
+              to="/sponsorship"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
               Sponsorship/Endorsements
