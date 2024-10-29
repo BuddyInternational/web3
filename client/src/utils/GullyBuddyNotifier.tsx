@@ -12,7 +12,6 @@ export const useGullyBuddyNotifier = () => {
     console.error("Wallet provider is not initialized.");
     return { notifyGullyBuddy: () => Promise.reject("Provider not initialized") };
   }
-
   const ethersProvider = new ethers.BrowserProvider(
     walletProvider as ethers.Eip1193Provider
   );

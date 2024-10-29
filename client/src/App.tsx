@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const App: React.FC = () => {
+
   useEffect(() => {
     // Disable right-click across the application
     const handleRightClick = (e: MouseEvent) => e.preventDefault();
@@ -15,6 +16,7 @@ const App: React.FC = () => {
     // Cleanup the event listener on component unmount
     return () => document.removeEventListener("contextmenu", handleRightClick);
   }, []);
+  
   return (
     <div className="flex flex-col min-h-screen bg-gray-800 overflow-x-hidden">
       <div className="flex-grow">

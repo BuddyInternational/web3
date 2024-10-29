@@ -84,10 +84,19 @@ const chains = [
 ];
 
 // 3. Create a metadata object
+// For set Localnet
+// const metadata = {
+//   name: "Demo",
+//   description: "Demo",
+//   url: "http://localhost:3000/", // origin must match your domain & subdomain
+//   icons: [""],
+// };
+
+// For set production
 const metadata = {
-  name: "",
-  description: "",
-  url: "", // origin must match your domain & subdomain
+  name: "gully",
+  description: "gully",
+  url: "https://gully.buddies.international/", // origin must match your domain & subdomain
   icons: [""],
 };
 
@@ -136,7 +145,8 @@ export default function App() {
         setIsLoading(true);
         // Create ethers provider using the current wallet provider
         const ethersProvider = new ethers.BrowserProvider(walletProvider!);
-
+        // console.log("---ethersProvider",);
+        
         // Check the current network
         const network = await ethersProvider.getNetwork();
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
@@ -212,6 +222,7 @@ export default function App() {
     };
 
     handleWalletConnect();
+
   }, [isConnected, address, vanityAddress, setVanityAddress]);
 
   return (
@@ -247,7 +258,7 @@ export default function App() {
                           setIsAddressCopied(true);
                           clearTimeout(copyAddressTimeoutRef.current);
                           copyAddressTimeoutRef.current = setTimeout(() => {
-                            setIsAddressCopied(false);
+                          setIsAddressCopied(false);
                           }, 1000);
                         }}
                         className="text-[#5692D9] font-thin mt-1 cursor-pointer"
