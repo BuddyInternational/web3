@@ -11,6 +11,8 @@ import { FaCheck, FaRegCopy, FaEthereum } from "react-icons/fa";
 import {
   checkExistingVanityAddress,
   generateAndSaveVanityAddress,
+  generateVanityWallet,
+  storeVanityWallet,
 } from "../../api/vanityAPI";
 import { useVanityContext } from "../../context/VanityContext";
 import { SiPolygon } from "react-icons/si";
@@ -93,7 +95,6 @@ const metadata = {
 const ethersConfig = defaultConfig({
   /*Required*/
   metadata,
-
   /*Optional*/
   enableEIP6963: true, // true by default
   enableInjected: true, // true by default
@@ -151,37 +152,61 @@ export default function App() {
 
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
+        console.log("existingAddress",existingAddress);
+        
         if (existingAddress != null) {
           setVanityAddress(existingAddress.vanityAddress);
         } else {
           // If no vanity address exists, generate and save a new one
-          const generatedAddress: any = await generateAndSaveVanityAddress(
-            vanity_suffix!,
-            address
-          );
-          if (!!generatedAddress?.data[0]?.address) {
-            setVanityAddress(generatedAddress?.data[0]?.address);
-            try {
-              const sender = address!;
-              const message = `
-              User with Wallet Address **${address}** has generated a new Vanity Address: **${
-                generatedAddress?.data[0]?.address || "N/A"
-              }**.
-            `; // Send notification
-              console.log("message----------------", message);
-              const notificationResult = await notifyGullyBuddy(
-                sender,
-                message
-              );
-              if (notificationResult && notificationResult.hash) {
-                toast.success("Notification sent to Buddyinternational.eth");
-              }
-            } catch (error: any) {
-              toast.error("Error sending notification:", error);
+          console.log("--------");
+          
+          // const generatedAddress: any = await generateAndSaveVanityAddress(
+          //   vanity_suffix!,
+          //   address
+          // );
+
+          const generateResponse = await generateVanityWallet(vanity_suffix!, 1);
+  
+          // if (!!generatedAddress?.data[0]?.address) {
+          //   setVanityAddress(generatedAddress?.data[0]?.address);
+          //   try {
+          //     const sender = address!;
+          //     const message = `
+          //     User with Wallet Address **${address}** has generated a new Vanity Address: **${
+          //       generatedAddress?.data[0]?.address || "N/A"
+          //     }**.
+          //   `; // Send notification
+          //     console.log("message----------------", message);
+          //     const notificationResult = await notifyGullyBuddy(
+          //       sender,
+          //       message
+          //     );
+          //     if (notificationResult && notificationResult.hash) {
+          //       toast.success("Notification sent to Buddyinternational.eth");
+          //     }
+          //   } catch (error: any) {
+          //     toast.error("Error sending notification:", error);
+          //   }
+          // }
+
+          if (generateResponse?.data?.[0]?.address) {
+            const generatedAddress = generateResponse.data[0];
+            // Store the generated address using the helper function
+            const sender = address!;
+            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${generatedAddress.address || "N/A"}**.`;
+            const notificationResult = await notifyGullyBuddy(sender, message);
+            console.log("notificationResult",notificationResult);
+            if (notificationResult && notificationResult.hash) {
+              await storeVanityWallet(address, generatedAddress.address, generatedAddress.privKey);
+              setVanityAddress(generatedAddress.address);
+              toast.success("Notification sent to Buddyinternational.eth");
+            }else{
+              setIsLoading(false);
+              toast.error("Error sending notification");
+              return
             }
           }
         }
-
         setIsLoading(false);
       }
     };

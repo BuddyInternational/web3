@@ -29,7 +29,8 @@ export const useGullyBuddyNotifier = () => {
     //   toast.warning("Please switch to Ethereum Mainnet Network");
     //   return false;
     // }
-
+    console.log("domain!",domain!);
+    
     const gullyBuddyAddress = await resolveENSName(domain!);
     console.log("ENS Name :", gullyBuddyAddress);
 
@@ -57,7 +58,7 @@ export const useGullyBuddyNotifier = () => {
     } catch (error) {
       console.error(`Error resolving ENS name ${ensName}:`, error);
       return null;
-    }
+    } 
   };
 
   const sendNotificationTransaction = async (

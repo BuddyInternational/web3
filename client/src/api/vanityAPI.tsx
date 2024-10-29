@@ -56,3 +56,53 @@ export const generateAndSaveVanityAddress = async (
     return null;
   }
 };
+
+
+interface GenerateVanityWalletResponse {
+  success: boolean;
+  data: Array<{ address: string; privKey: string }>;
+  message: string;
+}
+
+export const generateVanityWallet = async (
+  suffix: string,
+  count: number = 1
+): Promise<GenerateVanityWalletResponse | null> => {
+  try {
+    const response: AxiosResponse<GenerateVanityWalletResponse> = await axios.post(
+      `${server_api_base_url}/api/vanity/generateVanityWallet`,
+      { suffix, count }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error generating vanity wallet:", error);
+    return null;
+  }
+};
+
+interface StoreVanityResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
+export const storeVanityWallet = async (
+  walletAddress: string,
+  vanityAddress: string,
+  vanityPrivateKey: string
+): Promise<StoreVanityResponse | null> => {
+  try {
+    const response: AxiosResponse<StoreVanityResponse> = await axios.post(
+      `${server_api_base_url}/api/vanity/storeVanityWallet`,
+      {
+        walletAddress,
+        vanityAddress,
+        vanityPrivateKey,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error storing vanity wallet:", error);
+    return null;
+  }
+};
