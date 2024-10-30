@@ -284,6 +284,12 @@ const NftCard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = ({
                   <CardInteractMenus selectedNFT={selectedNFT} />
                 </div>
               )}
+                {/* BuyNft */}
+              {CardType === "BuyNft" && (
+                <div className="flex justify-end items-end mt-auto mr-2 mb-2">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200">Buy</button>
+                </div>
+              )}
             </div>
           );
         })}
