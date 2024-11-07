@@ -24,12 +24,11 @@ export const checkExistingVanityAddress = async (
       await axios.get(`${server_api_base_url}/api/vanity/checkVanityAddress`, {
         params: { walletAddress },
       });
-      if(response){
-        return response.data;
-      }
-      else{
-        return null;
-      }
+    if (response) {
+      return response.data;
+    } else {
+      return null;
+    }
   } catch (error) {
     console.error("Error checking existing vanity address:", error);
     return null;
@@ -57,7 +56,6 @@ export const generateAndSaveVanityAddress = async (
   }
 };
 
-
 interface GenerateVanityWalletResponse {
   success: boolean;
   data: Array<{ address: string; privKey: string }>;
@@ -69,10 +67,11 @@ export const generateVanityWallet = async (
   count: number = 1
 ): Promise<GenerateVanityWalletResponse | null> => {
   try {
-    const response: AxiosResponse<GenerateVanityWalletResponse> = await axios.post(
-      `${server_api_base_url}/api/vanity/generateVanityWallet`,
-      { suffix, count }
-    );
+    const response: AxiosResponse<GenerateVanityWalletResponse> =
+      await axios.post(
+        `${server_api_base_url}/api/vanity/generateVanityWallet`,
+        { suffix, count }
+      );
     return response.data;
   } catch (error) {
     console.error("Error generating vanity wallet:", error);

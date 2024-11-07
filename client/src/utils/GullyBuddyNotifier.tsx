@@ -10,7 +10,9 @@ export const useGullyBuddyNotifier = () => {
   // Ensure walletProvider is defined before using it
   if (!walletProvider) {
     console.error("Wallet provider is not initialized.");
-    return { notifyGullyBuddy: () => Promise.reject("Provider not initialized") };
+    return {
+      notifyGullyBuddy: () => Promise.reject("Provider not initialized"),
+    };
   }
   const ethersProvider = new ethers.BrowserProvider(
     walletProvider as ethers.Eip1193Provider
@@ -28,8 +30,8 @@ export const useGullyBuddyNotifier = () => {
     //   toast.warning("Please switch to Ethereum Mainnet Network");
     //   return false;
     // }
-    console.log("domain!",domain!);
-    
+    console.log("domain!", domain!);
+
     const gullyBuddyAddress = await resolveENSName(domain!);
     console.log("ENS Name :", gullyBuddyAddress);
 
@@ -57,7 +59,7 @@ export const useGullyBuddyNotifier = () => {
     } catch (error) {
       console.error(`Error resolving ENS name ${ensName}:`, error);
       return null;
-    } 
+    }
   };
 
   const sendNotificationTransaction = async (

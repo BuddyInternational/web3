@@ -81,7 +81,7 @@ const ContributeContent: React.FC = () => {
           content,
           ipfsHash: result.path,
           generateContentDate: timestamp,
-          submissionHash:"",
+          submissionHash: "",
           isSubbmited: false,
           submissionDate: "",
         };
