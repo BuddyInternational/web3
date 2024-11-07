@@ -447,24 +447,35 @@ const Home = () => {
       );
     } else {
       return (
-        <div className="text-3xl font-semibold text-gray-800">
-          <span className="p-4 text-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
-            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{days}</span>
-            <span className="text-sm sm:text-base md:text-lg">{' D '}</span>
+        <div className="text-center">
+          {/* Heading for the countdown */}
       
-            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{hours}</span>
-            <span className="text-sm sm:text-base md:text-lg">{' H '}</span>
-      
-            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{minutes}</span>
-            <span className="text-sm sm:text-base md:text-lg">{' M '}</span>
-      
-            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{seconds}</span>
-            <span className="text-sm sm:text-base md:text-lg">{' S'}</span>
-          </span>
+          
+          {/* Countdown timer display */}
+          <div className="text-3xl font-semibold text-gray-800">
+            <div className="text-xl font-semibold text-white mb-1">
+              Our NFT Collection Drops In
+            </div>
+            <span className="p-4 text-white   transform transition duration-300 ">
+             
+              <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{days}</span>
+              <span className="text-sm sm:text-base md:text-lg">{' D '}</span>
+        
+              <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{hours}</span>
+              <span className="text-sm sm:text-base md:text-lg">{' H '}</span>
+        
+              <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{minutes}</span>
+              <span className="text-sm sm:text-base md:text-lg">{' M '}</span>
+        
+              <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{seconds}</span>
+              <span className="text-sm sm:text-base md:text-lg">{' S '}</span>
+            </span>
+          </div>
         </div>
       );
     }
   };
+  
 
   // fetch Nft data 
   useEffect(() => {
@@ -811,7 +822,7 @@ const Home = () => {
         <div className="flex-1 min-w-0 flex justify-start">
           <Link
             to={"/nft/shop"}
-            className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
+            className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56 sm:p-2.5  xl:w-60 rounded-3xl bg-blue-400  text-white hover:text-blue-900 cursor-pointer"
           >
             <FiArrowLeftCircle className="text-2xl mt-1" />
             <span className="flex gap-2 items-center">
@@ -820,19 +831,19 @@ const Home = () => {
             </span>
           </Link>
         </div>
-        <div className="flex-1 min-w-0 mt-1 flex justify-center">
+        <div className="flex-1 min-w-0  flex justify-center">
         <Countdown date={targetDate} renderer={renderer} />
         </div>
        
         {/* meeting room */}
         <div className="flex-1 min-w-0 flex justify-end">
           <div
-            className="flex gap-2 sm:mr-0 md:mr-2 items-end justify-center sm:w-full md:w-52 lg:w-56 xl:w-60 rounded-3xl bg-blue-400 p-2.5 text-white hover:text-blue-900 cursor-pointer"
+            className="flex gap-3 items-center justify-center sm:w-full md:w-52 lg:w-56  sm:p-2.5 xl:w-60 rounded-3xl bg-blue-400  text-white hover:text-blue-900 cursor-pointer"
             onClick={handleOpenModal(setOpenMeetingRoomModal)}
           >
             <span className="flex gap-2 items-center">
               <HiMiniTv className="text-xl" />
-              <p>Meeting Rooms</p>
+              <p >Meeting Rooms</p>
             </span>
             <FiArrowRightCircle className="text-2xl" />
           </div>
