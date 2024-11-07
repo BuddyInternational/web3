@@ -17,11 +17,11 @@ app.use(cors());
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
-app.use("/api/nft/" , nftRoutes);
-app.use("/api/socket-nft/" , socketNFTRoutes);
-app.use("/api/user-content/",userContentRoutes);
+app.use("/api/nft/", nftRoutes);
+app.use("/api/socket-nft/", socketNFTRoutes);
+app.use("/api/user-content/", userContentRoutes);
 
-app.get("/api/ping", (req, res)=> {
+app.get("/api/ping", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Server running successfully."
