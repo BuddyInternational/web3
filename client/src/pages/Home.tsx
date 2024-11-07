@@ -448,11 +448,18 @@ const Home = () => {
     } else {
       return (
         <div className="text-3xl font-semibold text-gray-800">
-          <span className="p-3 bg-blue-400 text-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
-            <span className="text-3xl font-bold">{days}</span><span className="text-sm">{' D '}</span>
-            <span className="text-3xl font-bold">{hours}</span><span className="text-sm">{' H '}</span>
-            <span className="text-3xl font-bold">{minutes}</span><span className="text-sm">{' M '}</span>
-            <span className="text-3xl font-bold">{seconds}</span><span className="text-sm">{' S'}</span>
+          <span className="p-4 text-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{days}</span>
+            <span className="text-sm sm:text-base md:text-lg">{' D '}</span>
+      
+            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{hours}</span>
+            <span className="text-sm sm:text-base md:text-lg">{' H '}</span>
+      
+            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{minutes}</span>
+            <span className="text-sm sm:text-base md:text-lg">{' M '}</span>
+      
+            <span className="text-3xl sm:text-3xl md:text-3xl font-bold">{seconds}</span>
+            <span className="text-sm sm:text-base md:text-lg">{' S'}</span>
           </span>
         </div>
       );
@@ -836,13 +843,13 @@ const Home = () => {
       <div className="mt-3">
         {isConnected ? (
           vanityAddress === "0x0000000000000000000000000000000000000000" ? (
-            <h1 className="text-center font-bold text-3xl my-7 text-white">
+            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
               Vanity Address not generated
             </h1>
           ) : NFTdata?.length > 0 ? (
             <NftCard NFTDetails={NFTdata} CardType={"walletNFT"} />
           ) : (
-            <h1 className="text-center font-bold text-3xl my-7 text-white">
+            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
               No NFTs in your account at the moment
             </h1>
           )
