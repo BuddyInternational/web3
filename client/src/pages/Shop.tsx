@@ -1,11 +1,14 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link } from "react-router-dom";
-import NftCard from "../components/homeComponents/card/NftCard";
+import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
 import { NFTDetails } from "../utils/Types";
 
+
+const ApiKey: string | undefined= process.env.REACT_APP_OPENSEA_API_KEY|| "";
 const Shop = () => {
-  const NFTdata: NFTDetails[] = [
+  // Nft static data 
+  const NFTdata1: NFTDetails[] = [
     {
       chainName: "Ethereum",
       contractAddress: "0xABC123456789DEF",
@@ -118,28 +121,62 @@ const Shop = () => {
     },
   ];
 
+  const [NFTdata, setNFTdata] = useState([]);
+
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "x-api-key": `${ApiKey}`
+        }
+      };
+
+      try {
+        const response = await fetch(`https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`, options);
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        // Map response to your expected format if necessary
+        const formattedNFTs = (data.nfts as any).map((nft:any) => ({
+          chainName: nft.asset_contract?.chain || "Unknown Chain",
+          contractAddress: nft.contract || "",
+          tokenId: nft.identifier || "",
+          name: nft.name || "Unnamed NFT",
+          tokenType: nft.asset_contract?.schema_name || "ERC721",
+          tokenUri: nft.permalink || "",
+          imageUrl: nft.display_image_url || "",
+          mediaType: nft.display_animation_url ? "video" : "image",
+          timeLastUpdated: nft.updated_at || new Date().toISOString(),
+          floorPrice: nft.floor_price || 0,
+          floorPriceUsd: nft.floor_price_usd || 0,
+          priceCurrency: nft.payment_token?.symbol || "ETH",
+          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+          totalClaimedRewardCount: nft.claim_count || 0,
+          totalClaimedRewardHash: nft.claim_hashes || []
+        }));
+        console.log(formattedNFTs);
+        
+        setNFTdata(formattedNFTs);
+      } catch (err) {
+        console.error("Error fetching NFT data from OpenSea:", err);
+      }
+    };
+
+    fetchNFTs();
+  }, []);
+
   return (
-    <div className="w-full  mx-auto px-4 sm:px-6 lg:px-8">
-      <Link
-        to="/"
-        className="text-blue-500 hover:underline flex items-center mb-4"
-      >
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <Link to="/" className="text-blue-500 hover:underline flex items-center mb-4">
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
 
-      {/* <div className="flex text-white text-center text-xl gap-2 flex-col">
-        <h1 className="text-3xl font-bold mb-4">This Feature is Coming soon</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {NFTdata.map((nft, index) => (
-            <NftCard  NFTDetails={nft} CardType={"walletNFT1"} />
-          ))}
-          <NftCard  NFTDetails={NFTdata} CardType={"walletNFT1"} />
-        </div>
-      </div> */}
-
       <div className="mt-3">
-        <h1 className="text-3xl text-white text-center font-bold mb-4"> NFT Marketplace</h1>
-        <NftCard  NFTDetails={NFTdata} CardType={"BuyNft"} />
+        <h1 className="text-3xl text-white text-center font-bold mb-4">NFT Marketplace</h1>
+        <ShopeNftcard NFTDetails={NFTdata} CardType="BuyNft" />
       </div>
     </div>
   );

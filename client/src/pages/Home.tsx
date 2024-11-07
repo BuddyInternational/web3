@@ -7,6 +7,7 @@ import Web3 from "web3";
 import { NFTDetails } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
 import NftCard from "../components/homeComponents/card/NftCard";
+import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
 import TermsModel from "../components/homeComponents/modals/TermsModal";
 import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
@@ -25,6 +26,8 @@ import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
 import { toast } from "react-toastify";
 import { getNFTDetails, saveNFTDetails } from "../api/nftAPI";
 import { IoMdArrowDropdown } from "react-icons/io";
+import Countdown from 'react-countdown';
+
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -70,7 +73,7 @@ const TestTIMAddress: any =
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
-
+const ApiKey= process.env.REACT_APP_OPENSEA_API_KEY;
 // const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
 
 const Home = () => {
@@ -82,6 +85,7 @@ const Home = () => {
   const [testCDEBalance, setTestCDEBalance] = useState(0);
   const [testTIMBalance, setTestTIMBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
+  const [ NFTdata2, setNFTdata2] = useState<NFTDetails[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
@@ -97,12 +101,14 @@ const Home = () => {
   const { vanityAddress } = useVanityContext();
   const [anchorEl, setAnchorEl] = useState(null);
   const isDropdownOpen = Boolean(anchorEl);
+  const targetDate = new Date('2024-12-31T23:59:59');
+
 
   const handleDropdownToggle = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
-
-  const NFTdataState: NFTDetails[] = [
+   
+  const NFTdataState1: NFTDetails[] = [
     {
       chainName: "Ethereum",
       contractAddress: "0xABC123456789DEF",
@@ -424,7 +430,80 @@ const Home = () => {
     }
   };
 
-  console.log(vanityAddress);
+  interface CountdownRendererProps {
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    completed: boolean;
+  }
+
+  const renderer = ({ days, hours, minutes, seconds, completed }: CountdownRendererProps) => {
+    if (completed) {
+      return (
+        <div className="text-2xl font-bold text-green-500">
+          Time's up!
+        </div>
+      );
+    } else {
+      return (
+        <div className="text-3xl font-semibold text-gray-800">
+          <span className="p-3 bg-blue-400 text-white rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+            <span className="text-3xl font-bold">{days}</span><span className="text-sm">{' D '}</span>
+            <span className="text-3xl font-bold">{hours}</span><span className="text-sm">{' H '}</span>
+            <span className="text-3xl font-bold">{minutes}</span><span className="text-sm">{' M '}</span>
+            <span className="text-3xl font-bold">{seconds}</span><span className="text-sm">{' S'}</span>
+          </span>
+        </div>
+      );
+    }
+  };
+
+  // fetch Nft data 
+  useEffect(() => {
+    const fetchNFTs = async () => {      
+      
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "x-api-key": `${ApiKey}`
+        }
+      };
+
+      try {
+        const response = await fetch(`https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`, options);
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        // Map response to your expected format if necessary
+        const formattedNFTs = (data.nfts as any).map((nft:any) => ({
+          chainName: nft.asset_contract?.chain || "Unknown Chain",
+          contractAddress: nft.contract || "",
+          tokenId: nft.identifier || "",
+          name: nft.name || "Unnamed NFT",
+          tokenType: nft.asset_contract?.schema_name || "ERC721",
+          tokenUri: nft.permalink || "",
+          imageUrl: nft.display_image_url || "",
+          mediaType: nft.display_animation_url ? "video" : "image",
+          timeLastUpdated: nft.updated_at || new Date().toISOString(),
+          floorPrice: nft.floor_price || 0,
+          floorPriceUsd: nft.floor_price_usd || 0,
+          priceCurrency: nft.payment_token?.symbol || "ETH",
+          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+          totalClaimedRewardCount: nft.claim_count || 0,
+          totalClaimedRewardHash: nft.claim_hashes || []
+        }));
+        console.log(formattedNFTs);
+        
+        setNFTdata2(formattedNFTs);
+      } catch (err) {
+        console.error("Error fetching NFT data from OpenSea:", err);
+      }
+    };
+
+    fetchNFTs();
+  }, []);
 
   return (
     <>
@@ -734,6 +813,10 @@ const Home = () => {
             </span>
           </Link>
         </div>
+        <div className="flex-1 min-w-0 mt-1 flex justify-center">
+        <Countdown date={targetDate} renderer={renderer} />
+        </div>
+       
         {/* meeting room */}
         <div className="flex-1 min-w-0 flex justify-end">
           <div
@@ -764,7 +847,7 @@ const Home = () => {
             </h1>
           )
         ) : (
-          <NftCard NFTDetails={NFTdataState} CardType={"BuyNft"} />
+          <ShopeNftcard NFTDetails={NFTdata2} CardType={"BuyNft"} />
         )}
       </div>
 
