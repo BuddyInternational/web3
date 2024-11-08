@@ -266,7 +266,7 @@ const ShopeNftcard: React.FC<{
                         <span className=" flex flex-col gap-2">
                           <p className="">
                             {Number(nft?.floorPrice).toFixed(4)}{" "}
-                            {nft?.priceCurrency} ETH
+                            {nft?.priceCurrency} 
                           </p>
                           <p className="">
                             {Number(nft?.floorPriceUsd).toFixed(2)} USD
