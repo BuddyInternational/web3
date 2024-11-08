@@ -8,16 +8,19 @@ import ZoomedImage from "../modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
 import CardInteractMenus from "./CardInteractMenus";
 import CardChainFilterMenus from "./CardChainFilterMenus";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { useNavigate } from "react-router-dom";
 
-const ShopeNftcard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = ({
-  NFTDetails,
-  CardType,
-}) => {
+const ShopeNftcard: React.FC<{
+  NFTDetails: NFTDetails[];
+  CardType: string;
+}> = ({ NFTDetails, CardType }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
   const copyTimeoutRef: any = useRef(null);
-
+  const { isConnected } = useWeb3ModalAccount();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
   const [open, setOpen] = useState(false);
@@ -29,6 +32,7 @@ const ShopeNftcard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = (
     selectedChain === "All"
       ? NFTDetails
       : NFTDetails.filter((nft) => nft.chainName === selectedChain);
+  console.log();
 
   // Total number of page
   const totalPages = Math.ceil(filteredNFTDetails.length / itemsPerPage);
@@ -167,9 +171,7 @@ const ShopeNftcard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = (
                 {/* <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded dark:bg-blue-900 dark:text-blue-300">
                   {nft.chainName}
                 </span> */}
-                <span>
-
-                </span>
+                <span></span>
                 <p className="flex gap-1">
                   {nft.contractAddress?.slice(0, 6)}...
                   {nft.contractAddress?.slice(-4)}
@@ -287,10 +289,34 @@ const ShopeNftcard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = (
                   <CardInteractMenus selectedNFT={selectedNFT} />
                 </div>
               )}
-                {/* BuyNft */}
+              {/* BuyNft */}
               {CardType === "BuyNft" && (
                 <div className="flex justify-end items-end mt-auto mr-2 mb-2">
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200">Buy</button>
+                  {isConnected ? (
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200"
+                      onClick={() =>
+                        window.open(
+                          `https://opensea.io/assets/matic/${nft.contractAddress}/${nft.tokenId}`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      Purchase to Earn Rewards
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200"
+                      onClick={() =>
+                        window.open(
+                          `https://opensea.io/assets/matic/${nft.contractAddress}/${nft.tokenId}`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      Connect to Interact
+                    </button>
+                  )}
                 </div>
               )}
             </div>

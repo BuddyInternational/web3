@@ -586,13 +586,13 @@ const Home = () => {
               to="/endorsee/quest"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Endorsee Quest Form
+              Endorsee Quest Activity
             </Link>
             <Link
               to="/jotform2"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Jotform 2
+              Daily Quest Activity
             </Link>
             <Link
               to="/sponsorship"
@@ -916,6 +916,7 @@ const Home = () => {
             open={openSocketNFTModal}
             onClose={handleCloseModal(setOpenSocketNFTModal)}
             NFTDetails={NFTdata}
+            // ConnecteNetworkname={}
           />
         </>
       )}

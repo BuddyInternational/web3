@@ -33,6 +33,7 @@ interface CustomModalProps {
   open: boolean;
   onClose: () => void;
   modalContents: ModalContents;
+  ChainName: string | undefined;
 }
 
 const style = {
@@ -53,6 +54,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   open,
   onClose,
   modalContents,
+  ChainName,
 }) => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
@@ -64,8 +66,25 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [lastClaimedAt, setLastClaimedAt] = useState<Date | null>(null);
   const [timeUntilNextClaim, setTimeUntilNextClaim] = useState(0);
+  const [connectedNetwork, setConnectedNetwork] = useState<string | null>(null);
   const [canClaim, setCanClaim] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isCorrectNetwork =
+    connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
+  useEffect(() => {
+    const getConnectedNetwork = async () => {
+      if (typeof window.ethereum !== "undefined") {
+        const ethersProvider = new ethers.BrowserProvider(
+          walletProvider as ethers.Eip1193Provider
+        );
+        const network = await ethersProvider.getNetwork();
+        setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
+      } else {
+        console.error("Ethereum provider is not available.");
+      }
+    };
+    getConnectedNetwork();
+  }, []);
 
   // Helper to calculate the time difference until the next reward can be claimed
   const calculateTimeUntilNextClaim = (lastClaimed: Date) => {
@@ -83,6 +102,8 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       setCanClaim(true); // Can claim reward
     }
   };
+  console.log("---------ChainName", ChainName);
+  console.log(isCorrectNetwork);
 
   const claimRewards = async () => {
     setLoading(true);
@@ -132,7 +153,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     } catch (error) {
       console.log("Error Claiming Rewards", error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -268,10 +289,10 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                 />
-                <Button
+                {/* <Button
                   variant="contained"
                   onClick={claimRewards}
-                  disabled={timeLeft > 0 || !canClaim} // Disable based on 30s timer or 24h rule
+                  disabled={timeLeft > 0 || !canClaim } // Disable based on 30s timer or 24h rule
                   sx={{
                     width: "100%",
                     m: 3,
@@ -287,7 +308,38 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                     : timeLeft > 0
                     ? `Claim Reward in ${timeLeft} Seconds`
                     : "Claim Reward"}
-                </Button>
+                </Button> */}
+                {isCorrectNetwork ? (
+                  <Button
+                    variant="contained"
+                    onClick={claimRewards}
+                    disabled={timeLeft > 0 || !canClaim}
+                    sx={{
+                      width: "100%",
+                      m: 3,
+                      p: 1,
+                    }}
+                  >
+                    {timeUntilNextClaim > 0
+                      ? `Next Claim Reward After ${Math.floor(
+                          timeUntilNextClaim / 3600
+                        )}h ${Math.floor(
+                          (timeUntilNextClaim % 3600) / 60
+                        )}m ${Math.floor(timeUntilNextClaim % 60)}s`
+                      : timeLeft > 0
+                      ? `Claim Reward in ${timeLeft} Seconds`
+                      : "Claim Reward"}
+                  </Button>
+                ) : (
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    align="center"
+                    sx={{ mt: 2 }}
+                  >
+                    You can only claim rewards on the connected network's NFTs.
+                  </Typography>
+                )}
               </Box>
             ) : modalContents.content ? (
               // Render custom content if available
@@ -302,10 +354,10 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
             )}
           </DialogContent>
           {loading && (
-              <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-80 z-50">
-                <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-16 h-16 animate-spin"></div>
-              </div>
-            )}
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-80 z-50">
+              <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-16 h-16 animate-spin"></div>
+            </div>
+          )}
         </Box>
       </Fade>
     </Modal>

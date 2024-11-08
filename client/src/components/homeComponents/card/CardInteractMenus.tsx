@@ -72,7 +72,8 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  console.log("selectedNFT---",selectedNFT.chainName);
+  
   const handleOpenModal = (
     title: string,
     description: string,
@@ -161,6 +162,7 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
         open={openModal}
         onClose={handleCloseModal}
         modalContents={modalContent}
+        ChainName = {selectedNFT.chainName}
       />
     </div>
   );

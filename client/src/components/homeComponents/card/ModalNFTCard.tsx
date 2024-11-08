@@ -30,6 +30,15 @@ const ModalNFTCard: React.FC<{
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
 
+  const contracts:any = {
+    mainnet: {
+        contract1: { address:nftMarketContractAddress, abi: nftMarketAbi.abi },
+    },
+    sepolia: {
+        contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
+    }
+  };
+
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
@@ -73,12 +82,28 @@ const ModalNFTCard: React.FC<{
       walletProvider as ethers.Eip1193Provider
     );
     const signer = await ethersProvider.getSigner();
+    const network= await ethersProvider.getNetwork();
+    const networkName = network.name.toLowerCase();
+    console.log(networkName);
+    // return;
+
+    const networkContracts = contracts[networkName];
+    if (!networkContracts || !networkContracts.contract1 || !networkContracts.contract1.address) {
+        console.error(`No contracts available for the network: ${networkName}`);
+        toast.error(`No contracts available for the connected network: ${networkName}`);
+        return;
+    }
+
+    const nftMarketContractAddressget = networkContracts.contract1.address;
+    const nftMarketAbi1 = networkContracts.contract1.abi;
+    
     const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress!,
       nftMarketAbi.abi,
       signer
     );
-    setLoading(true);
+    setLoading(false);
+    // return;
     try {
       const tokenStandard: string | undefined = nftData.tokenType;
       // Approve the NFT to the smart contract

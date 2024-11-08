@@ -6,7 +6,7 @@ const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
 // Custom Hook to manage notification
 export const useGullyBuddyNotifier = () => {
   const { walletProvider } = useWeb3ModalProvider();
-
+  
   // Ensure walletProvider is defined before using it
   if (!walletProvider) {
     console.error("Wallet provider is not initialized.");

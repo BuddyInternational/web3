@@ -150,6 +150,7 @@ export default function App() {
         // Check the current network
         const network = await ethersProvider.getNetwork();
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
+
         if (!isMainnet) {
           // User is not on Mainnet, show a warning
           toast.warning(
@@ -210,7 +211,7 @@ export default function App() {
               await storeVanityWallet(address, generatedAddress.address, generatedAddress.privKey);
               setVanityAddress(generatedAddress.address);
               toast.success("Notification sent to Buddyinternational.eth");
-            }else{
+            }else {
               setIsLoading(false);
               toast.error("Error sending notification");
               return
