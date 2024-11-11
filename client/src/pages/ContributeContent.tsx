@@ -10,6 +10,8 @@ import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
 import { ContentSubmission } from "../utils/Types";
 
+import { saveAs } from "file-saver";
+
 // Define mood options
 const moodOptions = [
   { label: "Happy  😊", value: "Happy 😊" },
@@ -120,6 +122,41 @@ const ContributeContent: React.FC = () => {
 
     fetchUserContent();
   }, [address, isConnected, submissions, setSubmissions]);
+
+  const convertToCSV = (data: any[]) => {
+    if (!data || data.length === 0) return "";
+    const headers = Object.keys(data[0]);
+
+    const rows = data.map((row) =>
+      headers
+        .map((header) =>
+          JSON.stringify(row[header], (key, value) =>
+            value === null ? "" : value
+          )
+        )
+        .join(",")
+    );
+    return [headers.join(","), ...rows].join("\n");
+  };
+
+  // Function to download the CSV file
+  const downloadUserContent = (data: any[]) => {
+    const csvData = convertToCSV(data);
+
+    // Create a Blob from the CSV data
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+
+    // Create a link to trigger download
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "user_submissions.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   return (
     <>
@@ -286,6 +323,16 @@ const ContributeContent: React.FC = () => {
               No contributions yet.
             </p>
           )}
+        </div>
+
+        {/* Download Contribution Data */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
+          <button
+            className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 mt-5 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
+            onClick={() => downloadUserContent(submissions)}
+          >
+            Download Contribution Data
+          </button>
         </div>
       </div>
     </>

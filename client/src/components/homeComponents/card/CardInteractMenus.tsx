@@ -74,13 +74,14 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
     content: "",
     selectedNFT: selectedNFT,
   });
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-  console.log("selectedNFT---", selectedNFT.chainName);
 
   const handleOpenModal = (
     title: string,
@@ -105,28 +106,32 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
       videoUrl: "https://youtu.be/ym1zJGAW3WE",
-      slectedNFT: selectedNFT,
+      selectedNFT: selectedNFT,
     },
     {
       label: "View Reputation",
       onClick: handleOpenModal,
       title: "View Reputation",
       description: "This feature is coming soon.",
-      slectedNFT: selectedNFT,
+      selectedNFT: selectedNFT,
     },
     {
       label: "Order This NFTs Apparel",
-      onClick: "https://youtu.be/ym1zJGAW3WE",
+      onClick: () => {
+        // Redirect to the provided URL instead of opening the modal
+        window.location.href = "https://retail.gullybuddyclothing.co/";
+      },
       title: "Gully Buddy Retail Ambassador Apparels",
       content: <OrderNFTApparel />,
-      slectedNFT: selectedNFT,
+      selectedNFT: selectedNFT,
+      url: "https://retail.gullybuddyclothing.co/",
     },
     // {
     //   label: "Order This NFTs Apparel",
     //   onClick: handleOpenModal,
     //   title: "Gully Buddy Retail Ambassador Apparels",
     //   content: <OrderNFTApparel />,
-    //   slectedNFT: selectedNFT,
+    //   selectedNFT: selectedNFT,
     // },
   ];
 
@@ -153,33 +158,43 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
         open={open}
         onClose={handleClose}
       >
-        {options.map((item, index) => {
-          return (
-            <MenuItem
-              key={index}
-              onClick={() =>
+        {options.map((item, index) => (
+          <MenuItem
+            key={index}
+            onClick={() => {
+              // Check if the label is "Order This NFTs Apparel" and handle redirection
+              if (item.label === "Order This NFTs Apparel") {
+                const a = () => {
+                  window.open(item?.url);
+                };
+
+                a();
+              } else {
                 handleOpenModal(
                   item.title,
                   item.description!,
                   item.videoUrl!,
                   item.content,
-                  item.slectedNFT!
-                )
+                  item.selectedNFT!
+                );
               }
-            >
-              {item.label}
-            </MenuItem>
-          );
-        })}
+            }}
+          >
+            {item.label}
+          </MenuItem>
+        ))}
       </StyledMenu>
       {/* Modal */}
-      <InteractMenuModals
-        open={openModal}
-        onClose={handleCloseModal}
-        modalContents={modalContent}
-        ChainName={selectedNFT.chainName}
-      />
+      {openModal && (
+        <InteractMenuModals
+          open={openModal}
+          onClose={handleCloseModal}
+          modalContents={modalContent}
+          ChainName={selectedNFT.chainName}
+        />
+      )}
     </div>
   );
 };
+
 export default CardInteractMenus;
