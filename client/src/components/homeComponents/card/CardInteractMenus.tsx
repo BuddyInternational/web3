@@ -52,10 +52,12 @@ const StyledMenu = styled((props: MenuProps) => (
 }));
 
 interface CardInteractMenusProps {
-  selectedNFT: NFTDetails; 
+  selectedNFT: NFTDetails;
 }
 
-const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) => {
+const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
+  selectedNFT,
+}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -65,23 +67,29 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
     videoUrl: string;
     content: any;
     selectedNFT: NFTDetails;
-  }>({ title: "", description: "", videoUrl: "", content: "" ,selectedNFT: selectedNFT});
+  }>({
+    title: "",
+    description: "",
+    videoUrl: "",
+    content: "",
+    selectedNFT: selectedNFT,
+  });
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  console.log("selectedNFT---",selectedNFT.chainName);
-  
+  console.log("selectedNFT---", selectedNFT.chainName);
+
   const handleOpenModal = (
     title: string,
     description: string,
     videoUrl: string,
     content: any,
-    selectedNFT : NFTDetails
+    selectedNFT: NFTDetails
   ) => {
-    setModalContent({ title, description, videoUrl, content,selectedNFT });
+    setModalContent({ title, description, videoUrl, content, selectedNFT });
     setOpenModal(true);
     setAnchorEl(null);
   };
@@ -108,11 +116,18 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
     },
     {
       label: "Order This NFTs Apparel",
-      onClick: handleOpenModal,
+      onClick: "https://youtu.be/ym1zJGAW3WE",
       title: "Gully Buddy Retail Ambassador Apparels",
       content: <OrderNFTApparel />,
       slectedNFT: selectedNFT,
     },
+    // {
+    //   label: "Order This NFTs Apparel",
+    //   onClick: handleOpenModal,
+    //   title: "Gully Buddy Retail Ambassador Apparels",
+    //   content: <OrderNFTApparel />,
+    //   slectedNFT: selectedNFT,
+    // },
   ];
 
   return (
@@ -162,7 +177,7 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({ selectedNFT }) =>
         open={openModal}
         onClose={handleCloseModal}
         modalContents={modalContent}
-        ChainName = {selectedNFT.chainName}
+        ChainName={selectedNFT.chainName}
       />
     </div>
   );

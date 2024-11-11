@@ -17,6 +17,8 @@ import ImageCarousel from "./ImageCarousel";
 import Map from "./GoogleMap";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import GoogleMap from "./GoogleMap";
+import { saveAs } from "file-saver";
+
 
 ChartJS.register(
   CategoryScale,
@@ -82,6 +84,13 @@ interface APIResponse {
   os: OSData[];
   country: CountryData[];
   city: CityData[];
+}
+
+interface VanityData {
+  walletAddress: string;
+  vanityAddress: string;
+  vanityPrivateKey: string;
+  createdAt: string;
 }
 
 // API KEY
@@ -325,6 +334,38 @@ const ClickStatistics: React.FC = () => {
     a.click();
   };
 
+  // Server API Base URL
+  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
+
+  // Function to fetch data from the backend for vanity data
+  const downloadVanityData = async () => {
+    try {
+      const response = await axios.get(`${server_api_base_url}/api/vanity/downloadVanityAddress`);
+      
+      // Check if response.data exists and is an array
+      if (response.data.data && Array.isArray(response.data.data)) {
+        console.log("Setting data", response.data.data);
+
+        const csv = convertToCSV(response.data.data);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        saveAs(blob, "data.csv");
+      } else {
+        console.log("No data found");
+        alert("No data to download");
+          return;
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+
+  // Function to convert data to CSV format
+  const convertToCSV = (array: VanityData[]) => {
+    const headers = Object.keys(array[0]).join(",") + "\n";
+    const rows = array.map((obj) => Object.values(obj).join(",")).join("\n");
+    return headers + rows;
+  };
+
   // Replace loading message with Skeleton components
   if (loading) {
     return (
@@ -413,14 +454,21 @@ const ClickStatistics: React.FC = () => {
       </div>
 
       {/* CSV Download Button */}
-      <div className="flex justify-center mt-4 sm:mt-28 md:mt-12">
+      <div className="flex justify-between mt-4 sm:mt-28 md:mt-12">
         <button
           onClick={downloadCsv}
           className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
         >
           Download CSV
         </button>
+        <button
+          onClick={downloadVanityData}
+          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+        >
+          Download Vanity Data
+        </button>
       </div>
+    
     </div>
   );
 };

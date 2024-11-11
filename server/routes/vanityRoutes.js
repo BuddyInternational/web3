@@ -3,7 +3,8 @@ import {
   checkExistingVanityAddress,
   generateAndStoreVanityAddress,
   generateVanityWallet,
-  storeVanityWallet
+  storeVanityWallet,
+  downloadVanityAddress
 } from "../controllers/vanityController.js";
 
 const vanityRoutes = express.Router();
@@ -15,6 +16,7 @@ vanityRoutes.post(
 );
 vanityRoutes.post("/generateVanityWallet",generateVanityWallet);
 vanityRoutes.post("/storeVanityWallet",storeVanityWallet);
+vanityRoutes.get("/downloadVanityAddress", downloadVanityAddress);
 
 
 export { vanityRoutes };

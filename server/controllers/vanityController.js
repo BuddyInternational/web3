@@ -124,6 +124,25 @@ export const storeVanityWallet = async (req, res) => {
   }
 };
 
+// Download if vanity data exists 
+export const downloadVanityAddress = async (req, res) => {
+  try {
+    const data = await VanityData.find();  
+    if (data && data.length > 0) { 
+      console.log("Data found-----", data);
+      return res.status(200).json({
+        message: "Vanity data found",
+        data: data,  
+      });
+    } else {
+      return res.status(404).json({ message: "Vanity data not found" });
+    }
+  } catch (e) {
+    res.status(500).json({ message: "Error fetching vanity data", error: e.message });
+  }
+}
+
+
 // Check if a vanity address exists for a given wallet address
 export const checkExistingVanityAddress = async (req, res) => {
   const { walletAddress } = req.query;

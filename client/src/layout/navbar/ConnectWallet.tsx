@@ -19,6 +19,8 @@ import { SiPolygon } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 import { ethers } from "ethers";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -75,7 +77,7 @@ const chains = [
     rpcUrl: "http://localhost:8545",
   },
   {
-    chainId: 	84532,
+    chainId: 84532,
     name: "Base Sepolia",
     currency: "ETH",
     explorerUrl: "https://sepolia-explorer.base.org",
@@ -129,6 +131,14 @@ createWeb3Modal({
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
 
+// 6. Interface to get vanity details
+interface VanityData {
+  walletAddress: string;
+  vanityAddress: string;
+  vanityPrivateKey: string;
+  createdAt: string;
+}
+
 export default function App() {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useWeb3ModalAccount();
@@ -139,6 +149,38 @@ export default function App() {
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
 
+  // Server API Base URL
+  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
+
+  // Function to fetch data from the backend
+  const downloadVanityData = async () => {
+    try {
+      const response = await axios.get(`${server_api_base_url}/api/vanity/downloadVanityAddress`);
+    
+      // Check if response.data exists and is an array
+      if (response.data.data && Array.isArray(response.data.data)) {
+        console.log("Setting data", response.data.data);
+
+        const csv = convertToCSV(response.data.data);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        saveAs(blob, "data.csv");
+      } else {
+        console.log("No data found");
+        alert("No data to download");
+          return;
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+
+  // Function to convert data to CSV format
+  const convertToCSV = (array: VanityData[]) => {
+    const headers = Object.keys(array[0]).join(",") + "\n";
+    const rows = array.map((obj) => Object.values(obj).join(",")).join("\n");
+    return headers + rows;
+  };
+
   useEffect(() => {
     const handleWalletConnect = async () => {
       if (isConnected && address) {
@@ -146,7 +188,7 @@ export default function App() {
         // Create ethers provider using the current wallet provider
         const ethersProvider = new ethers.BrowserProvider(walletProvider!);
         // console.log("---ethersProvider",);
-        
+
         // Check the current network
         const network = await ethersProvider.getNetwork();
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
@@ -163,21 +205,24 @@ export default function App() {
 
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
-        console.log("existingAddress",existingAddress);
-        
+        console.log("existingAddress", existingAddress);
+
         if (existingAddress != null) {
           setVanityAddress(existingAddress.vanityAddress);
         } else {
           // If no vanity address exists, generate and save a new one
           console.log("--------");
-          
+
           // const generatedAddress: any = await generateAndSaveVanityAddress(
           //   vanity_suffix!,
           //   address
           // );
 
-          const generateResponse = await generateVanityWallet(vanity_suffix!, 1);
-  
+          const generateResponse = await generateVanityWallet(
+            vanity_suffix!,
+            1
+          );
+
           // if (!!generatedAddress?.data[0]?.address) {
           //   setVanityAddress(generatedAddress?.data[0]?.address);
           //   try {
@@ -204,17 +249,23 @@ export default function App() {
             const generatedAddress = generateResponse.data[0];
             // Store the generated address using the helper function
             const sender = address!;
-            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${generatedAddress.address || "N/A"}**.`;
+            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+              generatedAddress.address || "N/A"
+            }**.`;
             const notificationResult = await notifyGullyBuddy(sender, message);
-            console.log("notificationResult",notificationResult);
+            console.log("notificationResult", notificationResult);
             if (notificationResult && notificationResult.hash) {
-              await storeVanityWallet(address, generatedAddress.address, generatedAddress.privKey);
+              await storeVanityWallet(
+                address,
+                generatedAddress.address,
+                generatedAddress.privKey
+              );
               setVanityAddress(generatedAddress.address);
               toast.success("Notification sent to Buddyinternational.eth");
-            }else {
+            } else {
               setIsLoading(false);
               toast.error("Error sending notification");
-              return
+              return;
             }
           }
         }
@@ -223,7 +274,6 @@ export default function App() {
     };
 
     handleWalletConnect();
-
   }, [isConnected, address, vanityAddress, setVanityAddress]);
 
   return (
@@ -259,7 +309,7 @@ export default function App() {
                           setIsAddressCopied(true);
                           clearTimeout(copyAddressTimeoutRef.current);
                           copyAddressTimeoutRef.current = setTimeout(() => {
-                          setIsAddressCopied(false);
+                            setIsAddressCopied(false);
                           }, 1000);
                         }}
                         className="text-[#5692D9] font-thin mt-1 cursor-pointer"
@@ -339,6 +389,20 @@ export default function App() {
               </Button>
             </div>
           )}
+        </div>
+        <div>
+          <Button
+            variant="contained"
+            onClick={downloadVanityData}
+            sx={{
+              borderRadius: "22px",
+              textTransform: "capitalize",
+              background: "#5773FF",
+              mx: "10px",
+            }}
+          >
+            Download Vanity Data
+          </Button>
         </div>
       </div>
     </>
