@@ -390,7 +390,7 @@ export default function App() {
             </div>
           )}
         </div>
-        <div>
+        <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           <Button
             variant="contained"
             onClick={downloadVanityData}
