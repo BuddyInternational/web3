@@ -14,6 +14,12 @@ const PORT = process.env.PORT || 8080;
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://gully.buddy.international");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
