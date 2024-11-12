@@ -27,6 +27,9 @@ import { toast } from "react-toastify";
 import { getNFTDetails, saveNFTDetails } from "../api/nftAPI";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Countdown from "react-countdown";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -107,10 +110,12 @@ const Home = () => {
     wallet: [],
     vanity: [],
   });
+
   const [testCDEBalance, setTestCDEBalance] = useState(0);
   const [testTIMBalance, setTestTIMBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [NFTdata2, setNFTdata2] = useState<NFTDetails[]>([]);
+  const [NFTdata3, setNFTdata3] = useState<NFTDetails[]>([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
@@ -306,6 +311,59 @@ const Home = () => {
       console.error("Error fetching token balances:", error);
     }
   }, [isConnected, address, vanityAddress]);
+
+  // Function to fetch Gullybuddy specific NFTs
+  const fetchGullyBuddyNFTs = useCallback(async () => {
+    try {
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "x-api-key": `${ApiKey}`,
+        },
+      };
+
+      const buddyPassportCollection = await fetch(
+        `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
+        options
+      );
+
+      const buddyCollection = await fetch(
+        `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
+        options
+      );
+
+      const buddyPassportData = await buddyPassportCollection.json();
+      const buddyCollectionData = await buddyCollection.json();
+
+      const combinedNFTs = [
+        ...(buddyPassportData.nfts || []),
+        ...(buddyCollectionData.nfts || []),
+      ];
+
+      const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
+        chainName: nft.asset_contract?.chain || "Unknown Chain",
+        contractAddress: nft.contract || "",
+        tokenId: nft.identifier || "",
+        name: nft.name || "Unnamed NFT",
+        tokenType: nft.asset_contract?.schema_name || "ERC721",
+        tokenUri: nft.permalink || "",
+        imageUrl: nft.display_image_url || "",
+        mediaType: nft.display_animation_url ? "video" : "image",
+        timeLastUpdated: nft.updated_at || new Date().toISOString(),
+        floorPrice: nft.floor_price || 0,
+        floorPriceUsd: nft.floor_price_usd || 0,
+        priceCurrency: nft.payment_token?.symbol || "ETH",
+        lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+        totalClaimedRewardCount: nft.claim_count || 0,
+        totalClaimedRewardHash: nft.claim_hashes || [],
+      }));
+
+      setNFTdata3(formattedNFTs); // Update Gullybuddy specific NFTs
+    } catch (err) {
+      console.error("Error fetching Gullybuddy NFTs:", err);
+    }
+  }, []);
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
@@ -510,62 +568,38 @@ const Home = () => {
     }
   };
 
-  // fetch Nft data
+  // useEffect to filter common NFTs between NFTdata and NFTdata3
   useEffect(() => {
-    const fetchNFTs = async () => {
-      const options = {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          "x-api-key": `${ApiKey}`,
-        },
-      };
+    if (NFTdata.length > 0 && NFTdata3.length > 0) {
+      const commonNFTs = NFTdata.filter((nft) =>
+        NFTdata3.some(
+          (nft3) =>
+            nft3.tokenId === nft.tokenId &&
+            nft3.contractAddress === nft.contractAddress
+        )
+      );
 
-      try {
-        const buddyPassportCollection = await fetch(
-          `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
-          options
-        );
-        const buddyCollection = await fetch(
-          `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
-          options
-        );
-        
-        const buddyPassportData = await buddyPassportCollection.json();
-        const buddyCollectionData = await buddyCollection.json();
+      setNFTdata2(commonNFTs);
+    }
+  }, [NFTdata, NFTdata3]);
 
-        const combinedNFTs = [
-          ...(buddyPassportData.nfts || []),
-          ...(buddyCollectionData.nfts || []),
-        ];
+  // fetch NFT data from OpenSea on load
+  useEffect(() => {
+    fetchGullyBuddyNFTs();
+  }, [fetchGullyBuddyNFTs]);
 
-          const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
-          chainName: nft.asset_contract?.chain || "Unknown Chain",
-          contractAddress: nft.contract || "",
-          tokenId: nft.identifier || "",
-          name: nft.name || "Unnamed NFT",
-          tokenType: nft.asset_contract?.schema_name || "ERC721",
-          tokenUri: nft.permalink || "",
-          imageUrl: nft.display_image_url || "",
-          mediaType: nft.display_animation_url ? "video" : "image",
-          timeLastUpdated: nft.updated_at || new Date().toISOString(),
-          floorPrice: nft.floor_price || 0,
-          floorPriceUsd: nft.floor_price_usd || 0,
-          priceCurrency: nft.payment_token?.symbol || "ETH",
-          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
-          totalClaimedRewardCount: nft.claim_count || 0,
-          totalClaimedRewardHash: nft.claim_hashes || [],
-        }));
-        console.log(formattedNFTs);
+  // Fetch NFTs on load or when the user connects wallet
+  useEffect(() => {
+    if (address) {
+      fetchNFTs();
+    }
+  }, [address, fetchNFTs]);
 
-        setNFTdata2(formattedNFTs);
-      } catch (err) {
-        console.error("Error fetching NFT data from OpenSea:", err);
-      }
-    };
+  const [value, setValue] = React.useState(0);
 
-    fetchNFTs();
-  }, []);
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   return (
     <>
@@ -894,23 +928,47 @@ const Home = () => {
         </div>
       </div>
 
-      {/* NFT cards */}
-      <div className="mt-3">
-        {isConnected ? (
-          vanityAddress === "0x0000000000000000000000000000000000000000" ? (
-            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
-              Vanity Address not generated
-            </h1>
-          ) : NFTdata?.length > 0 ? (
-            <NftCard NFTDetails={NFTdata} CardType={"walletNFT"} />
+      {/* Holding options */}
+      <div className="container m-auto flex flex-col gap-3 py-2 mt-3 px-4 w-full">
+        <Box sx={{ width: "100%" }}>
+          <Tabs value={value} onChange={handleChange} centered>
+            <Tab label="All NFT Holdings" sx={{ color: "white" }} />
+            <Tab label="Gullybuddy's holdings" sx={{ color: "white" }} />
+          </Tabs>
+        </Box>
+
+        {/* NFT cards */}
+        <div className="mt-3 w-full">
+          {isConnected ? (
+            vanityAddress === "0x0000000000000000000000000000000000000000" ? (
+              <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                Vanity Address not generated
+              </h1>
+            ) : value === 0 ? ( // All NFTs
+              NFTdata.length > 0 ? (
+                <div className="w-full flex flex-wrap">
+                  <NftCard NFTDetails={NFTdata} CardType={"walletNFT"} />
+                </div>
+              ) : (
+                <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                  No NFTs in your account at the moment
+                </h1>
+              )
+            ) : value === 1 ? ( // Gullybuddy's holdings
+              NFTdata.length > 0 ? (
+                <div className="w-full flex flex-wrap">
+                  <NftCard NFTDetails={NFTdata2} CardType={"walletNFT"} />
+                </div>
+              ) : (
+                <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                  No NFTs in your account at the moment
+                </h1>
+              )
+            ) : null
           ) : (
-            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
-              No NFTs in your account at the moment
-            </h1>
-          )
-        ) : (
-          <ShopeNftcard NFTDetails={NFTdata2} CardType={"BuyNft"} />
-        )}
+            <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
+          )}
+        </div>
       </div>
 
       {/* Gully Buddies Membership Rewards Modal */}

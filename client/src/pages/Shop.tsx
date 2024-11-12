@@ -4,6 +4,31 @@ import { Link } from "react-router-dom";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
 import { NFTDetails } from "../utils/Types";
 
+interface NFT {
+  asset_contract: {
+    chain: string;
+    schema_name: string;
+  };
+  contract: string;
+  identifier: string;
+  name: string;
+  permalink: string;
+  display_image_url: string;
+  display_animation_url: string | null;
+  updated_at: string;
+  floor_price: number;
+  floor_price_usd: number;
+  payment_token: {
+    symbol: string;
+  };
+  last_claimed_date: string | null;
+  claim_count: number;
+  claim_hashes: string[];
+}
+
+interface OpenSeaCollectionResponse {
+  nfts: NFT[];
+}
 
 const ApiKey: string | undefined= process.env.REACT_APP_OPENSEA_API_KEY|| "";
 const Shop = () => {
@@ -120,27 +145,38 @@ const Shop = () => {
       ],
     },
   ];
+  const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
 
-  const [NFTdata, setNFTdata] = useState([]);
-
+  // fetch Nft data
   useEffect(() => {
     const fetchNFTs = async () => {
-      
       const options = {
         method: "GET",
         headers: {
           accept: "application/json",
-          "x-api-key": `${ApiKey}`
-        }
+          "x-api-key": `${ApiKey}`,
+        },
       };
 
       try {
-        const response = await fetch(`https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`, options);
-        const data = await response.json();
-        console.log("API Response:", data);
+        const buddyPassportCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
+          options
+        );
+        const buddyCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
+          options
+        );
+        
+        const buddyPassportData = await buddyPassportCollection.json();
+        const buddyCollectionData = await buddyCollection.json();
 
-        // Map response to your expected format if necessary
-        const formattedNFTs = (data.nfts as any).map((nft:any) => ({
+        const combinedNFTs = [
+          ...(buddyPassportData.nfts || []),
+          ...(buddyCollectionData.nfts || []),
+        ];
+
+          const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
           chainName: nft.asset_contract?.chain || "Unknown Chain",
           contractAddress: nft.contract || "",
           tokenId: nft.identifier || "",
@@ -155,10 +191,10 @@ const Shop = () => {
           priceCurrency: nft.payment_token?.symbol || "ETH",
           lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
           totalClaimedRewardCount: nft.claim_count || 0,
-          totalClaimedRewardHash: nft.claim_hashes || []
+          totalClaimedRewardHash: nft.claim_hashes || [],
         }));
         console.log(formattedNFTs);
-        
+
         setNFTdata(formattedNFTs);
       } catch (err) {
         console.error("Error fetching NFT data from OpenSea:", err);
