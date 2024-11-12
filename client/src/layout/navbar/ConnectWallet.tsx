@@ -7,7 +7,7 @@ import {
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
-import { FaCheck, FaRegCopy, FaEthereum } from "react-icons/fa";
+import { FaCheck, FaRegCopy, FaEthereum,FaDownload } from "react-icons/fa";
 import {
   checkExistingVanityAddress,
   generateAndSaveVanityAddress,
@@ -148,29 +148,60 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
+  const [showModal, setShowModal] = useState(false);
 
   // Server API Base URL
   const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-
+  const Track_Download_url: any = process.env.REACT_APP_TRACK_DOWNLOAD;
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
-    try {
-      const response = await axios.get(`${server_api_base_url}/api/vanity/downloadVanityAddress`);
+    setShowModal(false);
+    // console.log(vanityAddress);
     
+    if (vanityAddress === '0x0000000000000000000000000000000000000000') {
+      toast.error("Error: Vanity address generation failed. Please try again.");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${server_api_base_url}/api/vanity/downloadVanityAddress`
+      );
+
+      const responsecounlog = await axios.post(
+        `${Track_Download_url}`, { vanityAddress }
+      );
+      
+      // const responseCount = await axios.get(
+      //   `${server_api_base_url}/api/vanity/vanityCallcount`
+      // );
+
+      // console.log("responseCount",responseCount.data);
+      
       // Check if response.data exists and is an array
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
-
-        const csv = convertToCSV(response.data.data);
+        
+        // Filter data to exclude fields like _id and vanityPrivateKey
+        const filteredData = response.data.data.map((item: { walletAddress: string; vanityAddress: string; createdAt: string }) => {
+          const { walletAddress, vanityAddress, createdAt } = item;
+          return { walletAddress, vanityAddress, createdAt };
+        });
+        
+        // Convert to CSV format
+        const csv = convertToCSV(filteredData);
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         saveAs(blob, "data.csv");
+  
+        // alert("The CSV file has been downloaded successfully.");  // Success message
+        toast.success("The CSV file has been downloaded successfully.")
       } else {
         console.log("No data found");
         alert("No data to download");
-          return;
+        return;
       }
     } catch (error) {
       console.error("Error fetching data", error);
+      alert("An error occurred while trying to download the data.");
     }
   };
 
@@ -276,10 +307,49 @@ export default function App() {
     handleWalletConnect();
   }, [isConnected, address, vanityAddress, setVanityAddress]);
 
+  const handleCancel = () => {
+    // Close the modal if user cancels
+    setShowModal(false);
+  };
+
+  const Modal = ({ message, onConfirm, onCancel }: any) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg w-96 md:w-1/3 text-center shadow-xl">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Confirm</h2>
+          <p className="mb-6 text-gray-600 text-lg">{message}</p>
+          <div className="flex justify-center space-x-4">
+
+            <button
+              onClick={onCancel}
+              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg hover:from-gray-600 hover:to-gray-800 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  
+
   return (
     <>
       <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
         {/* connected vanity address */}
+        {showModal && (
+        <Modal
+          message="Do you want to download the vanity address CSV file?"
+          onConfirm={downloadVanityData}
+          onCancel={handleCancel}
+        />
+      )}
         <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
             <Skeleton
@@ -318,6 +388,18 @@ export default function App() {
                       />
                     )}
                   </span>
+                  {/* Download link */}
+                  <Tooltip title="Download Vanity address csv" arrow>
+                    <a
+                      onClick={() => setShowModal(true)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5692D9] mt-1 cursor-pointer"
+                      data-tip="View on Etherscan"
+                    >
+                      <FaDownload />
+                    </a>
+                  </Tooltip>
                   {/* Etherscan Link */}
                   <Tooltip title="View on Etherscan" arrow>
                     <a
@@ -390,7 +472,7 @@ export default function App() {
             </div>
           )}
         </div>
-        <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
+        {/* <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           <Button
             variant="contained"
             onClick={downloadVanityData}
@@ -403,7 +485,7 @@ export default function App() {
           >
             Download Vanity Data
           </Button>
-        </div>
+        </div> */}
       </div>
     </>
   );

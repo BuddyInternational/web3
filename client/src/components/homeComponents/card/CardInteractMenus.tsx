@@ -74,6 +74,11 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
     content: "",
     selectedNFT: selectedNFT,
   });
+  const videoUrls = process.env.REACT_APP_VIDEO_URLS?.split(",") || [];
+
+  const getRandomVideoUrl = () => {
+    return videoUrls[Math.floor(Math.random() * videoUrls.length)];
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -105,7 +110,7 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
       label: "Use A Buddy Earn TIM",
       title: "Use A Buddy Earn TIM",
       onClick: handleOpenModal,
-      videoUrl: "https://youtu.be/ym1zJGAW3WE",
+      videoUrl: getRandomVideoUrl(),
       selectedNFT: selectedNFT,
     },
     {

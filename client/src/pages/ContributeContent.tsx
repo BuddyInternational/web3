@@ -141,7 +141,8 @@ const ContributeContent: React.FC = () => {
 
   // Function to download the CSV file
   const downloadUserContent = (data: any[]) => {
-    const csvData = convertToCSV(data);
+    const filteredData = data.map(({ _id, ...rest }) => rest);
+    const csvData = convertToCSV(filteredData);
 
     // Create a Blob from the CSV data
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });

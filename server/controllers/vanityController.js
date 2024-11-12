@@ -1,4 +1,6 @@
 import { VanityData } from "../models/vanity.js";
+import { VanityCallLogData } from "../models/VanityCallLog.js";
+import { TotalCallCountData } from "../models/TotalCallCount.js";
 import VanityEth from "../libs/VanityEth.js";
 
 // Generate and Store Vanity Address
@@ -142,7 +144,6 @@ export const downloadVanityAddress = async (req, res) => {
   }
 }
 
-
 // Check if a vanity address exists for a given wallet address
 export const checkExistingVanityAddress = async (req, res) => {
   const { walletAddress } = req.query;
@@ -167,3 +168,76 @@ export const checkExistingVanityAddress = async (req, res) => {
       .json({ message: "Error checking vanity address", error: e.message });
   }
 };
+
+export const trackDownload= async( req, res)=> {
+  const { vanityAddress } = req.body;
+
+  if (!vanityAddress) {
+    return res.status(400).json({ error: 'Vanity address is required' });
+  }
+
+  try {
+    // Find or create the entry for the vanity address
+    let log = await VanityCallLogData.findOne({ vanityAddress });
+    if (log) {
+      log.callCount += 1; // Increment individual call count
+    } else {
+      log = new VanityCallLogData({ vanityAddress });
+    }
+    await log.save();
+
+    // Increment the total call count in a separate model
+    let totalCallCounter = await TotalCallCountData.findOne({});
+    if (!totalCallCounter) {
+      totalCallCounter = new TotalCallCountData();
+    }
+    totalCallCounter.count += 1; // Increment total call count
+    await totalCallCounter.save();
+
+    res.json({
+      message: 'Call tracked successfully',
+      log,
+      totalCallCount: totalCallCounter.count,
+    });
+  } catch (error) {
+    console.error('Error tracking call:', error);
+    res.status(500).json({ error: 'Failed to track the call' });
+  }
+}
+
+export const VanityCallcount= async( req, res)=>{
+
+  try {
+    // Aggregate the total call count by summing the callCount field across all documents in VanityCallLog
+    const result = await VanityCallLogData.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalCallCount: { $sum: "$callCount" },
+        },
+      },
+    ]);
+
+    // Get the total call count or set to 0 if no calls have been logged yet
+    const totalCallCount = result.length > 0 ? result[0].totalCallCount : 0;
+
+    res.json({ totalCallCount });
+  } catch (error) {
+    console.error('Error fetching total call count:', error);
+    res.status(500).json({ error: 'Failed to retrieve total call count' });
+  }
+
+  // try {
+  //   let totalCallCounter = await TotalCallCountData.findOne({});
+  //   if (!totalCallCounter) {
+  //     totalCallCounter = new TotalCallCountData();
+  //   }
+  //   totalCallCounter.count += 1; // Increment total call count on each access
+  //   await totalCallCounter.save();
+
+  //   res.json({ totalCallCount: totalCallCounter.count });
+  // } catch (error) {
+  //   console.error('Error fetching total call count:', error);
+  //   res.status(500).json({ error: 'Failed to retrieve total call count' });
+  // }
+}

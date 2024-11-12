@@ -363,7 +363,7 @@ const Home = () => {
     } catch (err) {
       console.error("Error fetching Gullybuddy NFTs:", err);
     }
-  }, []);
+  }, []); 
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
@@ -574,11 +574,10 @@ const Home = () => {
       const commonNFTs = NFTdata.filter((nft) =>
         NFTdata3.some(
           (nft3) =>
-            nft3.tokenId === nft.tokenId &&
-            nft3.contractAddress === nft.contractAddress
+            nft3.tokenId === nft.tokenId && nft3.contractAddress === nft.contractAddress
         )
       );
-
+  
       setNFTdata2(commonNFTs);
     }
   }, [NFTdata, NFTdata3]);
@@ -591,7 +590,7 @@ const Home = () => {
   // Fetch NFTs on load or when the user connects wallet
   useEffect(() => {
     if (address) {
-      fetchNFTs();
+      fetchNFTs(); 
     }
   }, [address, fetchNFTs]);
 
@@ -966,7 +965,9 @@ const Home = () => {
               )
             ) : null
           ) : (
-            <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
+            
+              <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
+            
           )}
         </div>
       </div>
