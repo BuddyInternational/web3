@@ -74,7 +74,8 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
-
+  // Server API Base URL
+  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (typeof window.ethereum !== "undefined") {
@@ -106,8 +107,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       setCanClaim(true); // Can claim reward
     }
   };
-  console.log("---------ChainName", ChainName);
-  console.log(isCorrectNetwork);
 
   const claimRewards = async () => {
     setLoading(true);
@@ -243,7 +242,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
             modalContents.videoUrl
           );
           const response = await axios.get(
-            `http://localhost:8080/api/resolve-url`,
+            `${server_api_base_url}/api/resolve-url`,
             {
               params: { shortUrl: modalContents.videoUrl },
             }
@@ -267,7 +266,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       resolveUrl();
       setHasFetched(true);
     }
-  }, [modalContents.videoUrl,hasFetched]);
+  }, [modalContents.videoUrl, hasFetched]);
 
   // Reset hasFetched to false when modal is closed (optional)
   useEffect(() => {
