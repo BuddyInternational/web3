@@ -56,6 +56,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   modalContents,
   ChainName,
 }) => {
+  console.log("modalContents===========",modalContents.videoUrl);
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
@@ -71,6 +72,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
+
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (typeof window.ethereum !== "undefined") {

@@ -167,9 +167,10 @@ export default function App() {
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
 
-      const responsecounlog = await axios.post(
-        `${Track_Download_url}`, { vanityAddress }
-      );
+      // const responsecounlog = await axios.post(
+      //   `${Track_Download_url}`, { vanityAddress }
+      // );
+      // console.log("responsecounlog==========",responsecounlog);
       
       // const responseCount = await axios.get(
       //   `${server_api_base_url}/api/vanity/vanityCallcount`

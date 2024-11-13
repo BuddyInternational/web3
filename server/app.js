@@ -11,15 +11,44 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// // Define CORS options
+// const corsOptions = {
+//   origin: ["http://localhost:3000", "https://downloads.gully.app/e4x6J2 "], // Allowed domains
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+//   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+//   optionsSuccessStatus: 200,
+// };
+
+// // Apply CORS middleware
+// app.use(cors(corsOptions));
+
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); // Adjust to your frontend's origin
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
+
+// app.use(cors({
+//   origin: 'http://localhost:3000',
+//   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://gully.buddy.international");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// const corsOptions = {
+//   origin: 'http://localhost:3000', // replace with your frontend domain
+//   optionsSuccessStatus: 200,
+// };
+// app.use(cors(corsOptions));
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "https://gully.buddy.international");
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
