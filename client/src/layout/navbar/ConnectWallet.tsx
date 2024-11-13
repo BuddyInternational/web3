@@ -7,7 +7,7 @@ import {
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
-import { FaCheck, FaRegCopy, FaEthereum,FaDownload } from "react-icons/fa";
+import { FaCheck, FaRegCopy, FaEthereum, FaDownload } from "react-icons/fa";
 import {
   checkExistingVanityAddress,
   generateAndSaveVanityAddress,
@@ -157,44 +157,56 @@ export default function App() {
   const downloadVanityData = async () => {
     setShowModal(false);
     // console.log(vanityAddress);
-    
-    if (vanityAddress === '0x0000000000000000000000000000000000000000') {
+
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
       toast.error("Error: Vanity address generation failed. Please try again.");
       return;
     }
     try {
+      console.log("vanity address---------", vanityAddress);
       const response = await axios.get(
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
-
-      // const responsecounlog = await axios.post(
-      //   `${Track_Download_url}`, { vanityAddress }
-      // );
-      // console.log("responsecounlog==========",responsecounlog);
       
+      console.log(Track_Download_url,vanityAddress);
+      
+      // const responsecounlog = await axios.post(`${Track_Download_url}`, {
+      //   vanityAddress,
+      // });
+      const responsecounlog = await axios.post(Track_Download_url, { vanityAddress }, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("responsecounlog==========", responsecounlog);
+
       // const responseCount = await axios.get(
       //   `${server_api_base_url}/api/vanity/vanityCallcount`
       // );
 
       // console.log("responseCount",responseCount.data);
-      
+
       // Check if response.data exists and is an array
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
-        
+
         // Filter data to exclude fields like _id and vanityPrivateKey
-        const filteredData = response.data.data.map((item: { walletAddress: string; vanityAddress: string; createdAt: string }) => {
-          const { walletAddress, vanityAddress, createdAt } = item;
-          return { walletAddress, vanityAddress, createdAt };
-        });
-        
+        const filteredData = response.data.data.map(
+          (item: {
+            walletAddress: string;
+            vanityAddress: string;
+            createdAt: string;
+          }) => {
+            const { walletAddress, vanityAddress, createdAt } = item;
+            return { walletAddress, vanityAddress, createdAt };
+          }
+        );
+
         // Convert to CSV format
         const csv = convertToCSV(filteredData);
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         saveAs(blob, "data.csv");
-  
+
         // alert("The CSV file has been downloaded successfully.");  // Success message
-        toast.success("The CSV file has been downloaded successfully.")
+        toast.success("The CSV file has been downloaded successfully.");
       } else {
         console.log("No data found");
         alert("No data to download");
@@ -320,10 +332,10 @@ export default function App() {
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Confirm</h2>
           <p className="mb-6 text-gray-600 text-lg">{message}</p>
           <div className="flex justify-center space-x-4">
-
             <button
               onClick={onCancel}
-              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg hover:from-gray-600 hover:to-gray-800 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"            >
+              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg hover:from-gray-600 hover:to-gray-800 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
+            >
               Cancel
             </button>
             <button
@@ -337,20 +349,18 @@ export default function App() {
       </div>
     );
   };
-  
-  
 
   return (
     <>
       <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
         {/* connected vanity address */}
         {showModal && (
-        <Modal
-          message="Do you want to download the vanity address CSV file?"
-          onConfirm={downloadVanityData}
-          onCancel={handleCancel}
-        />
-      )}
+          <Modal
+            message="Do you want to download the vanity address CSV file?"
+            onConfirm={downloadVanityData}
+            onCancel={handleCancel}
+          />
+        )}
         <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
             <Skeleton

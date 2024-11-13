@@ -20,6 +20,7 @@ import { ethers } from "ethers";
 import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { getClaimDetails, updateNFTClaimDetails } from "../../../api/nftAPI";
 import { NFTDetails } from "../../../utils/Types";
+import axios from "axios";
 
 interface ModalContents {
   title: string;
@@ -56,7 +57,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   modalContents,
   ChainName,
 }) => {
-  console.log("modalContents===========",modalContents.videoUrl);
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
@@ -69,6 +69,8 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const [timeUntilNextClaim, setTimeUntilNextClaim] = useState(0);
   const [connectedNetwork, setConnectedNetwork] = useState<string | null>(null);
   const [canClaim, setCanClaim] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [hasFetched, setHasFetched] = useState(false); // Initialize flag
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
@@ -231,6 +233,49 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     }
   }, [timeUntilNextClaim]);
 
+  // Function to resolve the short URL and set the full video URL
+  useEffect(() => {
+    const resolveUrl = async () => {
+      if (modalContents.videoUrl) {
+        try {
+          console.log(
+            "modalContent vedio URL----------------",
+            modalContents.videoUrl
+          );
+          const response = await axios.get(
+            `http://localhost:8080/api/resolve-url`,
+            {
+              params: { shortUrl: modalContents.videoUrl },
+            }
+          );
+          console.log(
+            "response url===================",
+            response.data.resolvedUrl
+          );
+          // Set the resolved URL if CORS allows
+          if (response.data.resolvedUrl) {
+            setVideoUrl(response.data.resolvedUrl);
+          } else {
+            console.warn("Could not resolve URL due to CORS.");
+          }
+        } catch (error) {
+          console.error("Error resolving the short URL:", error);
+        }
+      }
+    };
+    if (modalContents.videoUrl && !hasFetched) {
+      resolveUrl();
+      setHasFetched(true);
+    }
+  }, [modalContents.videoUrl,hasFetched]);
+
+  // Reset hasFetched to false when modal is closed (optional)
+  useEffect(() => {
+    if (!open) {
+      setHasFetched(false);
+    }
+  }, [open]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -285,12 +330,21 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                   }}
                   width={"100%"}
                   controls={true}
-                  url={modalContents.videoUrl}
+                  // url={modalContents.videoUrl}
+                  url={videoUrl}
                   loop={true}
                   playing={isPlaying}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
+                  config={{
+                    file: {
+                      attributes: {
+                        crossOrigin: "anonymous", // Allows cross-origin access if supported by server
+                      },
+                    },
+                  }}
                 />
+
                 {/* <Button
                   variant="contained"
                   onClick={claimRewards}

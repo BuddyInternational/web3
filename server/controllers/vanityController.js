@@ -241,3 +241,4 @@ export const VanityCallcount= async( req, res)=>{
   //   res.status(500).json({ error: 'Failed to retrieve total call count' });
   // }
 }
+

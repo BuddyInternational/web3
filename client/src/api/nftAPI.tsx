@@ -84,7 +84,7 @@ export const getClaimDetails = async (
     const response = await axios.get(
       `${server_api_base_url}/api/nft/getNFTClaimDetails/${walletAddress}/${tokenId}/${contractAddress}`
     );
-    console.log("response-------------", response);
+    // console.log("response-------------", response);
     if (response) {
       return response.data;
     } else {

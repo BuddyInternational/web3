@@ -6,7 +6,7 @@ import {
   storeVanityWallet,
   downloadVanityAddress,
   trackDownload,
-  VanityCallcount
+  VanityCallcount,
 } from "../controllers/vanityController.js";
 
 const vanityRoutes = express.Router();
