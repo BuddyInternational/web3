@@ -53,7 +53,7 @@ app.use("/api/user-content/", userContentRoutes);
 app.post("/proxy", async (req, res) => {
   try {
     // Make the actual request to downloads.gully.app
-    const response = await axios.post("https://downloads.gully.app/e4x6J2", req.body);
+    const response = await axios.post(process.env.TRACK_DOWNLOAD, req.body);
 
     // Forward the response from downloads.gully.app to the frontend
     res.json(response.data);

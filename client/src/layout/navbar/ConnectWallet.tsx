@@ -152,7 +152,7 @@ export default function App() {
 
   // Server API Base URL
   const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-  const Track_Download_url: any = process.env.REACT_APP_TRACK_DOWNLOAD;
+  // const Track_Download_url: any = process.env.REACT_APP_TRACK_DOWNLOAD;
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
     setShowModal(false);
@@ -167,13 +167,8 @@ export default function App() {
       const response = await axios.get(
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
-      
-      console.log(Track_Download_url,vanityAddress);
-      
-      // const responsecounlog = await axios.post(`${Track_Download_url}`, {
-      //   vanityAddress,
-      // });
-      const responsecounlog = await axios.post(Track_Download_url, { vanityAddress }, {
+
+      const responsecounlog = await axios.post(`${server_api_base_url}/proxy`, { vanityAddress }, {
         headers: { "Content-Type": "application/json" },
       });
       console.log("responsecounlog==========", responsecounlog);
