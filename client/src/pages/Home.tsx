@@ -128,6 +128,7 @@ const Home = () => {
   const [socketNFTImageMediaType, setsocketNFTImageMediaType] = useState<
     string | null
   >(null);
+  const [nftSocketed, setNftSocketed] = useState(false);
   const { vanityAddress } = useVanityContext();
   const [anchorEl, setAnchorEl] = useState(null);
   const isDropdownOpen = Boolean(anchorEl);
@@ -363,7 +364,7 @@ const Home = () => {
     } catch (err) {
       console.error("Error fetching Gullybuddy NFTs:", err);
     }
-  }, []); 
+  }, []);
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
@@ -462,6 +463,7 @@ const Home = () => {
       if (isConnected && vanityAddress) {
         const response = await getSocketNFTLastTransferDetails(vanityAddress);
         if (response !== null) {
+          setNftSocketed(true);
           setsocketNFTImageURL(response.imageUrl);
           setsocketNFTImageMediaType(response.mediaType);
         }
@@ -574,10 +576,11 @@ const Home = () => {
       const commonNFTs = NFTdata.filter((nft) =>
         NFTdata3.some(
           (nft3) =>
-            nft3.tokenId === nft.tokenId && nft3.contractAddress === nft.contractAddress
+            nft3.tokenId === nft.tokenId &&
+            nft3.contractAddress === nft.contractAddress
         )
       );
-  
+
       setNFTdata2(commonNFTs);
     }
   }, [NFTdata, NFTdata3]);
@@ -590,7 +593,7 @@ const Home = () => {
   // Fetch NFTs on load or when the user connects wallet
   useEffect(() => {
     if (address) {
-      fetchNFTs(); 
+      fetchNFTs();
     }
   }, [address, fetchNFTs]);
 
@@ -616,7 +619,7 @@ const Home = () => {
             </button>
           </div>
           {/* Account Persona: [Default] */}
-          <div className="flex flex-col mt-2 gap-4 sm:items-center md:items-start">
+          <div className="flex flex-col mt-2 gap-2 sm:items-center md:items-start">
             <p className="text-md font-sans text-[#5692D9]">
               Account Persona:{" "}
               {socketNFTImageURL ? "[NFT Socketed]" : " [Default]"}
@@ -638,6 +641,11 @@ const Home = () => {
                 alt="Account Persona not found"
                 className="md:w-30 sm:w-48 h-auto rounded-xl"
               />
+            )}
+            {nftSocketed ? (
+              <p className="text-green-600 text-md">Monthly Bonus Active 📈</p>
+            ) : (
+              <p className="text-red-700 text-md">No Bonus Active 😞</p>
             )}
             <Link
               to={`/nft/socketNFT/${vanityAddress}`}
@@ -702,7 +710,7 @@ const Home = () => {
               className="hover:text-[#5692D9] cursor-pointer underline"
               onClick={handleOpenModal(setOpenSocketNFTModal)}
             >
-              Edit Persona Socket NFT
+              Edit Persona Socket NFT(% Increase Monthly Return)
             </Link>
             <Link
               to="/#"
@@ -965,10 +973,8 @@ const Home = () => {
               )
             ) : null
           ) : (
-            
-              <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
-            
-          )}
+            <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
+          )}  
         </div>
       </div>
 

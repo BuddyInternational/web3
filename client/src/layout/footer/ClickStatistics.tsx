@@ -19,7 +19,6 @@ import { APIProvider } from "@vis.gl/react-google-maps";
 import GoogleMap from "./GoogleMap";
 import { saveAs } from "file-saver";
 
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -163,15 +162,9 @@ const ClickStatistics: React.FC = () => {
 
   const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
   const [osData, setOsData] = useState<OSData[]>([]);
-  const [countryData, setCountryData] = useState<
-  CountryData[]
-  >([]);
-  const [cityData, setCityData] = useState<
-  CityData[]
-  >([]);
+  const [countryData, setCountryData] = useState<CountryData[]>([]);
+  const [cityData, setCityData] = useState<CityData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-
 
   useEffect(() => {
     // Set static data instead of fetching
@@ -203,7 +196,7 @@ const ClickStatistics: React.FC = () => {
   //         const osData = response.data.os;
   //         const countryData = response.data.country;
   //         const cityData = response.data.city;
-  
+
   //         setClickData(clickData);
   //         setOsData(osData);
   //         setCountryData(countryData);
@@ -218,7 +211,6 @@ const ClickStatistics: React.FC = () => {
 
   //   fetchData();
   // }, []);
-
 
   const labels = clickData.map((item) => new Date(item.x).toLocaleDateString());
   const dataPoints = clickData.map((item) => parseInt(item.y));
@@ -340,8 +332,10 @@ const ClickStatistics: React.FC = () => {
   // Function to fetch data from the backend for vanity data
   const downloadVanityData = async () => {
     try {
-      const response = await axios.get(`${server_api_base_url}/api/vanity/downloadVanityAddress`);
-      
+      const response = await axios.get(
+        `${server_api_base_url}/api/vanity/downloadVanityAddress`
+      );
+
       // Check if response.data exists and is an array
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
@@ -352,7 +346,7 @@ const ClickStatistics: React.FC = () => {
       } else {
         console.log("No data found");
         alert("No data to download");
-          return;
+        return;
       }
     } catch (error) {
       console.error("Error fetching data", error);
@@ -375,21 +369,41 @@ const ClickStatistics: React.FC = () => {
         </h1>
 
         <div className="mb-6 px-4 sm:px-8 lg:px-20">
-          <Skeleton variant="rectangular" width="100%" height={400} animation="wave"/>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={400}
+            animation="wave"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex flex-col items-center">
             <Skeleton variant="text" width="80%" />
-            <Skeleton variant="rounded" width="100%" height={200} animation="wave"/>
+            <Skeleton
+              variant="rounded"
+              width="100%"
+              height={200}
+              animation="wave"
+            />
           </div>
           <div className="flex flex-col items-center">
             <Skeleton variant="text" width="80%" />
-            <Skeleton variant="rounded" width="100%" height={200} animation="wave"/>
+            <Skeleton
+              variant="rounded"
+              width="100%"
+              height={200}
+              animation="wave"
+            />
           </div>
           <div className="flex flex-col items-center">
             <Skeleton variant="text" width="80%" />
-            <Skeleton variant="rounded" width="100%" height={200} animation="wave"/>
+            <Skeleton
+              variant="rounded"
+              width="100%"
+              height={200}
+              animation="wave"
+            />
           </div>
         </div>
       </div>
@@ -401,9 +415,7 @@ const ClickStatistics: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">Retail QR Scan</h1>
 
       {/* Line Chart for Clicks Over Time */}
-      <div
-        className="mb-6"
-      >
+      <div className="mb-6">
         <Line data={chartData} options={{ responsive: true }} />
       </div>
 
@@ -445,9 +457,9 @@ const ClickStatistics: React.FC = () => {
       </div>
 
       <div className="">
-      <APIProvider apiKey={google_map_api_key!}>
-    <GoogleMap />
-  </APIProvider>
+        <APIProvider apiKey={google_map_api_key!}>
+          <GoogleMap />
+        </APIProvider>
       </div>
       <div className="my-4">
         <ImageCarousel />
@@ -465,10 +477,9 @@ const ClickStatistics: React.FC = () => {
           onClick={downloadVanityData}
           className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
         >
-          Download Vanity Data
+          Download Global Vanity Data
         </button>
       </div>
-    
     </div>
   );
 };

@@ -3,16 +3,14 @@ import React from "react";
 const Pagination: React.FC<{
   currentPage: number;
   totalPages: number;
-  onPageChange: any;
+  onPageChange: (pageNumber: number) => void;
 }> = ({ currentPage, totalPages, onPageChange }) => {
-  // Handle page click
   const handlePageClick = (pageNumber: number) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       onPageChange(pageNumber);
     }
   };
 
-  // Add pageNumber
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
@@ -20,10 +18,10 @@ const Pagination: React.FC<{
 
   return (
     <div className="flex justify-center mt-4">
-      <ul className="flex gap-2">
+      <ul className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
         <button
           className="px-3 py-2 rounded-md text-sm cursor-pointer focus:outline-none disabled:opacity-50"
-          onClick={() => handlePageClick(Math.max(currentPage - 1, 1))}
+          onClick={() => handlePageClick(currentPage - 1)}
           disabled={currentPage === 1}
         >
           Previous
@@ -31,8 +29,8 @@ const Pagination: React.FC<{
         {pageNumbers.map((pageNumber) => (
           <li
             key={pageNumber}
-            className={`px-3 py-2 rounded text-sm cursor-pointer hover:bg-gray-200 text-center ${
-              currentPage === pageNumber ? "bg-[#5773FF]" : ""
+            className={`px-3 py-2 rounded text-sm cursor-pointer hover:bg-gray-200 ${
+              currentPage === pageNumber ? "bg-blue-500 text-white" : ""
             }`}
             onClick={() => handlePageClick(pageNumber)}
           >
@@ -41,7 +39,7 @@ const Pagination: React.FC<{
         ))}
         <button
           className="px-3 py-2 rounded-md text-sm cursor-pointer focus:outline-none disabled:opacity-50"
-          onClick={() => handlePageClick(Math.min(currentPage + 1, totalPages))}
+          onClick={() => handlePageClick(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           Next

@@ -53,8 +53,8 @@ const SocketNFTDetails = () => {
                 timeLastUpdated: nft.last_metadata_sync,
                 floorPrice: nft?.floor_price,
                 floorPriceUsd: nft?.floor_price_usd,
-                lastclaimedAt: null, 
-                totalClaimedRewardCount: 0, 
+                lastclaimedAt: null,
+                totalClaimedRewardCount: 0,
                 totalClaimedRewardHash: [],
               }))
             )
@@ -68,11 +68,25 @@ const SocketNFTDetails = () => {
     }
   }, [vanityAddress]);
 
+  // Function to calculate the total USD value of all Socketed NFTs
+  const calculateTotalSocketedNFTValue = () => {
+    if (!socketNFTdata.length) return 0;
+
+    let totalFloorPriceUsd = 0;
+    for (const nft of socketNFTdata) {
+      if (nft.floorPriceUsd !== null) {
+        totalFloorPriceUsd += Number(nft.floorPriceUsd);
+      }
+    }
+    return Number(totalFloorPriceUsd).toFixed(4);
+  };
+
   useEffect(() => {
     if (address && isConnected && vanityAddress) {
       fetchSocketNFTs();
     }
   }, [address, isConnected, vanityAddress, fetchSocketNFTs]);
+
   return (
     <div className="container m-auto flex flex-col mt-2 gap-3 ">
       <Link
@@ -82,13 +96,21 @@ const SocketNFTDetails = () => {
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
       {/* Socket NFT cards */}
-      {socketNFTdata && socketNFTdata.length > 0 && vanityAddress !== '0x0000000000000000000000000000000000000000' ?(
-
-      <div className="mt-3">
-        <NftCard NFTDetails={socketNFTdata} CardType={"vanityNFT"} />
-      </div>
-      ):(
-        <p className="text-2xl text-white m-auto my-6">You don’t have any socketed NFTs at the moment. Explore and add some NFTs to see them here!</p>
+      {socketNFTdata &&
+      socketNFTdata.length > 0 &&
+      vanityAddress !== "0x0000000000000000000000000000000000000000" ? (
+        <div className="mt-3">
+          <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
+            <p className="text-[#5692D9]">Total Value:</p>
+            <p>{calculateTotalSocketedNFTValue()} USD</p>
+          </span>
+          <NftCard NFTDetails={socketNFTdata} CardType={"vanityNFT"} />
+        </div>
+      ) : (
+        <p className="text-2xl text-white m-auto my-6">
+          You don’t have any socketed NFTs at the moment. Explore and add some
+          NFTs to see them here!
+        </p>
       )}
     </div>
   );

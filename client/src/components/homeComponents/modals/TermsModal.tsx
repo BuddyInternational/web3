@@ -63,8 +63,6 @@ const TermsModal: React.FC<{
               <br />
               CDE (CDE) Token Tracker
               <br />
-              CDE (CDE) Token Tracker
-              <br />
               <br />
               There is members only option to send amounts to be vested to
               passport client wallet. Client wallets are a vanity address you

@@ -63,7 +63,7 @@ const SupportMenu: React.FC = () => {
           <span className="mr-2">
             <FaWpforms />
           </span>
-          Fill Your Query
+          Fill Your Query & Feedback
         </MenuItem>
       </Menu>
       <SupporyQueryModal

@@ -1,8 +1,9 @@
-import React,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link } from "react-router-dom";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
 import { NFTDetails } from "../utils/Types";
+import { Box, Tab, Tabs } from "@mui/material";
 
 interface NFT {
   asset_contract: {
@@ -30,122 +31,18 @@ interface OpenSeaCollectionResponse {
   nfts: NFT[];
 }
 
-const ApiKey: string | undefined= process.env.REACT_APP_OPENSEA_API_KEY|| "";
+const ApiKey: string | undefined = process.env.REACT_APP_OPENSEA_API_KEY || "";
 const Shop = () => {
-  // Nft static data 
-  const NFTdata1: NFTDetails[] = [
-    {
-      chainName: "Ethereum",
-      contractAddress: "0xABC123456789DEF",
-      tokenId: "1",
-      name: "CryptoKitty #1",
-      tokenType: "ERC721",
-      tokenUri: "https://example.com/api/nft/1",
-      imageUrl: "https://contenthub-static.crypto.com/cdn-cgi/image/width=800,quality=75/wp_media/2023/08/TOP-10-NFT-TOKENS-TO-KNOW-IN-2023-.jpg",  // Replace with actual NFT image URL
-      mediaType: "image",
-      timeLastUpdated: "2023-09-28T10:00:00Z",
-      floorPrice: 2.5,
-      floorPriceUsd: 5000,
-      priceCurrency: "",
-      lastclaimedAt: new Date("2023-10-01T12:30:00Z"),
-      totalClaimedRewardCount: 5,
-      totalClaimedRewardHash: [
-        "0xhash1",
-        "0xhash2",
-        "0xhash3",
-        "0xhash4",
-        "0xhash5"
-      ],
-    },
-    {
-      chainName: "Ethereum",
-      contractAddress: "0xDEF123456789ABC",
-      tokenId: "2",
-      name: "CryptoKitty #2",
-      tokenType: "ERC721",
-      tokenUri: "https://example.com/api/nft/2",
-      imageUrl: "https://i.seadn.io/s/raw/files/87ed0dd90f7f6be4aba2bcdc86a6fcb7.png?auto=format&dpr=1&w=1000",  // Replace with actual NFT image URL
-      mediaType: "image",
-      timeLastUpdated: "2023-09-28T10:30:00Z",
-      floorPrice: 3.0,
-      floorPriceUsd: 6000,
-      priceCurrency: "",
-      lastclaimedAt: new Date("2023-10-02T14:00:00Z"),
-      totalClaimedRewardCount: 3,
-      totalClaimedRewardHash: [
-        "0xhash6",
-        "0xhash7",
-        "0xhash8"
-      ],
-    },
-    {
-      chainName: "Ethereum",
-      contractAddress: "0x123456789DEFABC",
-      tokenId: "3",
-      name: "CryptoKitty #3",
-      tokenType: "ERC721",
-      tokenUri: "https://example.com/api/nft/3",
-      imageUrl: "https://preview.redd.it/rbx-network-mint-and-sell-your-nfts-p2p-validate-on-core-v0-482saok8g1gc1.jpeg?width=640&crop=smart&auto=webp&s=6ec4f3850d55becfe8287b424913bb95f63d6a98",  // Replace with actual NFT image URL
-      mediaType: "image",
-      timeLastUpdated: "2023-09-28T11:00:00Z",
-      floorPrice: 1.8,
-      floorPriceUsd: 3600,
-      priceCurrency: "",
-      lastclaimedAt: new Date("2023-10-03T16:00:00Z"),
-      totalClaimedRewardCount: 4,
-      totalClaimedRewardHash: [
-        "0xhash9",
-        "0xhash10",
-        "0xhash11",
-        "0xhash12"
-      ],
-    },
-    {
-      chainName: "Ethereum",
-      contractAddress: "0x123456789DEFABC",
-      tokenId: "4",
-      name: "CryptoKitty #4",
-      tokenType: "ERC721",
-      tokenUri: "https://example.com/api/nft/3",
-      imageUrl: "https://preview.redd.it/rbx-network-mint-and-sell-your-nfts-p2p-validate-on-core-v0-482saok8g1gc1.jpeg?width=640&crop=smart&auto=webp&s=6ec4f3850d55becfe8287b424913bb95f63d6a98",  // Replace with actual NFT image URL
-      mediaType: "image",
-      timeLastUpdated: "2023-09-28T11:00:00Z",
-      floorPrice: 1.8,
-      floorPriceUsd: 3600,
-      priceCurrency: "",
-      lastclaimedAt: new Date("2023-10-03T16:00:00Z"),
-      totalClaimedRewardCount: 4,
-      totalClaimedRewardHash: [
-        "0xhash9",
-        "0xhash10",
-        "0xhash11",
-        "0xhash12"
-      ],
-    },
-    {
-      chainName: "Ethereum",
-      contractAddress: "0x123456789DEFABC",
-      tokenId: "5",
-      name: "CryptoKitty #5",
-      tokenType: "ERC721",
-      tokenUri: "https://example.com/api/nft/3",
-      imageUrl: "https://preview.redd.it/rbx-network-mint-and-sell-your-nfts-p2p-validate-on-core-v0-482saok8g1gc1.jpeg?width=640&crop=smart&auto=webp&s=6ec4f3850d55becfe8287b424913bb95f63d6a98",  // Replace with actual NFT image URL
-      mediaType: "image",
-      timeLastUpdated: "2023-09-28T11:00:00Z",
-      floorPrice: 1.8,
-      floorPriceUsd: 3600,
-      priceCurrency: "",
-      lastclaimedAt: new Date("2023-10-03T16:00:00Z"),
-      totalClaimedRewardCount: 4,
-      totalClaimedRewardHash: [
-        "0xhash9",
-        "0xhash10",
-        "0xhash11",
-        "0xhash12"
-      ],
-    },
-  ];
-  const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
+  const [buddyPassportNFTdata, setBuddyPassportNFTdata] = useState<
+    NFTDetails[]
+  >([]);
+  const [teamNFTdata, setTeamNFTdata] = useState<NFTDetails[]>([]);
+  const [managerNFTdata, setManagerNFTdata] = useState<NFTDetails[]>([]);
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   // fetch Nft data
   useEffect(() => {
@@ -163,20 +60,45 @@ const Shop = () => {
           `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
           options
         );
-        const buddyCollection = await fetch(
+        const teamCollection = await fetch(
           `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
           options
         );
-        
-        const buddyPassportData = await buddyPassportCollection.json();
-        const buddyCollectionData = await buddyCollection.json();
+        const managerCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
+          options
+        );
 
-        const combinedNFTs = [
-          ...(buddyPassportData.nfts || []),
-          ...(buddyCollectionData.nfts || []),
-        ];
+        const buddyPassportCollectionData =
+          await buddyPassportCollection.json();
+        const teamCollectionData = await teamCollection.json();
+        const managerCollectionData = await managerCollection.json();
 
-          const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
+        const buddyPassportNFTs = buddyPassportCollectionData.nfts || [];
+        const teamNFTs = teamCollectionData.nfts || [];
+        const managerNFTs = managerCollectionData.nfts || [];
+
+        const formattedBuddyPassportNFTs = buddyPassportNFTs.map(
+          (nft: NFT) => ({
+            chainName: nft.asset_contract?.chain || "Unknown Chain",
+            contractAddress: nft.contract || "",
+            tokenId: nft.identifier || "",
+            name: nft.name || "Unnamed NFT",
+            tokenType: nft.asset_contract?.schema_name || "ERC721",
+            tokenUri: nft.permalink || "",
+            imageUrl: nft.display_image_url || "",
+            mediaType: nft.display_animation_url ? "video" : "image",
+            timeLastUpdated: nft.updated_at || new Date().toISOString(),
+            floorPrice: nft.floor_price || 0,
+            floorPriceUsd: nft.floor_price_usd || 0,
+            priceCurrency: nft.payment_token?.symbol || "ETH",
+            lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+            totalClaimedRewardCount: nft.claim_count || 0,
+            totalClaimedRewardHash: nft.claim_hashes || [],
+          })
+        );
+
+        const formattedTeamNFTs = teamNFTs.map((nft: NFT) => ({
           chainName: nft.asset_contract?.chain || "Unknown Chain",
           contractAddress: nft.contract || "",
           tokenId: nft.identifier || "",
@@ -193,9 +115,29 @@ const Shop = () => {
           totalClaimedRewardCount: nft.claim_count || 0,
           totalClaimedRewardHash: nft.claim_hashes || [],
         }));
-        console.log(formattedNFTs);
 
-        setNFTdata(formattedNFTs);
+        const formattedManagerNFTs = managerNFTs.map((nft: NFT) => ({
+          chainName: nft.asset_contract?.chain || "Unknown Chain",
+          contractAddress: nft.contract || "",
+          tokenId: nft.identifier || "",
+          name: nft.name || "Unnamed NFT",
+          tokenType: nft.asset_contract?.schema_name || "ERC721",
+          tokenUri: nft.permalink || "",
+          imageUrl: nft.display_image_url || "",
+          mediaType: nft.display_animation_url ? "video" : "image",
+          timeLastUpdated: nft.updated_at || new Date().toISOString(),
+          floorPrice: nft.floor_price || 0,
+          floorPriceUsd: nft.floor_price_usd || 0,
+          priceCurrency: nft.payment_token?.symbol || "ETH",
+          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+          totalClaimedRewardCount: nft.claim_count || 0,
+          totalClaimedRewardHash: nft.claim_hashes || [],
+        }));
+
+        setBuddyPassportNFTdata(formattedBuddyPassportNFTs);
+        setTeamNFTdata(formattedTeamNFTs);
+        setManagerNFTdata(formattedManagerNFTs);
+        // setNFTdata(formattedNFTs);
       } catch (err) {
         console.error("Error fetching NFT data from OpenSea:", err);
       }
@@ -205,18 +147,57 @@ const Shop = () => {
   }, []);
 
   return (
-    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-      <Link to="/" className="text-blue-500 hover:underline flex items-center mb-4">
+    <div className="container m-auto flex flex-col mt-2 gap-3 ">
+      <Link
+        to="/"
+        className="text-blue-500 hover:underline flex items-center mb-4"
+      >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
 
       <div className="mt-3">
-        <h1 className="text-3xl text-white text-center font-bold mb-4">NFT Marketplace</h1>
-        <ShopeNftcard NFTDetails={NFTdata} CardType="BuyNft" />
+        <h1 className="text-3xl text-white text-center font-bold mb-4">
+          NFT Marketplace
+        </h1>
+
+        {/* Holding options */}
+        <div className="container m-auto flex flex-col gap-3 py-2 mt-3 px-4 w-full">
+          <Box sx={{ width: "100%" }}>
+            <Tabs value={value} onChange={handleChange} centered>
+              <Tab label="Passport" sx={{ color: "white" }} />
+              <Tab label="Team Member" sx={{ color: "white" }} />
+              <Tab label="Persona Of Manager" sx={{ color: "white" }} />
+            </Tabs>
+          </Box>
+        </div>
+
+        {value === 0 &&
+          (buddyPassportNFTdata.length > 0 ? (
+            <ShopeNftcard NFTDetails={buddyPassportNFTdata} CardType="BuyNft" />
+          ) : (
+            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+              No NFTs exits at the moment
+            </h1>
+          ))}
+        {value === 1 &&
+          (teamNFTdata.length > 0 ? (
+            <ShopeNftcard NFTDetails={teamNFTdata} CardType="BuyNft" />
+          ) : (
+            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+              No NFTs exits at the moment
+            </h1>
+          ))}
+        {value === 2 &&
+          (managerNFTdata.length > 0 ? (
+            <ShopeNftcard NFTDetails={managerNFTdata} CardType="BuyNft" />
+          ) : (
+            <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+              No NFTs exits at the moment
+            </h1>
+          ))}
       </div>
     </div>
   );
 };
 
 export default Shop;
-

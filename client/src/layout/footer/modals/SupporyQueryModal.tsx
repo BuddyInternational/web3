@@ -47,7 +47,7 @@ const SupporyQueryModal: React.FC<{
             sx={{ m: 0, p: 2, textAlign: "center" }}
             id="customized-dialog-title"
           >
-            Submit Your Query
+            Submit Your Query & Feedback
           </DialogTitle>
           <IconButton
             aria-label="close"

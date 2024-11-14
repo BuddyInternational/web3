@@ -53,14 +53,22 @@ const ContributeContent: React.FC = () => {
   const [mood, setMood] = useState<string>("");
   const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [wordCount, setWordCount] = useState<number>(0);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
   const [isVanityAddressCopied, setIsVanityAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const copyVanityAddressTimeoutRef: any = useRef(null);
 
+
+  // Function to calculate word count
+  const calculateWordCount = (text: string) => {
+    return text.trim().split(/\s+/).filter(Boolean).length;
+  };
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+    const newContent = e.target.value;
+    setContent(newContent);
+    setWordCount(calculateWordCount(newContent));
   };
 
   // Handler for mood selection
@@ -73,6 +81,7 @@ const ContributeContent: React.FC = () => {
     if (mood && content) {
       setLoading(true);
       try {
+        console.log("word Count=============",wordCount);
         const timestamp = new Date().toISOString();
         const submissionData = { mood, content, timestamp };
         const buffer = Buffer.from(JSON.stringify(submissionData));
@@ -83,6 +92,8 @@ const ContributeContent: React.FC = () => {
           content,
           ipfsHash: result.path,
           generateContentDate: timestamp,
+          contentWordCount: wordCount,
+          eligibleStatus: false,
           submissionHash: "",
           isSubbmited: false,
           submissionDate: "",
@@ -141,6 +152,7 @@ const ContributeContent: React.FC = () => {
 
   // Function to download the CSV file
   const downloadUserContent = (data: any[]) => {
+    console.log("download data-------------",data);
     const filteredData = data.map(({ _id, ...rest }) => rest);
     const csvData = convertToCSV(filteredData);
 

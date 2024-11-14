@@ -16,6 +16,8 @@ const UserContentSchema = new mongoose.Schema(
       content: {type: String}, 
       ipfsHash : {type: String},
       generateContentDate: { type: Date },
+      contentWordCount: {type: Number},
+      eligibleStatus: {type: Boolean},
       isSubbmited : {type: Boolean},
       submissionHash : {type: String},
       submissionDate : {type: Date}

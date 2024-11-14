@@ -5,6 +5,7 @@ export const saveUserContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
+      console.log("contentDetails--------",contentDetails)
     let userContent = await UserContentData.findOne({
       walletAddress,
       vanityAddress,

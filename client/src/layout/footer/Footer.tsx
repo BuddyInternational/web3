@@ -137,14 +137,6 @@ const Footer: React.FC = () => {
             >
               Privacy
             </a>
-            <a
-              href="/privacy-policy.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-semibold transition-colors duration-300 hover:text-yellow-400"
-            >
-              Feedback
-            </a>
             <SupportMenu />
           </div>
         </div>

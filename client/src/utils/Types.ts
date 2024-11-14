@@ -58,6 +58,8 @@ export interface ContentSubmission {
   content: string;
   ipfsHash?: string;
   generateContentDate: string;
+  contentWordCount: number;
+  eligibleStatus: boolean;
   submissionHash: string;
   isSubbmited: boolean;
   submissionDate: string;

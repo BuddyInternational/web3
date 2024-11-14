@@ -4,7 +4,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
-import { Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import { ethers } from "ethers";
 import {
@@ -17,12 +17,11 @@ import {
   updateContentDetail,
 } from "../../api/userContentAPI";
 import { ContentSubmission } from "../../utils/Types";
-import {  useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
+import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 
 interface ContributionsProps {
   submissions: ContentSubmission[];
 }
-
 
 const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   const { address } = useWeb3ModalAccount();
@@ -136,6 +135,33 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
             <Typography variant="body2" color="inherit">
               {submission.content}
             </Typography>
+            {/* Flex container for word count and chips */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mt={1}
+              mb={1}
+            >
+              <Typography variant="body2" color="inherit">
+                Total Content Words: {submission.contentWordCount}
+              </Typography>
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                {submission.eligibleStatus ? (
+                  <Chip
+                    label="Eligible for Reward"
+                    color="success"
+                    variant="outlined"
+                  />
+                ) : (
+                  <Chip
+                    label="Not Eligible for Reward"
+                    color="error"
+                    variant="outlined"
+                  />
+                )}
+              </Stack>
+            </Box>
             {submission.isSubbmited && submission.submissionHash && (
               <Typography
                 variant="body2"

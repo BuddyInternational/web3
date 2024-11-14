@@ -76,6 +76,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
   // Server API Base URL
   const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
+  
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (typeof window.ethereum !== "undefined") {
