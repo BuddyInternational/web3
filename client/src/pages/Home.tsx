@@ -643,9 +643,9 @@ const Home = () => {
               />
             )}
             {nftSocketed ? (
-              <p className="text-green-600 text-md">Monthly Bonus Active 📈</p>
+              <p className="text-green-600 text-md mx-4">Monthly Bonus Active 📈</p>
             ) : (
-              <p className="text-red-700 text-md">No Bonus Active 😞</p>
+              <p className="text-red-700 text-md mx-4">No Bonus Active 😕</p>
             )}
             <Link
               to={`/nft/socketNFT/${vanityAddress}`}
