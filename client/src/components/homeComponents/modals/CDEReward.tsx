@@ -22,6 +22,7 @@ import {
 import { useVanityContext } from "../../../context/VanityContext";
 import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { ethers } from "ethers";
+import { toast } from "react-toastify";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -105,12 +106,14 @@ const CDEReward: React.FC<{
       walletProvider as ethers.Eip1193Provider
     );
     const signer = await ethersProvider.getSigner();
-    console.log("signer-------------", signer);
+    console.log("signer===========", signer);
     const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress!,
       nftMarketAbi.abi,
       signer
     );
+
+    console.log("nftMarketContract============", nftMarketContract);
     setLoading(true);
     try {
       // Convert the price from Ether to Wei
@@ -132,6 +135,7 @@ const CDEReward: React.FC<{
           receiverType,
           {
             value: 0, // Pass the Ether amount
+            gasLimit: 800000,
           }
         );
         console.log("Transaction sent:", tx);
@@ -139,8 +143,25 @@ const CDEReward: React.FC<{
         await tx.wait();
         console.log("Transaction confirmed:", tx.hash);
       }
-    } catch (error) {
-      console.error("Error executing transaction:", error);
+    } catch (error: any) {
+      // console.error("Error from contract:", error);
+      // console.error("Transaction error:", error.reason);
+      console.error("Error from contract:", error);
+      // if(error?.message){
+      //   console.error("Error message:", error.message.error.message);
+      //   toast.error("Error message:", error?.message);
+      // }
+      if (error?.reason) {
+        console.error("Revert reason:", error.reason);
+        toast.error("Revert reason:", error.reason);
+      } else {
+        console.error(
+          "Unknown error occurred, check the transaction details in the explorer."
+        );
+        toast.error(
+          "Unknown error occurred, check the transaction details in the explorer."
+        );
+      }
     } finally {
       setLoading(false);
       onClose();
@@ -176,7 +197,7 @@ const CDEReward: React.FC<{
               sx={{ m: 0, p: 2, textAlign: "center" }}
               id="customized-dialog-title"
             >
-               Purchase and/or Wrap your CDE for % off Market Price!
+              Purchase and/or Wrap your CDE for % off Market Price!
             </DialogTitle>
             <IconButton
               aria-label="close"

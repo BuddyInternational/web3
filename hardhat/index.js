@@ -146,11 +146,11 @@ app.post("/transferToken", async (req, res) => {
   }
 });
 
-// check token balance
-app.get("/tokenBalance/:userAddress", async (req, res) => {
-  const { userAddress } = req.params;
+// check CDE token balance
+app.post("/CDEtokenBalance", async (req, res) => {
+  const { userAddress } = req.body;
   try {
-    const userBalance = await tokenContract.balanceOf(userAddress);
+    const userBalance = await cdeTokenContract.balanceOf(userAddress);
     console.log("userBalance---------------------", userBalance.toString());
     res.status(200).json({ userBalance: userBalance.toString() });
   } catch (error) {
@@ -158,10 +158,10 @@ app.get("/tokenBalance/:userAddress", async (req, res) => {
   }
 });
 
-//************************************************* NFT API ****************************************************
+//************************************************* NFT Market  API ****************************************************
 
-// const contractAddress = process.env.NFT_CONTRACT_ADDRESS;
-// const nftContract = new ethers.Contract(contractAddress, nftAbi.abi, wallet);
+const contractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
+const nftContract = new ethers.Contract(contractAddress, nftMarketAbi.abi, wallet);
 
 // // Get Token Owner endpoint
 // app.get('/owner/:tokenId', async (req, res) => {
@@ -174,16 +174,38 @@ app.get("/tokenBalance/:userAddress", async (req, res) => {
 //     }
 // });
 
-// // Get contract owner
-// app.get('/getOwner',async(req,res)=>{
-//     try {
-//         const owner = await nftContract.owner();
-//         console.log("owner-----------",owner);
-//         res.status(200).json({ owner });
-//     } catch (error) {
-//         res.status(500).send(error.message);
-//     }
-// })
+// Get contract owner
+app.get('/getOwner',async(req,res)=>{
+    try {
+        const owner = await nftContract.owner();
+        console.log("owner-----------",owner);
+        res.status(200).json({ owner });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+})
+
+// API to transfer NFT and pay
+app.post('/transferEthAndGetTestCDEOrTestTIM', async (req, res) => {
+    const { ethAmount, receiverAddress, tokenType, receiverType } = req.body;
+    const amountInWei = ethers.parseEther(ethAmount);
+        console.log("amountInWei-----------", Number(amountInWei));
+    try {
+        const tx = await nftContract.transferEthAndGetTestCDEOrTestTIM(
+          amountInWei,
+          receiverAddress,
+          tokenType,
+          receiverType,
+        );
+        console.log("tx===============",tx);
+        await tx.wait(); // Wait for the transaction to be mined
+        res.status(200).json({ transactionHash: tx.hash });
+    } catch (error) {
+        console.error('Error in transfer token:', error);
+        res.status(500).send(error.message);
+    }
+});
+
 
 // // Mint NFT endpoint
 // app.post('/mint', async (req, res) => {
@@ -207,24 +229,6 @@ app.get("/tokenBalance/:userAddress", async (req, res) => {
 // const nftMarketContractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
 // const nftMarketContract = new ethers.Contract(nftMarketContractAddress, nftMarketAbi.abi, wallet);
 
-// // API to transfer NFT and pay
-// app.post('/transferNFTAndPay', async (req, res) => {
-//     const { vanityAddress, nftAddress, tokenId, tokenStandard, price } = req.body;
-//     try {
-//         const tx = await nftMarketContract.transferNFTAndPay(
-//             vanityAddress,
-//             nftAddress,
-//             tokenId,
-//             tokenStandard,
-//             price
-//         );
-//         await tx.wait(); // Wait for the transaction to be mined
-//         res.status(200).json({ transactionHash: tx.hash });
-//     } catch (error) {
-//         console.error('Error transferring NFT and paying:', error);
-//         res.status(500).send(error.message);
-//     }
-// });
 
 // Start the server
 app.listen(port, () => {

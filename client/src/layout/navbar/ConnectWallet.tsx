@@ -168,14 +168,14 @@ export default function App() {
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
 
-      const responsecounlog = await axios.post(
-        `${server_api_base_url}/proxy`,
+      const responseCountLog = await axios.post(
+        `${server_api_base_url}/proxyVanityDataDownload`,
         { vanityAddress },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log("responsecounlog==========", responsecounlog);
+      console.log("responseCountLog==========", responseCountLog);
 
       // const responseCount = await axios.get(
       //   `${server_api_base_url}/api/vanity/vanityCallcount`

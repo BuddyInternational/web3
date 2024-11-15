@@ -1,4 +1,5 @@
 import { UserContentData } from "../models/userContent.js";
+import { UserContentCallLogData } from "../models/UserContentCallLog.js";
 
 //  save user content data
 export const saveUserContent = async (req, res) => {
@@ -147,3 +148,34 @@ export const deleteContentDetail = async (req, res) => {
     });
   }
 };
+
+// Track dowanload user content data
+export const trackDownloadUserContent= async( req, res)=> {
+  const { vanityAddress } = req.body;
+
+  if (!vanityAddress) {
+    return res.status(400).json({ error: 'Vanity address is required' });
+  }
+
+  try {
+    // Find or create the entry for the vanity address
+    let log = await UserContentCallLogData.findOne({ vanityAddress });
+    console.log("log1===========",log);
+    if (log) {
+      log.callCount += 1; // Increment individual call count
+    } else {
+      log = new UserContentCallLogData({ vanityAddress });
+    }
+
+    console.log("log==========",log);
+    await log.save();
+
+    res.json({
+      message: 'Call tracked successfully',
+      log,
+    });
+  } catch (error) {
+    console.error('Error tracking call:', error);
+    res.status(500).json({ error: 'Failed to track the call' });
+  }
+}

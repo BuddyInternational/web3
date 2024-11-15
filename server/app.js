@@ -9,7 +9,6 @@ dotenv.config();
 import cors from "cors";
 import axios from "axios";
 
-
 const app = express();
 const PORT = process.env.PORT || 8080;
 // Middleware to parse JSON bodies
@@ -18,45 +17,68 @@ app.use(express.json());
 // Apply CORS middleware with the configured options
 app.use(cors());
 
-
-
 // Routes
 app.use("/api/vanity", vanityRoutes);
 app.use("/api/nft/", nftRoutes);
 app.use("/api/socket-nft/", socketNFTRoutes);
 app.use("/api/user-content/", userContentRoutes);
 
-app.post("/proxy", async (req, res) => {
+// track download vanity data CSV using short link
+app.post("/proxyVanityDataDownload", async (req, res) => {
   try {
     // Make the actual request to downloads.gully.app
-    const response = await axios.post(process.env.TRACK_DOWNLOAD, req.body);
+    const response = await axios.post(
+      process.env.TRACK_DOWNLOAD_VANITY_DATA,
+      req.body
+    );
 
     // Forward the response from downloads.gully.app to the frontend
     res.json(response.data);
   } catch (error) {
-    console.error("Proxy request failed:", error);
+    console.error("proxyVanityDataDownload request failed:", error);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });
 
-app.get('/api/resolve-url', async (req, res) => {
+// Track download User Content CSV using short link
+app.post("/proxyUserContentDownload", async (req, res) => {
+  try {
+    // Make the actual request to downloads.gully.app
+    const response = await axios.post(
+      process.env.TRACK_DOWNLOAD_USER_CONTENT_DATA,
+      req.body
+    );
+
+    console.log("response===========", response);
+    // Forward the response from downloads.gully.app to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error("proxyUserContentDownload request failed:", error);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+
+app.get("/api/resolve-url", async (req, res) => {
   const { shortUrl } = req.query;
   if (!shortUrl) {
-    return res.status(400).json({ message: 'Short URL is required' });
+    return res.status(400).json({ message: "Short URL is required" });
   }
 
   try {
-    const response = await fetch(shortUrl, { method: 'HEAD', redirect: 'follow' });
+    const response = await fetch(shortUrl, {
+      method: "HEAD",
+      redirect: "follow",
+    });
     res.json({ resolvedUrl: response.url });
   } catch (error) {
-    res.status(500).json({ message: 'Error resolving URL' });
+    res.status(500).json({ message: "Error resolving URL" });
   }
 });
 
 app.get("/api/ping", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Server running successfully."
+    message: "Server running successfully.",
   });
 });
 

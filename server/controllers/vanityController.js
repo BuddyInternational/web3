@@ -169,6 +169,7 @@ export const checkExistingVanityAddress = async (req, res) => {
   }
 };
 
+// Track dowanload vanity data dowanload
 export const trackDownload= async( req, res)=> {
   const { vanityAddress } = req.body;
 

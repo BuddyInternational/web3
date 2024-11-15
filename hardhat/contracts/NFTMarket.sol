@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
+// error purchaseCDETokenError(string);
 contract NFTMarket {
     IERC20 public testCDEToken;
     IERC20 public testTIMToken;
@@ -33,19 +34,20 @@ contract NFTMarket {
         return tokenAmount;
     }
 
-    //Funtion to transfer eth and get the test CDE token
+     //Funtion to transfer eth and get the test CDE token
     function transferEthAndGetTestCDEOrTestTIM(
         uint256 _ethAmount,
-        address _receiverAddress,
+        address _vanityAddress,
         string memory _tokenType,
-        string memory _receiverAddressType
+        string memory _addressType
     ) external payable {
+
         // require(msg.value == _ethAmount, "Incorrect Ether amount sent");
         uint256 baseTokenAmount = _calculateTokenAmount(_ethAmount);
         uint256 tokenAmount = baseTokenAmount * 10**18;
 
         bool isVanityAddress = keccak256(
-            abi.encodePacked(_receiverAddressType)
+            abi.encodePacked(_addressType)
         ) == keccak256(abi.encodePacked("vanityAddress"));
 
         if (isVanityAddress) {
@@ -61,7 +63,10 @@ contract NFTMarket {
                 tokenAmount = (tokenAmount * 1095) / 1000; // 9.5% discount
             }
         }
-
+        
+        // if(testCDEToken.balanceOf(_vanityAddress)+tokenAmount >= 125000000000000000000000){
+        //     revert purchaseCDETokenError("User can't purchase more than 125000 CDE Token");
+        // }
         // Check allowances
         uint256 allowance;
         if (
@@ -73,8 +78,11 @@ contract NFTMarket {
                 allowance >= tokenAmount,
                 "Insufficient allowance for CDE token transfer"
             );
+            uint256 CDEMaximumAmt = testCDEToken.balanceOf(_vanityAddress) + tokenAmount;
+            require(CDEMaximumAmt <= 125000000000000000000000,"User can not purchase more than 125000 CDE Token");
+            
             require(
-                testCDEToken.transferFrom(owner, _receiverAddress, tokenAmount),
+                testCDEToken.transferFrom(owner, _vanityAddress, tokenAmount),
                 "CDE token transfer failed"
             );
         } else if (
@@ -87,7 +95,7 @@ contract NFTMarket {
                 "Insufficient allowance for TIM token transfer"
             );
             require(
-                testTIMToken.transferFrom(owner, _receiverAddress, tokenAmount),
+                testTIMToken.transferFrom(owner, _vanityAddress, tokenAmount),
                 "TIM token transfer failed"
             );
         }

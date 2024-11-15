@@ -9,8 +9,8 @@ import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
 import { ContentSubmission } from "../utils/Types";
-
 import { saveAs } from "file-saver";
+import axios from "axios";
 
 // Define mood options
 const moodOptions = [
@@ -59,11 +59,14 @@ const ContributeContent: React.FC = () => {
   const copyAddressTimeoutRef: any = useRef(null);
   const copyVanityAddressTimeoutRef: any = useRef(null);
 
+  // Server API Base URL
+  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
   // Function to calculate word count
   const calculateWordCount = (text: string) => {
     return text.trim().split(/\s+/).filter(Boolean).length;
   };
+
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
@@ -81,7 +84,6 @@ const ContributeContent: React.FC = () => {
     if (mood && content) {
       setLoading(true);
       try {
-        console.log("word Count=============",wordCount);
         const timestamp = new Date().toISOString();
         const submissionData = { mood, content, timestamp };
         const buffer = Buffer.from(JSON.stringify(submissionData));
@@ -151,24 +153,29 @@ const ContributeContent: React.FC = () => {
   };
 
   // Function to download the CSV file
-  const downloadUserContent = (data: any[]) => {
-    console.log("download data-------------",data);
+  const downloadUserContent = async (data: any[]) => {
+    console.log("download data-------------", data);
+    // /api/user-content/trackDownloadUserContent
+    const responseUserContentCountLog = await axios.post(
+      `${server_api_base_url}/proxyUserContentDownload`,
+      { vanityAddress },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    console.log(
+      "responseUserContentCountLog==========",
+      responseUserContentCountLog
+    );
     const filteredData = data.map(({ _id, ...rest }) => rest);
     const csvData = convertToCSV(filteredData);
 
     // Create a Blob from the CSV data
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
 
-    // Create a link to trigger download
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", "user_submissions.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    saveAs(blob, "user_submissions.csv");
+    toast.success("The CSV file has been downloaded successfully.");
+
   };
 
   return (
