@@ -3,6 +3,14 @@ import { ethers } from "ethers";
 
 const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
 
+// const notificationDomains: Record<string, string | undefined> = {
+//   "1": process.env.REACT_APP_ETHEREUM_DOMAIN, // Ethereum Mainnet
+//   "137": process.env.REACT_APP_MATIC_DOMAIN ,  // Polygon Mainnet
+//   "42161": process.env.REACT_APP_ARBITRUM_DOMAIN, // Arbitrum Mainnet
+//   "8453": process.env.REACT_APP_BASE_DOMAIN, // Base Mainnet
+// };
+
+
 // Custom Hook to manage notification
 export const useGullyBuddyNotifier = () => {
   const { walletProvider } = useWeb3ModalProvider();
@@ -30,6 +38,24 @@ export const useGullyBuddyNotifier = () => {
     //   toast.warning("Please switch to Ethereum Mainnet Network");
     //   return false;
     // }
+
+
+    // const network = await ethersProvider.getNetwork();
+    // const chainId = network.chainId.toString();
+
+    // console.log("network=============",network);
+    // console.log("chainId=============",chainId);
+
+    // const domainOrAddress = notificationDomains[chainId];
+
+    // if (!domainOrAddress) {
+    //   console.error(
+    //     `No domain configured for chainId ${chainId}. Ensure the domain are set correctly.`
+    //   );
+    //   return false;
+    // }
+
+    // console.log("domainOrAddress!", domainOrAddress!);
     console.log("domain!", domain!);
 
     const gullyBuddyAddress = await resolveENSName(domain!);

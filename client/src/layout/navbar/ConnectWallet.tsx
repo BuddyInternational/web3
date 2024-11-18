@@ -10,7 +10,6 @@ import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaRegCopy, FaEthereum, FaDownload } from "react-icons/fa";
 import {
   checkExistingVanityAddress,
-  generateAndSaveVanityAddress,
   generateVanityWallet,
   storeVanityWallet,
 } from "../../api/vanityAPI";
@@ -283,7 +282,7 @@ export default function App() {
             } 
             else {
               setIsLoading(false);
-              toast.error("Error sending notification");
+              toast.error("Error sending notification and Generate vanity Address!");
               return;
             }
           }

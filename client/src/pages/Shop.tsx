@@ -27,10 +27,6 @@ interface NFT {
   claim_hashes: string[];
 }
 
-interface OpenSeaCollectionResponse {
-  nfts: NFT[];
-}
-
 const ApiKey: string | undefined = process.env.REACT_APP_OPENSEA_API_KEY || "";
 const Shop = () => {
   const [buddyPassportNFTdata, setBuddyPassportNFTdata] = useState<
@@ -69,18 +65,25 @@ const Shop = () => {
           options
         );
 
+        // console.log("managerCollection=======",managerCollection);
+
         const buddyPassportCollectionData =
           await buddyPassportCollection.json();
         const teamCollectionData = await teamCollection.json();
         const managerCollectionData = await managerCollection.json();
 
+        console.log("teamCollectionData===========",teamCollectionData);
+        // console.log("managerCollectionData===========",managerCollectionData);
+
         const buddyPassportNFTs = buddyPassportCollectionData.nfts || [];
         const teamNFTs = teamCollectionData.nfts || [];
         const managerNFTs = managerCollectionData.nfts || [];
 
+        // console.log("managerNFTs------------", managerNFTs);
+
         const formattedBuddyPassportNFTs = buddyPassportNFTs.map(
           (nft: NFT) => ({
-            chainName: nft.asset_contract?.chain || "Unknown Chain",
+            chainName: nft.asset_contract?.chain || "Matic",
             contractAddress: nft.contract || "",
             tokenId: nft.identifier || "",
             name: nft.name || "Unnamed NFT",
@@ -99,7 +102,7 @@ const Shop = () => {
         );
 
         const formattedTeamNFTs = teamNFTs.map((nft: NFT) => ({
-          chainName: nft.asset_contract?.chain || "Unknown Chain",
+          chainName: nft.asset_contract?.chain || "Matic",
           contractAddress: nft.contract || "",
           tokenId: nft.identifier || "",
           name: nft.name || "Unnamed NFT",
@@ -117,7 +120,7 @@ const Shop = () => {
         }));
 
         const formattedManagerNFTs = managerNFTs.map((nft: NFT) => ({
-          chainName: nft.asset_contract?.chain || "Unknown Chain",
+          chainName: nft.asset_contract?.chain || "Matic",
           contractAddress: nft.contract || "",
           tokenId: nft.identifier || "",
           name: nft.name || "Unnamed NFT",
