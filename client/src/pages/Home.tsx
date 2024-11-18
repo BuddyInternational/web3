@@ -100,6 +100,14 @@ interface NFT {
   claim_hashes: string[];
 }
 
+interface CountdownRendererProps {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+}
+
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const [balances, setBalances] = useState<any>({
@@ -127,6 +135,7 @@ const Home = () => {
   const [nftSocketed, setNftSocketed] = useState(false);
   const { vanityAddress } = useVanityContext();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [value, setValue] = React.useState(0);
   const isDropdownOpen = Boolean(anchorEl);
   const targetDate = new Date("2024-12-31T23:59:59");
 
@@ -386,7 +395,7 @@ const Home = () => {
     }
   }, [address, vanityAddress]);
 
-  // fetch the NFT and Token Details
+  // fetch the Account persona NFT and Token Details
   useEffect(() => {
     // fetch the Account Persona socket NFT
     const fetchAccountPersonaNFT = async () => {
@@ -428,30 +437,18 @@ const Home = () => {
     return imageUrl;
   };
 
-  // navigate the user generated content page if user connected
-  const handleClick = (e: any) => {
-    if (!isConnected || !address) {
-      e.preventDefault();
-      toast.warning("Please connect your wallet to generate the content.");
-    }
-  };
-
-  // navigate the view socket nft if user connected
-  const handleClickSocketNFT = (e: any) => {
+  // Check the wallet connection priorer for require feature
+  const handleClickCheckConnectNetwork = (
+    e: React.MouseEvent,
+    message: string
+  ) => {
     if (!isConnected || !address || !vanityAddress) {
       e.preventDefault();
-      toast.warning("Please connect your wallet to view Socketed NFTs.");
+      toast.warning(message);
     }
   };
 
-  interface CountdownRendererProps {
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-    completed: boolean;
-  }
-
+  // Render count Down
   const renderer = ({
     days,
     hours,
@@ -515,7 +512,7 @@ const Home = () => {
     }
   }, [NFTdata, NFTdata3]);
 
-  // fetch NFT data from OpenSea on load
+  // fetch NFT data Collection from OpenSea on load
   useEffect(() => {
     fetchGullyBuddyNFTs();
   }, [fetchGullyBuddyNFTs]);
@@ -526,8 +523,6 @@ const Home = () => {
       fetchNFTs();
     }
   }, [address, fetchNFTs]);
-
-  const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -573,14 +568,21 @@ const Home = () => {
               />
             )}
             {nftSocketed ? (
-              <p className="text-green-600 text-md mx-4">Monthly Bonus Active 📈</p>
+              <p className="text-green-600 text-md mx-4">
+                Monthly Bonus Active 📈
+              </p>
             ) : (
               <p className="text-red-700 text-md mx-4">No Bonus Active 😕</p>
             )}
             <Link
               to={`/nft/socketNFT/${vanityAddress}`}
               className="hover:text-[#5692D9] cursor-pointer underline text-white"
-              onClick={handleClickSocketNFT}
+              onClick={(e) =>
+                handleClickCheckConnectNetwork(
+                  e,
+                  "Please connect your wallet to view Socketed NFTs."
+                )
+              }
             >
               Get List of [Socketed NFTs]
             </Link>
@@ -652,7 +654,12 @@ const Home = () => {
             <Link
               to={`/content/${address}`}
               className="hover:text-[#5692D9] cursor-pointer underline"
-              onClick={handleClick}
+              onClick={(e) =>
+                handleClickCheckConnectNetwork(
+                  e,
+                  "Please connect your wallet to generate the content."
+                )
+              }
             >
               Contribute user generated content
             </Link>
@@ -904,7 +911,7 @@ const Home = () => {
             ) : null
           ) : (
             <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
-          )}  
+          )}
         </div>
       </div>
 

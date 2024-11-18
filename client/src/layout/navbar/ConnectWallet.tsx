@@ -235,15 +235,15 @@ export default function App() {
         const network = await ethersProvider.getNetwork();
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
 
-        if (!isMainnet) {
-          // User is not on Mainnet, show a warning
-          toast.warning(
-            "Please switch to the Ethereum Mainnet to generate a vanity address."
-          );
-          disconnect(); // Disconnect from the wallet
-          setIsLoading(false);
-          return;
-        }
+        // if (!isMainnet) {
+        //   // User is not on Mainnet, show a warning
+        //   toast.warning(
+        //     "Please switch to the Ethereum Mainnet to generate a vanity address."
+        //   );
+        //   disconnect(); // Disconnect from the wallet
+        //   setIsLoading(false);
+        //   return;
+        // }
 
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
@@ -252,16 +252,11 @@ export default function App() {
         if (existingAddress != null) {
           setVanityAddress(existingAddress.vanityAddress);
         } else {
-          // const generatedAddress: any = await generateAndSaveVanityAddress(
-          //   vanity_suffix!,
-          //   address
-          // );
-
+          // Generate a new vanity address
           const generateResponse = await generateVanityWallet(
             vanity_suffix!,
             1
           );
-
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
             // Store the generated address using the helper function

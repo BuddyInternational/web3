@@ -40,49 +40,146 @@ const Shop = () => {
     setValue(newValue);
   };
 
-  // fetch Nft data
+  // // fetch Nft Collection data
+  // useEffect(() => {
+  //   const fetchNFTsCollection = async () => {
+  //     const options = {
+  //       method: "GET",
+  //       headers: {
+  //         accept: "application/json",
+  //         "x-api-key": `${ApiKey}`,
+  //       },
+  //     };
+
+  //     try {
+  //       const buddyPassportCollection = await fetch(
+  //         `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
+  //         options
+  //       );
+  //       const teamCollection = await fetch(
+  //         `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
+  //         options
+  //       );
+  //       const managerCollection = await fetch(
+  //         `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
+  //         options
+  //       );
+
+  //       // console.log("managerCollection=======",managerCollection);
+
+  //       const buddyPassportCollectionData =
+  //         await buddyPassportCollection.json();
+  //       const teamCollectionData = await teamCollection.json();
+  //       const managerCollectionData = await managerCollection.json();
+
+  //       console.log("teamCollectionData===========",teamCollectionData);
+  //       // console.log("managerCollectionData===========",managerCollectionData);
+
+  //       const buddyPassportNFTs = buddyPassportCollectionData.nfts || [];
+  //       const teamNFTs = teamCollectionData.nfts || [];
+  //       const managerNFTs = managerCollectionData.nfts || [];
+
+  //       // console.log("managerNFTs------------", managerNFTs);
+
+  //       const formattedBuddyPassportNFTs = buddyPassportNFTs.map(
+  //         (nft: NFT) => ({
+  //           chainName: nft.asset_contract?.chain || "Matic",
+  //           contractAddress: nft.contract || "",
+  //           tokenId: nft.identifier || "",
+  //           name: nft.name || "Unnamed NFT",
+  //           tokenType: nft.asset_contract?.schema_name || "ERC721",
+  //           tokenUri: nft.permalink || "",
+  //           imageUrl: nft.display_image_url || "",
+  //           mediaType: nft.display_animation_url ? "video" : "image",
+  //           timeLastUpdated: nft.updated_at || new Date().toISOString(),
+  //           floorPrice: nft.floor_price || 0,
+  //           floorPriceUsd: nft.floor_price_usd || 0,
+  //           priceCurrency: nft.payment_token?.symbol || "ETH",
+  //           lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+  //           totalClaimedRewardCount: nft.claim_count || 0,
+  //           totalClaimedRewardHash: nft.claim_hashes || [],
+  //         })
+  //       );
+
+  //       const formattedTeamNFTs = teamNFTs.map((nft: NFT) => ({
+  //         chainName: nft.asset_contract?.chain || "Matic",
+  //         contractAddress: nft.contract || "",
+  //         tokenId: nft.identifier || "",
+  //         name: nft.name || "Unnamed NFT",
+  //         tokenType: nft.asset_contract?.schema_name || "ERC721",
+  //         tokenUri: nft.permalink || "",
+  //         imageUrl: nft.display_image_url || "",
+  //         mediaType: nft.display_animation_url ? "video" : "image",
+  //         timeLastUpdated: nft.updated_at || new Date().toISOString(),
+  //         floorPrice: nft.floor_price || 0,
+  //         floorPriceUsd: nft.floor_price_usd || 0,
+  //         priceCurrency: nft.payment_token?.symbol || "ETH",
+  //         lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+  //         totalClaimedRewardCount: nft.claim_count || 0,
+  //         totalClaimedRewardHash: nft.claim_hashes || [],
+  //       }));
+
+  //       const formattedManagerNFTs = managerNFTs.map((nft: NFT) => ({
+  //         chainName: nft.asset_contract?.chain || "Matic",
+  //         contractAddress: nft.contract || "",
+  //         tokenId: nft.identifier || "",
+  //         name: nft.name || "Unnamed NFT",
+  //         tokenType: nft.asset_contract?.schema_name || "ERC721",
+  //         tokenUri: nft.permalink || "",
+  //         imageUrl: nft.display_image_url || "",
+  //         mediaType: nft.display_animation_url ? "video" : "image",
+  //         timeLastUpdated: nft.updated_at || new Date().toISOString(),
+  //         floorPrice: nft.floor_price || 0,
+  //         floorPriceUsd: nft.floor_price_usd || 0,
+  //         priceCurrency: nft.payment_token?.symbol || "ETH",
+  //         lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+  //         totalClaimedRewardCount: nft.claim_count || 0,
+  //         totalClaimedRewardHash: nft.claim_hashes || [],
+  //       }));
+
+  //       setBuddyPassportNFTdata(formattedBuddyPassportNFTs);
+  //       setTeamNFTdata(formattedTeamNFTs);
+  //       setManagerNFTdata(formattedManagerNFTs);
+  //       // setNFTdata(formattedNFTs);
+  //     } catch (err) {
+  //       console.error("Error fetching NFT data from OpenSea:", err);
+  //     }
+  //   };
+
+  //   fetchNFTsCollection();
+  // }, []);
+
   useEffect(() => {
-    const fetchNFTs = async () => {
+    const fetchNFTsCollection = async () => {
       const options = {
         method: "GET",
         headers: {
           accept: "application/json",
-          "x-api-key": `${ApiKey}`,
+          "x-api-key": ApiKey, // No need for template literal here
         },
       };
-
+  
+      // Define collection URLs
+      const collectionUrls = [
+        "https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts",
+        "https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts",
+        "https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts",
+      ];
+  
       try {
-        const buddyPassportCollection = await fetch(
-          `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
-          options
+        // Fetch all collections in parallel
+        const responses = await Promise.all(
+          collectionUrls.map((url) => fetch(url, options))
         );
-        const teamCollection = await fetch(
-          `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
-          options
+  
+        // Parse JSON responses
+        const collectionsData = await Promise.all(
+          responses.map((response) => response.json())
         );
-        const managerCollection = await fetch(
-          `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
-          options
-        );
-
-        // console.log("managerCollection=======",managerCollection);
-
-        const buddyPassportCollectionData =
-          await buddyPassportCollection.json();
-        const teamCollectionData = await teamCollection.json();
-        const managerCollectionData = await managerCollection.json();
-
-        console.log("teamCollectionData===========",teamCollectionData);
-        // console.log("managerCollectionData===========",managerCollectionData);
-
-        const buddyPassportNFTs = buddyPassportCollectionData.nfts || [];
-        const teamNFTs = teamCollectionData.nfts || [];
-        const managerNFTs = managerCollectionData.nfts || [];
-
-        // console.log("managerNFTs------------", managerNFTs);
-
-        const formattedBuddyPassportNFTs = buddyPassportNFTs.map(
-          (nft: NFT) => ({
+  
+        // Define a utility function to format NFTs
+        const formatNFTs = (nfts = []) =>
+          nfts.map((nft: NFT) => ({
             chainName: nft.asset_contract?.chain || "Matic",
             contractAddress: nft.contract || "",
             tokenId: nft.identifier || "",
@@ -98,56 +195,26 @@ const Shop = () => {
             lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
             totalClaimedRewardCount: nft.claim_count || 0,
             totalClaimedRewardHash: nft.claim_hashes || [],
-          })
-        );
-
-        const formattedTeamNFTs = teamNFTs.map((nft: NFT) => ({
-          chainName: nft.asset_contract?.chain || "Matic",
-          contractAddress: nft.contract || "",
-          tokenId: nft.identifier || "",
-          name: nft.name || "Unnamed NFT",
-          tokenType: nft.asset_contract?.schema_name || "ERC721",
-          tokenUri: nft.permalink || "",
-          imageUrl: nft.display_image_url || "",
-          mediaType: nft.display_animation_url ? "video" : "image",
-          timeLastUpdated: nft.updated_at || new Date().toISOString(),
-          floorPrice: nft.floor_price || 0,
-          floorPriceUsd: nft.floor_price_usd || 0,
-          priceCurrency: nft.payment_token?.symbol || "ETH",
-          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
-          totalClaimedRewardCount: nft.claim_count || 0,
-          totalClaimedRewardHash: nft.claim_hashes || [],
-        }));
-
-        const formattedManagerNFTs = managerNFTs.map((nft: NFT) => ({
-          chainName: nft.asset_contract?.chain || "Matic",
-          contractAddress: nft.contract || "",
-          tokenId: nft.identifier || "",
-          name: nft.name || "Unnamed NFT",
-          tokenType: nft.asset_contract?.schema_name || "ERC721",
-          tokenUri: nft.permalink || "",
-          imageUrl: nft.display_image_url || "",
-          mediaType: nft.display_animation_url ? "video" : "image",
-          timeLastUpdated: nft.updated_at || new Date().toISOString(),
-          floorPrice: nft.floor_price || 0,
-          floorPriceUsd: nft.floor_price_usd || 0,
-          priceCurrency: nft.payment_token?.symbol || "ETH",
-          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
-          totalClaimedRewardCount: nft.claim_count || 0,
-          totalClaimedRewardHash: nft.claim_hashes || [],
-        }));
-
-        setBuddyPassportNFTdata(formattedBuddyPassportNFTs);
-        setTeamNFTdata(formattedTeamNFTs);
-        setManagerNFTdata(formattedManagerNFTs);
-        // setNFTdata(formattedNFTs);
+          }));
+  
+        // Extract and format data for each collection
+        const [
+          buddyPassportCollectionData,
+          teamCollectionData,
+          managerCollectionData,
+        ] = collectionsData;
+  
+        setBuddyPassportNFTdata(formatNFTs(buddyPassportCollectionData.nfts));
+        setTeamNFTdata(formatNFTs(teamCollectionData.nfts));
+        setManagerNFTdata(formatNFTs(managerCollectionData.nfts));
       } catch (err) {
         console.error("Error fetching NFT data from OpenSea:", err);
       }
     };
-
-    fetchNFTs();
+  
+    fetchNFTsCollection();
   }, []);
+  
 
   return (
     <div className="container m-auto flex flex-col mt-2 gap-3 ">

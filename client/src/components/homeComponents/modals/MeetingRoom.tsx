@@ -11,12 +11,29 @@ import {
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import ApplyMeeting from "./ApplyMeeting";
 
 const MeetingRoom: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [openApplyModal, setOpenApplyModal] = React.useState(false);
+  
+
+  const handleOpenApplyMeetingModal = () => {
+    setOpenApplyModal(true);
+    setAnchorEl(null);
+  };
+
+  const handleCloseApplyMeetingModal = () => {
+    setOpenApplyModal(false);
+    setAnchorEl(null);
+    onClose();
+  };
   return (
+    <>
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
         <Box
@@ -64,8 +81,8 @@ const MeetingRoom: React.FC<{
 
             <Box sx={{ marginTop: 4,marginBottom:2, textAlign: "center" }}>
               <Link to={"/#"}>
-                <Button variant="contained" color="primary">
-                  Start
+                <Button variant="contained" color="primary" onClick={handleOpenApplyMeetingModal}>
+                  Apply for Meeting Room
                 </Button>
               </Link>
             </Box>
@@ -89,6 +106,13 @@ const MeetingRoom: React.FC<{
         </Box>
       </Fade>
     </Modal>
+    {openApplyModal &&(
+      <ApplyMeeting
+      open={openApplyModal}
+      onClose={handleCloseApplyMeetingModal}
+    />
+    )}
+    </>
   );
 };
 

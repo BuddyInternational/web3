@@ -1,4 +1,5 @@
 import { useWeb3ModalProvider } from "@web3modal/ethers/react";
+import axios from "axios";
 import { ethers } from "ethers";
 
 const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
@@ -10,11 +11,10 @@ const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
 //   "8453": process.env.REACT_APP_BASE_DOMAIN, // Base Mainnet
 // };
 
-
 // Custom Hook to manage notification
 export const useGullyBuddyNotifier = () => {
   const { walletProvider } = useWeb3ModalProvider();
-  
+
   // Ensure walletProvider is defined before using it
   if (!walletProvider) {
     console.error("Wallet provider is not initialized.");
@@ -31,14 +31,6 @@ export const useGullyBuddyNotifier = () => {
     console.log(
       `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
     );
-
-    // // Check the network
-    // const network = await ethersProvider.getNetwork();
-    // if (network.chainId !== BigInt(1)) { // Ethereum Mainnet
-    //   toast.warning("Please switch to Ethereum Mainnet Network");
-    //   return false;
-    // }
-
 
     // const network = await ethersProvider.getNetwork();
     // const chainId = network.chainId.toString();
@@ -65,18 +57,33 @@ export const useGullyBuddyNotifier = () => {
       console.log(
         `Resolved address for Buddyinternational.eth: ${gullyBuddyAddress}`
       );
-      const transactionResult = await sendNotificationTransaction(
+
+      // Step 1: Send the notification message
+      const notificationTx = await sendNotificationTransaction(
         gullyBuddyAddress,
         content
       );
-      return transactionResult;
+      if (!notificationTx) {
+        console.error("Failed to send notification message.");
+        return false;
+      }
+      
+      // Step 2: Send the equivalent of 10 USD in ETH
+      const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, 10);
+      if (!paymentTx) {
+        console.error("Failed to send payment.");
+        return false;
+      }
+
+      console.log("Notification and payment completed successfully.");
+      return notificationTx;
     } else {
       console.error("Failed to resolve Buddyinternational.eth");
-      // toast.warning("Please switch to Ethereum Mainnet Network");
       return false;
     }
   };
 
+  // Resolve Domain name
   const resolveENSName = async (ensName: string) => {
     try {
       const ensAddress = await ethersProvider.resolveName(ensName);
@@ -88,6 +95,7 @@ export const useGullyBuddyNotifier = () => {
     }
   };
 
+  //  send notification to domain
   const sendNotificationTransaction = async (
     toAddress: string,
     messageContent: string
@@ -110,6 +118,60 @@ export const useGullyBuddyNotifier = () => {
       return tx;
     } catch (error) {
       console.error("Error sending notification transaction:", error);
+      return false;
+    }
+  };
+
+  // send Payment Transaction to send fees to domain for onchain message.
+  const sendPaymentTransaction = async (
+    toAddress: string,
+    amountInUSD: number
+  ) => {
+    try {
+      const signer = await ethersProvider.getSigner();
+
+      // Fetch conversion rate from USD to ETH
+      const options = {
+        method: "GET",
+        url: "https://api.fxratesapi.com/latest",
+        params: {
+          base: "USD",
+          currencies: "ETH",
+          resolution: "1m",
+          amount: 1,
+          places: 6,
+          format: "json",
+        },
+      };
+
+      const response = await axios.request(options);
+      const usdToEthRate = response.data.rates.ETH;
+
+      if (!usdToEthRate) {
+        console.error("Failed to retrieve USD to ETH conversion rate.");
+        return false;
+      }
+
+      // Calculate the amount in ETH
+      const amountInEth = ethers.parseUnits(
+        (amountInUSD * usdToEthRate).toFixed(18),
+        "ether"
+      );
+
+      const paymentTx = await signer.sendTransaction({
+        to: toAddress,
+        value: amountInEth,
+      });
+
+      await paymentTx.wait();
+      console.log(
+        "Payment transaction sent to Buddyinternational.eth:",
+        paymentTx
+      );
+
+      return paymentTx;
+    } catch (error) {
+      console.error("Error sending payment transaction:", error);
       return false;
     }
   };
