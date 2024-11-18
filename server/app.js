@@ -69,6 +69,8 @@ app.get("/api/resolve-url", async (req, res) => {
       method: "HEAD",
       redirect: "follow",
     });
+
+    console.log("response===========",response.url)
     res.json({ resolvedUrl: response.url });
   } catch (error) {
     res.status(500).json({ message: "Error resolving URL" });

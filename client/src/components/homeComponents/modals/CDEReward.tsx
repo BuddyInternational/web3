@@ -156,10 +156,10 @@ const CDEReward: React.FC<{
         toast.error("Revert reason:", error.reason);
       } else {
         console.error(
-          "Unknown error occurred, check the transaction details in the explorer."
+          "Error Purchasing Tokens,Please check the transaction details in the explorer."
         );
         toast.error(
-          "Unknown error occurred, check the transaction details in the explorer."
+          "Error Purchasing Tokens,Please check the transaction details in the explorer."
         );
       }
     } finally {

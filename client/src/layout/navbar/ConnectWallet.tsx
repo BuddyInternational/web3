@@ -253,9 +253,6 @@ export default function App() {
         if (existingAddress != null) {
           setVanityAddress(existingAddress.vanityAddress);
         } else {
-          // If no vanity address exists, generate and save a new one
-          console.log("--------");
-
           // const generatedAddress: any = await generateAndSaveVanityAddress(
           //   vanity_suffix!,
           //   address
@@ -265,28 +262,6 @@ export default function App() {
             vanity_suffix!,
             1
           );
-
-          // if (!!generatedAddress?.data[0]?.address) {
-          //   setVanityAddress(generatedAddress?.data[0]?.address);
-          //   try {
-          //     const sender = address!;
-          //     const message = `
-          //     User with Wallet Address **${address}** has generated a new Vanity Address: **${
-          //       generatedAddress?.data[0]?.address || "N/A"
-          //     }**.
-          //   `; // Send notification
-          //     console.log("message----------------", message);
-          //     const notificationResult = await notifyGullyBuddy(
-          //       sender,
-          //       message
-          //     );
-          //     if (notificationResult && notificationResult.hash) {
-          //       toast.success("Notification sent to Buddyinternational.eth");
-          //     }
-          //   } catch (error: any) {
-          //     toast.error("Error sending notification:", error);
-          //   }
-          // }
 
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
@@ -305,7 +280,8 @@ export default function App() {
               );
               setVanityAddress(generatedAddress.address);
               toast.success("Notification sent to Buddyinternational.eth");
-            } else {
+            } 
+            else {
               setIsLoading(false);
               toast.error("Error sending notification");
               return;

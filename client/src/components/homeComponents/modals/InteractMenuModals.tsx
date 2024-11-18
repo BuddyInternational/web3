@@ -74,9 +74,15 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
+
+    console.log("connected network==========",connectedNetwork?.toLowerCase());
+    console.log("chain network==========",ChainName?.toLowerCase());
+    console.log("isCorrectNetwork==========",isCorrectNetwork);
+
   // Server API Base URL
   const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
   
+  // fetch the connected network 
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (typeof window.ethereum !== "undefined") {
@@ -84,6 +90,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
           walletProvider as ethers.Eip1193Provider
         );
         const network = await ethersProvider.getNetwork();
+        console.log("network==========",network);
         setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
       } else {
         console.error("Ethereum provider is not available.");
@@ -248,6 +255,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
               params: { shortUrl: modalContents.videoUrl },
             }
           );
+          console.log("response============",response);
           console.log(
             "response url===================",
             response.data.resolvedUrl
