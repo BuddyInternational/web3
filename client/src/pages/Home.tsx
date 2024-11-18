@@ -603,19 +603,19 @@ const Home = () => {
               to="/endorsee/quest"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Endorsee Quest Activity
+              Endorsee Quest Activity (*Beta Coming Soon)
             </Link>
             <Link
               to="/jotform2"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Daily Quest Activity
+              Daily Quest Activity (*Beta Coming Soon)
             </Link>
             <Link
               to="/sponsorship"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Sponsorship/Endorsements
+              Sponsorship/Endorsements (*Beta Coming Soon)
             </Link>
             <Link
               to="/#"
