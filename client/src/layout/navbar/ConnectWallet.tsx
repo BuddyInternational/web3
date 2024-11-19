@@ -158,7 +158,7 @@ export default function App() {
     // console.log(vanityAddress);
 
     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
-      toast.error("Error: Vanity address generation failed. Please try again.");
+      toast.error("Please connect your wallet to Download Vanity Data.");
       return;
     }
     try {
@@ -207,12 +207,10 @@ export default function App() {
         toast.success("The CSV file has been downloaded successfully.");
       } else {
         console.log("No data found");
-        alert("No data to download");
         return;
       }
     } catch (error) {
       console.error("Error fetching data", error);
-      alert("An error occurred while trying to download the data.");
     }
   };
 

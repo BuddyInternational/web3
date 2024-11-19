@@ -18,6 +18,8 @@ import Map from "./GoogleMap";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import GoogleMap from "./GoogleMap";
 import { saveAs } from "file-saver";
+import { useVanityContext } from "../../context/VanityContext";
+import { toast } from "react-toastify";
 
 ChartJS.register(
   CategoryScale,
@@ -160,6 +162,7 @@ const ClickStatistics: React.FC = () => {
     ],
   };
 
+  const {vanityAddress} = useVanityContext();
   const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
   const [osData, setOsData] = useState<OSData[]>([]);
   const [countryData, setCountryData] = useState<CountryData[]>([]);
@@ -291,7 +294,13 @@ const ClickStatistics: React.FC = () => {
     ],
   };
 
+  // dowanload Statistics Data
   const downloadCsv = () => {
+
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      toast.error("Please connect your wallet to Download Statistics Data.");
+      return;
+    }
     const csvRows = [["Date", "Clicks"]];
 
     clickData.forEach((item) => {
@@ -331,6 +340,10 @@ const ClickStatistics: React.FC = () => {
 
   // Function to fetch data from the backend for vanity data
   const downloadVanityData = async () => {
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      toast.error("Please connect your wallet to Download Vanity Data.");
+      return;
+    }
     try {
       const response = await axios.get(
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
@@ -340,7 +353,19 @@ const ClickStatistics: React.FC = () => {
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
 
-        const csv = convertToCSV(response.data.data);
+        // Filter data to exclude fields like _id and vanityPrivateKey
+        const filteredData = response.data.data.map(
+          (item: {
+            walletAddress: string;
+            vanityAddress: string;
+            createdAt: string;
+          }) => {
+            const { walletAddress, vanityAddress, createdAt } = item;
+            return { walletAddress, vanityAddress, createdAt };
+          }
+        );
+
+        const csv = convertToCSV(filteredData);
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         saveAs(blob, "data.csv");
       } else {

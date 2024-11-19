@@ -29,7 +29,7 @@ const SocketNFTDetails = () => {
           { chain: "0x2105", name: "Base" },
           { chain: "0xaa36a7", name: "Sepolia" },
           { chain: "0x13882", name: "Matic-Amoy" },
-          { chain: "0x14a33", name: "Base-Sepolia" },
+          { chain: "0x14a34", name: "Base-Sepolia" },
         ];
 
         const nftPromises = chains.map((chain) =>
