@@ -6,26 +6,23 @@ import {
   IconButton,
   Modal,
 } from "@mui/material";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { NFTData } from "../../../utils/Types";
 import ModalNFTCard from "../card/ModalNFTCard";
 import CardChainFilterMenus from "../card/CardChainFilterMenus";
 import { ethers } from "ethers";
-import {
-  useWeb3ModalProvider,
-} from "@web3modal/ethers/react";
+import { useWeb3ModalProvider } from "@web3modal/ethers/react";
 
 const SocketNFT: React.FC<{
   open: boolean;
   onClose: () => void;
   NFTDetails: NFTData[];
 }> = ({ open, onClose, NFTDetails }) => {
-  console.log("NFTDetails--------------",NFTDetails);
+  console.log("NFTDetails--------------", NFTDetails);
   const [connectedNetwork, setConnectedNetwork] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState<string>("All");
   const { walletProvider } = useWeb3ModalProvider();
-
 
   useEffect(() => {
     const getConnectedNetwork = async () => {
@@ -33,7 +30,7 @@ const SocketNFT: React.FC<{
         const ethersProvider = new ethers.BrowserProvider(
           walletProvider as ethers.Eip1193Provider
         );
-        const network= await ethersProvider.getNetwork();
+        const network = await ethersProvider.getNetwork();
         setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
       } else {
         console.error("Ethereum provider is not available.");
@@ -64,6 +61,8 @@ const SocketNFT: React.FC<{
       (selectedChain === "All" || nft.chainName === selectedChain)
   );
 
+  console.log("filteredNFTDetails============", filteredNFTDetails);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -93,7 +92,7 @@ const SocketNFT: React.FC<{
             sx={{ m: 0, p: 2, textAlign: "center" }}
             id="customized-dialog-title"
           >
-            Select NFT to Socket 
+            Select NFT to Socket
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -109,10 +108,11 @@ const SocketNFT: React.FC<{
           >
             <IoClose />
           </IconButton>
+
           <DialogContent dividers>
             {/* Dropdown for filtering by chain */}
-            <div className="flex justify-end sm: mb-1 md:mb-3 container mx-auto px-4 gap-2">
-              {/* <label
+            <div className="flex justify-end sm:mb-1 md:mb-3 container mx-auto px-4 gap-2">
+             {/* <label
                 htmlFor="chainSelect"
                 className="text-md font-bold text-[#191818] sm:py-2 md:py-4 "
               >
@@ -125,12 +125,17 @@ const SocketNFT: React.FC<{
                 component="SocketNFT"
               /> */}
             </div>
+
+            {/* Message for no NFTs found */}
+            {filteredNFTDetails.length === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                No NFTs found in the connected network.
+              </div>
+            )}
+
+            {/* Render NFT cards */}
             {filteredNFTDetails.map((nft, index) => (
-              <ModalNFTCard
-                key={index}
-                nft={nft}
-                onClose={onClose}
-              />
+              <ModalNFTCard key={index} nft={nft} onClose={onClose} />
             ))}
           </DialogContent>
         </Box>
