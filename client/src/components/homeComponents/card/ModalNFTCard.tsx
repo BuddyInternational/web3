@@ -100,8 +100,8 @@ const ModalNFTCard: React.FC<{
       return;
     }
 
-    const nftMarketContractAddressget = networkContracts.contract1.address;
-    const nftMarketAbi1 = networkContracts.contract1.abi;
+    // const nftMarketContractAddressget = networkContracts.contract1.address;
+    // const nftMarketAbi1 = networkContracts.contract1.abi;
 
     const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress!,

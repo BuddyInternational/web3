@@ -97,7 +97,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       }
     };
     getConnectedNetwork();
-  }, []);
+  });
 
   // Helper to calculate the time difference until the next reward can be claimed
   const calculateTimeUntilNextClaim = (lastClaimed: Date) => {
@@ -192,7 +192,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   }, [
     open,
     address,
-    modalContents.selectedNFT.contractAddress!,
+    modalContents.selectedNFT.contractAddress,
     modalContents.selectedNFT.tokenId,
     setLastClaimedAt,
   ]);
@@ -275,7 +275,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       resolveUrl();
       setHasFetched(true);
     }
-  }, [modalContents.videoUrl, hasFetched]);
+  }, [modalContents.videoUrl, hasFetched,server_api_base_url]);
 
   // Reset hasFetched to false when modal is closed (optional)
   useEffect(() => {

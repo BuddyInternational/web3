@@ -5,11 +5,10 @@ import {
   Fade,
   IconButton,
   Modal,
-  Typography,
 } from "@mui/material";
 import React from "react";
 import { IoClose } from "react-icons/io5";
-import ClickStatistics from "../ClickStatistics";
+import ClickStatisticsModal from "../ClickStatisticsModal";
 
 const VendorRewardModal: React.FC<{
   open: boolean;
@@ -55,7 +54,7 @@ const VendorRewardModal: React.FC<{
             <IoClose />
           </IconButton>
           <DialogContent dividers>
-            <ClickStatistics />
+            <ClickStatisticsModal />
           </DialogContent>
         </Box>
       </Fade>

@@ -30,6 +30,7 @@ import Countdown from "react-countdown";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import { useBalanceUpdate } from "../context/BalanceUpdateContext";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -110,6 +111,7 @@ interface CountdownRendererProps {
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
+  const { triggerUpdate ,resetBalances} = useBalanceUpdate();
   const [balances, setBalances] = useState<any>({
     wallet: [],
     vanity: [],
@@ -167,7 +169,8 @@ const Home = () => {
   // Fetch connected user wallet token balance
   const fetchTokenBalance = useCallback(async () => {
     try {
-      if (!isConnected && !address && !vanityAddress) {
+      if (!isConnected || !address || !vanityAddress || vanityAddress === "0x0000000000000000000000000000000000000000") {
+        resetBalances();
         setBalances({
           wallet: [],
           vanity: [],
@@ -248,7 +251,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [isConnected, address, vanityAddress]);
+  }, [isConnected, address, vanityAddress,resetBalances]);
 
   // Function to fetch Gullybuddy specific NFTs
   const fetchGullyBuddyNFTs = useCallback(async () => {
@@ -412,7 +415,6 @@ const Home = () => {
       }
     };
     if (address && isConnected && vanityAddress) {
-      fetchTokenBalance();
       fetchNFTs();
       fetchAccountPersonaNFT();
     }
@@ -420,12 +422,29 @@ const Home = () => {
     address,
     isConnected,
     vanityAddress,
-    fetchTokenBalance,
     fetchNFTs,
     testCDEBalance,
     testTIMBalance,
     socketNFTImageURL,
   ]);
+
+  //fetch Token Balance
+  useEffect(() => {
+      fetchTokenBalance();
+  }, [triggerUpdate, fetchTokenBalance]);
+
+   // Reset balances when triggerUpdate is true
+   useEffect(() => {
+    if (triggerUpdate) {
+      setBalances({
+        wallet: [],
+        vanity: [],
+      });
+      setTestCDEBalance(0);
+      setTestTIMBalance(0);
+    }
+  }, [triggerUpdate]);
+
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
@@ -527,7 +546,6 @@ const Home = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
   return (
     <>
       {/* second Navbar */}

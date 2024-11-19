@@ -23,6 +23,7 @@ import { useVanityContext } from "../../../context/VanityContext";
 import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
+import { useBalanceUpdate } from "../../../context/BalanceUpdateContext";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -31,6 +32,7 @@ const CDEReward: React.FC<{
   const { address, chainId } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
+  const { setTriggerUpdate } = useBalanceUpdate();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
 
@@ -44,19 +46,10 @@ const CDEReward: React.FC<{
     receiver: "walletAddress", // Default receiver
   });
 
-  // // network explorer
-  // const networkExplorers : Record<string, string | undefined> =  {
-  //   "1": "https://etherscan.io/tx/", // Mainnet
-  //   "11155111": "https://sepolia.etherscan.io/tx/", // Sepolia
-  //   "137": "https://polygonscan.com/tx/", // Polygon Mainnet
-  //   "80001": "https://mumbai.polygonscan.com/tx/", // Polygon Testnet
-  //   "42161": "https://arbiscan.io/tx/", // Arbitrum One
-  // };
-
-   // network explorer
-   const networkExplorers :any=  {
+  // network explorer
+  const networkExplorers: any = {
     1: "https://etherscan.io/tx/", // Mainnet
-   11155111: "https://sepolia.etherscan.io/tx/", // Sepolia
+    11155111: "https://sepolia.etherscan.io/tx/", // Sepolia
     137: "https://polygonscan.com/tx/", // Polygon Mainnet
     80001: "https://mumbai.polygonscan.com/tx/", // Polygon Testnet
     42161: "https://arbiscan.io/tx/", // Arbitrum One
@@ -67,21 +60,18 @@ const CDEReward: React.FC<{
     if (typeof window.ethereum === "undefined") {
       throw new Error("Ethereum provider is not available");
     }
-  
+
     const ethersProvider = new ethers.BrowserProvider(walletProvider!);
     const network = await ethersProvider.getNetwork();
     const chainId = network.chainId.toString();
-  
+
     const baseExplorerUrl = networkExplorers[chainId];
-    console.log("baseExplorerUrl=========",baseExplorerUrl);
     if (!baseExplorerUrl) {
       throw new Error("Network explorer URL not configured for this chain");
     }
-  
+
     return `${baseExplorerUrl}${transactionHash}`;
   };
-  
-  
 
   useEffect(() => {
     // Mapping chainId to chain names
@@ -178,6 +168,8 @@ const CDEReward: React.FC<{
         console.log("Transaction sent:", tx);
         // Wait for the transaction to be confirmed
         await tx.wait();
+        // Trigger the balance update
+        setTriggerUpdate((prev) => !prev);
         console.log("Transaction confirmed:", tx.hash);
         // Explorer link
         const explorerLink = await getExplorerLink(tx.hash);
@@ -192,7 +184,7 @@ const CDEReward: React.FC<{
               rel="noopener noreferrer"
               style={{ color: "lightblue", textDecoration: "underline" }}
             >
-             Explorer
+              Explorer
             </a>
           </span>,
           {
@@ -233,8 +225,7 @@ const CDEReward: React.FC<{
           }
         );
         // toast.error(`Reason: ${error?.info?.error?.message || "An unknown error occurred"}`);
-      } 
-      else if (error?.receipt) {
+      } else if (error?.receipt) {
         const transactionHash = error.receipt?.hash;
         const explorerLink = await getExplorerLink(transactionHash);
 
@@ -260,13 +251,12 @@ const CDEReward: React.FC<{
             onClick: () => window.open(explorerLink, "_blank"),
           }
         );
-      } 
-      else {
+      } else {
         console.error(
-          "Error Purchasing Tokens,Please check the transaction details in the explorer."
+          "Error Purchasing Tokens."
         );
         toast.error(
-          "Error Purchasing Tokens,Please check the transaction details in the explorer."
+          "Error Purchasing Tokens,"
         );
       }
     } finally {

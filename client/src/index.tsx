@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { VanityProvider } from "./context/VanityContext";
+import { BalanceUpdateProvider } from "./context/BalanceUpdateContext";
 
 // Disable right-click globally
 document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -13,9 +14,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   // <React.StrictMode>
-    <VanityProvider>
+  <VanityProvider>
+    <BalanceUpdateProvider>
       <App />
-    </VanityProvider>
+    </BalanceUpdateProvider>
+  </VanityProvider>
   // </React.StrictMode>
 );
 

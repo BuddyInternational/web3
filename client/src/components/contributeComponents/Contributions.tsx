@@ -6,10 +6,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { toast } from "react-toastify";
-import { ethers } from "ethers";
 import {
   useWeb3ModalAccount,
-  useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../context/VanityContext";
 import {

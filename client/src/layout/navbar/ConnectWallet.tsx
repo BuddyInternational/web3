@@ -20,6 +20,7 @@ import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 import { ethers } from "ethers";
 import axios from "axios";
 import { saveAs } from "file-saver";
+import { useBalanceUpdate } from "../../context/BalanceUpdateContext";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -141,6 +142,7 @@ interface VanityData {
 export default function App() {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useWeb3ModalAccount();
+  const { resetBalances } = useBalanceUpdate();
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const { vanityAddress, setVanityAddress } = useVanityContext();
@@ -369,6 +371,7 @@ export default function App() {
                   {/* Download link */}
                   <Tooltip title="Download Vanity address csv" arrow>
                     <a
+                      href={`/#`}
                       onClick={() => setShowModal(true)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -437,6 +440,7 @@ export default function App() {
                   setVanityAddress(
                     "0x0000000000000000000000000000000000000000"
                   );
+                  resetBalances();
                   disconnect();
                 }}
                 sx={{

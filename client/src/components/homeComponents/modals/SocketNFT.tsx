@@ -10,7 +10,6 @@ import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { NFTData } from "../../../utils/Types";
 import ModalNFTCard from "../card/ModalNFTCard";
-import CardChainFilterMenus from "../card/CardChainFilterMenus";
 import { ethers } from "ethers";
 import { useWeb3ModalProvider } from "@web3modal/ethers/react";
 
@@ -37,16 +36,16 @@ const SocketNFT: React.FC<{
       }
     };
     getConnectedNetwork();
-  }, []);
+  });
 
-  // Get unique chains from NFTDetails
-  const uniqueChains: string[] = Array.from(
-    new Set(
-      NFTDetails.map((nft) => nft.chainName).filter(
-        (chain): chain is string => chain !== undefined
-      )
-    )
-  );
+  // // Get unique chains from NFTDetails
+  // const uniqueChains: string[] = Array.from(
+  //   new Set(
+  //     NFTDetails.map((nft) => nft.chainName).filter(
+  //       (chain): chain is string => chain !== undefined
+  //     )
+  //   )
+  // );
 
   // Filter NFTs based on selected chain
   // const filteredNFTDetails =
@@ -61,7 +60,6 @@ const SocketNFT: React.FC<{
       (selectedChain === "All" || nft.chainName === selectedChain)
   );
 
-  console.log("filteredNFTDetails============", filteredNFTDetails);
 
   return (
     <Modal open={open} onClose={onClose}>

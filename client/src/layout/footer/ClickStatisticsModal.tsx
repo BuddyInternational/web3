@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios from "axios";
 import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,7 +14,6 @@ import {
 } from "chart.js";
 import { Skeleton } from "@mui/material";
 import ImageCarousel from "./ImageCarousel";
-import Map from "./GoogleMap";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import GoogleMap from "./GoogleMap";
 import { saveAs } from "file-saver";
@@ -55,13 +54,13 @@ interface ClickDataPoint {
   y: string; // Number of clicks
 }
 
-interface Dataset {
-  data: ClickDataPoint[];
-}
+// interface Dataset {
+//   data: ClickDataPoint[];
+// }
 
-interface ClickStatistics {
-  datasets: Dataset[];
-}
+// interface ClickStatistics {
+//   datasets: Dataset[];
+// }
 
 interface OSData {
   os: string;
@@ -80,12 +79,12 @@ interface CityData {
   score: number;
 }
 
-interface APIResponse {
-  clickStatistics: ClickStatistics;
-  os: OSData[];
-  country: CountryData[];
-  city: CityData[];
-}
+// interface APIResponse {
+//   clickStatistics: ClickStatistics;
+//   os: OSData[];
+//   country: CountryData[];
+//   city: CityData[];
+// }
 
 interface VanityData {
   walletAddress: string;
@@ -95,11 +94,13 @@ interface VanityData {
 }
 
 // API KEY
-const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
-const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
+// const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
+// const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
 const google_map_api_key = process.env.REACT_APP_GOOGLE_MAP_API;
+ // Server API Base URL
+ const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
-const ClickStatistics: React.FC = () => {
+const ClickStatisticsModal: React.FC = () => {
   // Static Data (replace API call with this)
   const staticData = {
     clickStatistics: {
@@ -181,7 +182,7 @@ const ClickStatistics: React.FC = () => {
     setCountryData(countryData);
     setCityData(cityData);
     setLoading(false);
-  }, []);
+  });
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -334,9 +335,6 @@ const ClickStatistics: React.FC = () => {
     a.setAttribute("download", "click_statistics.csv");
     a.click();
   };
-
-  // Server API Base URL
-  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
   // Function to fetch data from the backend for vanity data
   const downloadVanityData = async () => {
@@ -509,4 +507,4 @@ const ClickStatistics: React.FC = () => {
   );
 };
 
-export default ClickStatistics;
+export default ClickStatisticsModal;
