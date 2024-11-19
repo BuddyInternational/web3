@@ -29,7 +29,6 @@ const CDEReward: React.FC<{
   onClose: () => void;
 }> = ({ open, onClose }) => {
   const { address, chainId } = useWeb3ModalAccount();
-  console.log("chainId========", chainId);
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
@@ -44,6 +43,45 @@ const CDEReward: React.FC<{
     selectedToken: "CDE", // Default token
     receiver: "walletAddress", // Default receiver
   });
+
+  // // network explorer
+  // const networkExplorers : Record<string, string | undefined> =  {
+  //   "1": "https://etherscan.io/tx/", // Mainnet
+  //   "11155111": "https://sepolia.etherscan.io/tx/", // Sepolia
+  //   "137": "https://polygonscan.com/tx/", // Polygon Mainnet
+  //   "80001": "https://mumbai.polygonscan.com/tx/", // Polygon Testnet
+  //   "42161": "https://arbiscan.io/tx/", // Arbitrum One
+  // };
+
+   // network explorer
+   const networkExplorers :any=  {
+    1: "https://etherscan.io/tx/", // Mainnet
+   11155111: "https://sepolia.etherscan.io/tx/", // Sepolia
+    137: "https://polygonscan.com/tx/", // Polygon Mainnet
+    80001: "https://mumbai.polygonscan.com/tx/", // Polygon Testnet
+    42161: "https://arbiscan.io/tx/", // Arbitrum One
+  };
+
+  // get ExplorerLink
+  const getExplorerLink = async (transactionHash: string) => {
+    if (typeof window.ethereum === "undefined") {
+      throw new Error("Ethereum provider is not available");
+    }
+  
+    const ethersProvider = new ethers.BrowserProvider(walletProvider!);
+    const network = await ethersProvider.getNetwork();
+    const chainId = network.chainId.toString();
+  
+    const baseExplorerUrl = networkExplorers[chainId];
+    console.log("baseExplorerUrl=========",baseExplorerUrl);
+    if (!baseExplorerUrl) {
+      throw new Error("Network explorer URL not configured for this chain");
+    }
+  
+    return `${baseExplorerUrl}${transactionHash}`;
+  };
+  
+  
 
   useEffect(() => {
     // Mapping chainId to chain names
@@ -142,19 +180,19 @@ const CDEReward: React.FC<{
         await tx.wait();
         console.log("Transaction confirmed:", tx.hash);
         // Explorer link
-        const explorerLink = `https://etherscan.io/tx/${tx.hash}`;
+        const explorerLink = await getExplorerLink(tx.hash);
 
         // Success toast with redirect link
         toast.success(
           <span>
-            Transaction sent! View on{" "}
+            Transaction Confirmed! View on{" "}
             <a
               href={explorerLink}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "lightblue", textDecoration: "underline" }}
             >
-              Etherscan
+             Explorer
             </a>
           </span>,
           {
@@ -168,66 +206,61 @@ const CDEReward: React.FC<{
         console.error("Revert reason:", error.reason);
         console.error("Revert reason message:", error?.info?.error?.message);
 
-        // const explorerLink = `https://etherscan.io/tx/${
-        //   error?.transaction?.hash || ""
-        // }`;
+        const explorerLink = await getExplorerLink(error?.transaction?.hash);
 
-        // // Failure toast with explorer link
-        // toast.error(
-        //   <span>
-        //     {`Reason: ${
-        //       error?.info?.error?.message || "An unknown error occurred."
-        //     } `}
-        //     {error?.transaction?.hash && (
-        //       <>
-        //         View on{" "}
-        //         <a
-        //           href={explorerLink}
-        //           target="_blank"
-        //           rel="noopener noreferrer"
-        //           style={{ color: "lightblue", textDecoration: "underline" }}
-        //         >
-        //           Etherscan
-        //         </a>
-        //       </>
-        //     )}
-        //   </span>,
-        //   {
-        //     onClick: () => window.open(explorerLink, "_blank"),
-        //   }
-        // );
-        toast.error(`Reason: ${error?.info?.error?.message || "An unknown error occurred"}`);
+        // Failure toast with explorer link
+        toast.error(
+          <span>
+            {`Reason: ${
+              error?.info?.error?.message || "An unknown error occurred."
+            } `}
+            {error?.transaction?.hash && (
+              <>
+                View on{" "}
+                <a
+                  href={explorerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "lightblue", textDecoration: "underline" }}
+                >
+                  Explorer
+                </a>
+              </>
+            )}
+          </span>,
+          {
+            onClick: () => window.open(explorerLink, "_blank"),
+          }
+        );
+        // toast.error(`Reason: ${error?.info?.error?.message || "An unknown error occurred"}`);
       } 
-      // else if (error?.receipt) {
-      //   // Handle errors with a receipt object
-      //   console.error("Transaction receipt:", error.receipt);
+      else if (error?.receipt) {
+        const transactionHash = error.receipt?.hash;
+        const explorerLink = await getExplorerLink(transactionHash);
 
-      //   const transactionHash = error.receipt?.hash;
-      //   const explorerLink = `https://etherscan.io/tx/${transactionHash || ""}`;
-
-      //   toast.error(
-      //     <span>
-      //       {`Error Purchasing Tokens. Please check the transaction details.`}
-      //       {transactionHash && (
-      //         <>
-      //           {" "}
-      //           View on{" "}
-      //           <a
-      //             href={explorerLink}
-      //             target="_blank"
-      //             rel="noopener noreferrer"
-      //             style={{ color: "lightblue", textDecoration: "underline" }}
-      //           >
-      //             Etherscan
-      //           </a>
-      //         </>
-      //       )}
-      //     </span>,
-      //     {
-      //       onClick: () => window.open(explorerLink, "_blank"),
-      //     }
-      //   );
-      // } 
+        toast.error(
+          <span>
+            {`Error Purchasing Tokens. Please check the transaction details.`}
+            {transactionHash && (
+              <>
+                {" "}
+                View on{" "}
+                <a
+                  href={explorerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "lightblue", textDecoration: "underline" }}
+                >
+                  Explorer
+                </a>
+              </>
+            )}
+          </span>,
+          {
+            onClick: () => window.open(explorerLink, "_blank"),
+          }
+        );
+      } 
       else {
         console.error(
           "Error Purchasing Tokens,Please check the transaction details in the explorer."
