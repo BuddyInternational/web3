@@ -113,7 +113,6 @@ const CDEReward: React.FC<{
       signer
     );
 
-    console.log("nftMarketContract============", nftMarketContract);
     setLoading(true);
     try {
       // Convert the price from Ether to Wei
@@ -129,32 +128,107 @@ const CDEReward: React.FC<{
         console.log("amountInWei-----------", Number(amountInWei));
 
         const tx = await nftMarketContract.transferEthAndGetTestCDEOrTestTIM(
-          amountInWei,
+          amountInEther,
           vanityAddress,
           tokenType,
           receiverType,
           {
             value: 0, // Pass the Ether amount
-            gasLimit: 800000,
+            gasLimit: 300000,
           }
         );
         console.log("Transaction sent:", tx);
         // Wait for the transaction to be confirmed
         await tx.wait();
         console.log("Transaction confirmed:", tx.hash);
+        // Explorer link
+        const explorerLink = `https://etherscan.io/tx/${tx.hash}`;
+
+        // Success toast with redirect link
+        toast.success(
+          <span>
+            Transaction sent! View on{" "}
+            <a
+              href={explorerLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "lightblue", textDecoration: "underline" }}
+            >
+              Etherscan
+            </a>
+          </span>,
+          {
+            onClick: () => window.open(explorerLink, "_blank"),
+          }
+        );
       }
     } catch (error: any) {
-      // console.error("Error from contract:", error);
-      // console.error("Transaction error:", error.reason);
       console.error("Error from contract:", error);
-      // if(error?.message){
-      //   console.error("Error message:", error.message.error.message);
-      //   toast.error("Error message:", error?.message);
-      // }
       if (error?.reason) {
         console.error("Revert reason:", error.reason);
-        toast.error("Revert reason:", error.reason);
-      } else {
+        console.error("Revert reason message:", error?.info?.error?.message);
+
+        // const explorerLink = `https://etherscan.io/tx/${
+        //   error?.transaction?.hash || ""
+        // }`;
+
+        // // Failure toast with explorer link
+        // toast.error(
+        //   <span>
+        //     {`Reason: ${
+        //       error?.info?.error?.message || "An unknown error occurred."
+        //     } `}
+        //     {error?.transaction?.hash && (
+        //       <>
+        //         View on{" "}
+        //         <a
+        //           href={explorerLink}
+        //           target="_blank"
+        //           rel="noopener noreferrer"
+        //           style={{ color: "lightblue", textDecoration: "underline" }}
+        //         >
+        //           Etherscan
+        //         </a>
+        //       </>
+        //     )}
+        //   </span>,
+        //   {
+        //     onClick: () => window.open(explorerLink, "_blank"),
+        //   }
+        // );
+        toast.error(`Reason: ${error?.info?.error?.message || "An unknown error occurred"}`);
+      } 
+      // else if (error?.receipt) {
+      //   // Handle errors with a receipt object
+      //   console.error("Transaction receipt:", error.receipt);
+
+      //   const transactionHash = error.receipt?.hash;
+      //   const explorerLink = `https://etherscan.io/tx/${transactionHash || ""}`;
+
+      //   toast.error(
+      //     <span>
+      //       {`Error Purchasing Tokens. Please check the transaction details.`}
+      //       {transactionHash && (
+      //         <>
+      //           {" "}
+      //           View on{" "}
+      //           <a
+      //             href={explorerLink}
+      //             target="_blank"
+      //             rel="noopener noreferrer"
+      //             style={{ color: "lightblue", textDecoration: "underline" }}
+      //           >
+      //             Etherscan
+      //           </a>
+      //         </>
+      //       )}
+      //     </span>,
+      //     {
+      //       onClick: () => window.open(explorerLink, "_blank"),
+      //     }
+      //   );
+      // } 
+      else {
         console.error(
           "Error Purchasing Tokens,Please check the transaction details in the explorer."
         );
