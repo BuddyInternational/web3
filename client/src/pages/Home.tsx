@@ -621,19 +621,19 @@ const Home = () => {
               to="/endorsee/quest"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Endorsee Quest Activity (*Beta Coming Soon)
+              Endorsee Quest Activity (Closed Beta Coming Soon)
             </Link>
             <Link
               to="/jotform2"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Daily Quest Activity (*Beta Coming Soon)
+              Daily Quest Activity (Closed Beta Coming Soon)
             </Link>
             <Link
               to="/sponsorship"
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Sponsorship/Endorsements (*Beta Coming Soon)
+              Sponsorship/Endorsements (Closed Beta Coming Soon)
             </Link>
             <Link
               to="/#"
@@ -653,7 +653,7 @@ const Home = () => {
               to={`/quest/completed/${address}`}
               className="hover:text-[#5692D9] cursor-pointer underline"
             >
-              Get Your Endorsee Quest Response
+              Get Your Endorsee Quest Response (Closed Beta Coming Soon)
             </Link>
             <Link
               to="/#"

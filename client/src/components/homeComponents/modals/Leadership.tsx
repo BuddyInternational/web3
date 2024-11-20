@@ -1,20 +1,86 @@
 import {
   Box,
+  Button,
+  Checkbox,
   DialogContent,
   DialogTitle,
   Fade,
+  FormControlLabel,
   IconButton,
   Modal,
   Typography,
 } from "@mui/material";
-import React from "react";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import { checkExistingVanityAddress, generateVanityWallet, storeVanityWallet } from "../../../api/vanityAPI";
+import { toast } from "react-toastify";
+
+
+// vanity address suffix
+const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
 
 const Leadership: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
+  const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isConnected, address } = useWeb3ModalAccount();
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
+  };
+
+  // const handleGenerateVanityAddress = async() => {
+  //   if (isConnected && address) {
+  //     // setIsLoading(true);
+  //       // Check if the wallet already has a vanity address
+  //       const existingAddress = await checkExistingVanityAddress(address);
+  //       console.log("existingAddress", existingAddress);
+
+  //       if (existingAddress != null) {
+  //         // setVanityAddress(existingAddress.vanityAddress);
+  //         // Generate a new vanity address
+  //         const generateResponse = await generateVanityWallet(
+  //           vanity_suffix!,
+  //           1
+  //         );
+  //         if (generateResponse?.data?.[0]?.address) {
+  //           const generatedAddress = generateResponse.data[0];
+  //           // // Store the generated address using the helper function
+  //           // const sender = address!;
+  //           // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+  //           //   generatedAddress.address || "N/A"
+  //           // }**.`;
+  //           // const notificationResult = await notifyGullyBuddy(sender, message);
+  //           // console.log("notificationResult", notificationResult);
+  //           // if (notificationResult && notificationResult.hash) {
+  //             await storeVanityWallet(
+  //               address,
+  //               generatedAddress.address,
+  //               generatedAddress.privKey
+  //             );
+  //             // setVanityAddress(generatedAddress.address);
+  //             toast.success("Generate Prestige Account Successfully!");
+  //           // } 
+  //           // else {
+  //             // setIsLoading(false);
+  //             // toast.error("Error sending notification and Generate vanity Address!");
+  //             // return;
+  //           // }
+  //         }
+  //         else {
+  //           setIsLoading(false);
+  //           toast.error("Error sending notification and Generate vanity Address!");
+  //           return;
+  //         }
+  //       }
+  //       setIsLoading(false);
+  //   }
+  // }
+
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -37,7 +103,7 @@ const Leadership: React.FC<{
             sx={{ m: 0, p: 2, textAlign: "center" }}
             id="customized-dialog-title"
           >
-           Liquidating Your Full Account Token NFT
+            Liquidating Your Full Account Token NFT
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -57,25 +123,31 @@ const Leadership: React.FC<{
             <Typography
               variant="body1"
               color="text.secondary"
-              sx={{ marginBottom: 2 }}
+              sx={{ marginBottom: 3 }}
             >
               To initiate the liquidation of your full account, you must provide
               the original developers with a complete snapshot of your account
-              history. This includes any items related to the collaboration,
-              such as:
+              history at the time of liquidation. This process will not take
+              long. Simply complete your request to join the waitlist, which
+              will be processed accordingly. These requests may coincide with
+              mass wallet payouts, which are conducted monthly or more
+              frequently. All items, including those related to your{" "}
+              <strong>Manager Role</strong> in collaboration with Web3 Gully
+              Buddy International, will be addressed as part of this process.
             </Typography>
             <Typography
               variant="body1"
               color="text.secondary"
-              sx={{ marginBottom: 2 }}
+              sx={{ marginBottom: 3 }}
             >
-              - NFTs
+              - Any of your <strong>"Gully Buddy International NFTs"</strong>,
+              including those in your personal wallet or those wrapped
               <br />
-              - Vested wrappers
+              - Your "Tokens that are currently wrapped at the time of request"
               <br />
-              - User-generated content participation rewards
+              - User generated content participation rewards
               <br />
-              - Client-wrapped vested items
+              - Your externally Wrapped NFTs
               <br />- Any items linked to your provided vanity address
             </Typography>
             <Typography
@@ -83,8 +155,19 @@ const Leadership: React.FC<{
               color="text.secondary"
               sx={{ marginBottom: 2 }}
             >
-              Once validated and approved by the organization, you will receive
-              the “manager” NFT, allowing you to manage your assets effectively.
+              a report is issued on the available Annotation Prestige for those
+              interested in the information.
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ marginBottom: 2 }}
+            >
+              Once your account request has been validated and approved by the
+              organization, your vanity will be listed on the marketplace. Your
+              account will enter hibernation mode, and funds will be made
+              available. You may resume your journey at any time, and the
+              marketplace will send the proceeds to your personal wallet.
             </Typography>
             <Typography
               variant="body1"
@@ -92,28 +175,42 @@ const Leadership: React.FC<{
               sx={{ marginBottom: 2 }}
             >
               Within four days, you will be able to claim an additional wallet,
-              enabling you to embark on this journey again. Now, you will have
-              more than one "vanity address" with the organization.
+              allowing you to resume your journey. You will now have more than
+              one "vanity address" associated with the organization.
             </Typography>
             <Typography
               variant="body1"
               color="text.secondary"
-              sx={{ marginBottom: 2 }}
+              sx={{ marginBottom: 3 }}
             >
-              <strong>Prestige NFTs</strong> are endorsements from the
-              organization’s partners and can be issued to you at any time based
-              on your citations at Gully Buddy International.
+              <strong>Prestige NFTs</strong> are based on endorsement agreements
+              for <strong>"Managers"</strong> of the Gully Buddy International organization’s
+              partners. They can be issued to you at any time based on
+              user-contributed and/or generated content, participation earnings,
+              or interactions with <strong>"Team Members"</strong> NFTs. These are distributed
+              daily or monthly and may be limited to special events, which can
+              vary.
             </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ marginTop: 2 }}
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
+                  color="primary"
+                />
+              }
+              sx={{ marginBottom: 3 }}
+              label="If you would like to proceed to liquidate items in prestige vanity by marketplace."
+            />
+
+            <Button
+              variant="contained"
+              color="primary"
+              // onClick={handleGenerateVanityAddress}
             >
-              Liquidate full account requires refresh token NFT{" "}
-              <Link to="/#" className="underline text-blue-400 ml-2">
-                click here
-              </Link>
-            </Typography>
+              Prestige Your Account Now
+            </Button>
           </DialogContent>
         </Box>
       </Fade>
