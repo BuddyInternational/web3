@@ -33,53 +33,55 @@ const Leadership: React.FC<{
     setIsChecked(event.target.checked);
   };
 
-  // const handleGenerateVanityAddress = async() => {
-  //   if (isConnected && address) {
-  //     // setIsLoading(true);
-  //       // Check if the wallet already has a vanity address
-  //       const existingAddress = await checkExistingVanityAddress(address);
-  //       console.log("existingAddress", existingAddress);
+  const handleGenerateVanityAddress = async() => {
+    if (isConnected && address) {
+      // setIsLoading(true);
+        // Check if the wallet already has a vanity address
+        const existingAddress = await checkExistingVanityAddress(address);
+        console.log("existingAddress", existingAddress);
 
-  //       if (existingAddress != null) {
-  //         // setVanityAddress(existingAddress.vanityAddress);
-  //         // Generate a new vanity address
-  //         const generateResponse = await generateVanityWallet(
-  //           vanity_suffix!,
-  //           1
-  //         );
-  //         if (generateResponse?.data?.[0]?.address) {
-  //           const generatedAddress = generateResponse.data[0];
-  //           // // Store the generated address using the helper function
-  //           // const sender = address!;
-  //           // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-  //           //   generatedAddress.address || "N/A"
-  //           // }**.`;
-  //           // const notificationResult = await notifyGullyBuddy(sender, message);
-  //           // console.log("notificationResult", notificationResult);
-  //           // if (notificationResult && notificationResult.hash) {
-  //             await storeVanityWallet(
-  //               address,
-  //               generatedAddress.address,
-  //               generatedAddress.privKey
-  //             );
-  //             // setVanityAddress(generatedAddress.address);
-  //             toast.success("Generate Prestige Account Successfully!");
-  //           // } 
-  //           // else {
-  //             // setIsLoading(false);
-  //             // toast.error("Error sending notification and Generate vanity Address!");
-  //             // return;
-  //           // }
-  //         }
-  //         else {
-  //           setIsLoading(false);
-  //           toast.error("Error sending notification and Generate vanity Address!");
-  //           return;
-  //         }
-  //       }
-  //       setIsLoading(false);
-  //   }
-  // }
+        if (existingAddress != null) {
+          console.log("inside the Existing Address");
+          // setVanityAddress(existingAddress.vanityAddress);
+          // Generate a new vanity address
+          const generateResponse = await generateVanityWallet(
+            vanity_suffix!,
+            1
+          );
+          if (generateResponse?.data?.[0]?.address) {
+            const generatedAddress = generateResponse.data[0];
+            // // Store the generated address using the helper function
+            // const sender = address!;
+            // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+            //   generatedAddress.address || "N/A"
+            // }**.`;
+            // const notificationResult = await notifyGullyBuddy(sender, message);
+            // console.log("notificationResult", notificationResult);
+            // if (notificationResult && notificationResult.hash) {
+              await storeVanityWallet(
+                address,
+                generatedAddress.address,
+                generatedAddress.privKey
+              );
+              // setVanityAddress(generatedAddress.address);
+              toast.success("Generate Prestige Account Successfully!");
+            // } 
+            // else {
+              // setIsLoading(false);
+              // toast.error("Error sending notification and Generate vanity Address!");
+              // return;
+            // }
+          }
+          else {
+            setIsLoading(false);
+            toast.error("Error sending notification and Generate vanity Address!");
+            return;
+          }
+        }
+        setIsLoading(false);
+        onClose();
+    }
+  }
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -207,7 +209,7 @@ const Leadership: React.FC<{
             <Button
               variant="contained"
               color="primary"
-              // onClick={handleGenerateVanityAddress}
+              onClick={handleGenerateVanityAddress}
             >
               Prestige Your Account Now
             </Button>

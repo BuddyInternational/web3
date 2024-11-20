@@ -1,12 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 
-// Define interfaces for the response types
-interface ExistingVanityResponse {
-  message: string;
-  vanityAddress: string;
-  vanityPrivateKey: string;
-}
-
 interface GenerateVanityResponse {
   data: string[];
   message: string;
@@ -16,14 +9,14 @@ interface GenerateVanityResponse {
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 // Function to check existing vanity address
-export const checkExistingVanityAddress = async (
-  walletAddress: string
-): Promise<ExistingVanityResponse | null> => {
+export const checkExistingVanityAddress = async (walletAddress: string) => {
   try {
-    const response: AxiosResponse<ExistingVanityResponse | null> =
-      await axios.get(`${server_api_base_url}/api/vanity/checkVanityAddress`, {
+    const response: any = await axios.get(
+      `${server_api_base_url}/api/vanity/checkVanityAddress`,
+      {
         params: { walletAddress },
-      });
+      }
+    );
     if (response) {
       return response.data;
     } else {

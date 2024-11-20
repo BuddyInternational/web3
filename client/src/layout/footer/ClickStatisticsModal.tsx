@@ -351,15 +351,28 @@ const ClickStatisticsModal: React.FC = () => {
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
 
-        // Filter data to exclude fields like _id and vanityPrivateKey
-        const filteredData = response.data.data.map(
+        // // Filter data to exclude fields like _id and vanityPrivateKey
+        // const filteredData = response.data.data.map(
+        //   (item: {
+        //     walletAddress: string;
+        //     vanityAddress: string;
+        //     createdAt: string;
+        //   }) => {
+        //     const { walletAddress, vanityAddress, createdAt } = item;
+        //     return { walletAddress, vanityAddress, createdAt };
+        //   }
+        // );
+
+         // Filter data to exclude fields like _id and vanityPrivateKey
+         const filteredData = response.data.data.map(
           (item: {
             walletAddress: string;
-            vanityAddress: string;
+            vanityDetails: { vanityAddress: string; vanityPrivateKey: string; }[];
             createdAt: string;
           }) => {
-            const { walletAddress, vanityAddress, createdAt } = item;
-            return { walletAddress, vanityAddress, createdAt };
+            const { walletAddress, vanityDetails, createdAt } = item;
+            const vanityAddresses = vanityDetails.map(detail => detail.vanityAddress);
+            return { walletAddress, vanityAddresses, createdAt };
           }
         );
 

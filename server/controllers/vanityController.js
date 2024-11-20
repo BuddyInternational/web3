@@ -38,15 +38,39 @@ export const generateAndStoreVanityAddress = async (req, res) => {
 
       results.push(wallet);
 
-      // Store each generated wallet's details in the database
-      const newAddress = new VanityData({
-        walletAddress,
-        vanityAddress: wallet.address,
-        vanityPrivateKey: wallet.privKey,
-        createdAt: new Date(),
-      });
-      console.log("newAddress-----------", newAddress);
-      await newAddress.save();
+      // // Store each generated wallet's details in the database
+      // const newAddress = new VanityData({
+      //   walletAddress,
+      //   vanityAddress: wallet.address,
+      //   vanityPrivateKey: wallet.privKey,
+      //   createdAt: new Date(),
+      // });
+      // console.log("newAddress-----------", newAddress);
+      // await newAddress.save();
+
+      // Find or create the vanity entry and add to the vanityDetails array
+      const newAddress = await VanityData.findOne({ walletAddress });
+
+      if (!newAddress) {
+        const newVanityData = new VanityData({
+          walletAddress,
+          vanityDetails: [
+            {
+              vanityAddress: wallet.address,
+              vanityPrivateKey: wallet.privKey,
+            },
+          ],
+          createdAt: new Date(),
+        });
+        await newVanityData.save();
+      } else {
+        // If entry exists, push the new vanity address into the array
+        newAddress.vanityDetails.push({
+          vanityAddress: wallet.address,
+          vanityPrivateKey: wallet.privKey,
+        });
+        await newAddress.save();
+      }
 
       walletsFound++;
     }
@@ -82,7 +106,12 @@ export const generateVanityWallet = async (req, res) => {
     };
 
     while (walletsFound < count) {
-      const wallet = VanityEth.getVanityWallet(suffix, isChecksum, isContract, counter);
+      const wallet = VanityEth.getVanityWallet(
+        suffix,
+        isChecksum,
+        isContract,
+        counter
+      );
       results.push(wallet);
       walletsFound++;
     }
@@ -103,17 +132,44 @@ export const storeVanityWallet = async (req, res) => {
   const { walletAddress, vanityAddress, vanityPrivateKey } = req.body;
 
   try {
-    // Create and save the new vanity wallet record in the database
-    const newAddress = new VanityData({
-      walletAddress,
-      vanityAddress,
-      vanityPrivateKey,
-      createdAt: new Date(),
-    });
+    // // Create and save the new vanity wallet record in the database
+    // const newAddress = new VanityData({
+    //   walletAddress,
+    //   vanityAddress,
+    //   vanityPrivateKey,
+    //   createdAt: new Date(),
+    // });
 
-    await newAddress.save();
+    // await newAddress.save();
+    // console.log("Stored new vanity address:", newAddress);
+
+    // Find or create the vanity address entry in the database
+    let newAddress = await VanityData.findOne({ walletAddress });
+
+    if (!newAddress) {
+      // If wallet address is not found, create a new record
+      newAddress = new VanityData({
+        walletAddress,
+        vanityDetails: [
+          {
+            vanityAddress,
+            vanityPrivateKey,
+          },
+        ],
+        createdAt: new Date(),
+      });
+      await newAddress.save();
+    } else {
+      // If wallet address exists, just add the new vanity address
+      newAddress.vanityDetails.push({
+        vanityAddress,
+        vanityPrivateKey,
+      });
+      await newAddress.save();
+    }
+
     console.log("Stored new vanity address:", newAddress);
-    
+
     res.status(200).json({
       message: "Vanity wallet stored successfully",
       data: newAddress,
@@ -126,23 +182,25 @@ export const storeVanityWallet = async (req, res) => {
   }
 };
 
-// Download if vanity data exists 
+// Download if vanity data exists
 export const downloadVanityAddress = async (req, res) => {
   try {
-    const data = await VanityData.find();  
-    if (data && data.length > 0) { 
+    const data = await VanityData.find();
+    if (data && data.length > 0) {
       console.log("Data found-----", data);
       return res.status(200).json({
         message: "Vanity data found",
-        data: data,  
+        data: data,
       });
     } else {
       return res.status(404).json({ message: "Vanity data not found" });
     }
   } catch (e) {
-    res.status(500).json({ message: "Error fetching vanity data", error: e.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching vanity data", error: e.message });
   }
-}
+};
 
 // Check if a vanity address exists for a given wallet address
 export const checkExistingVanityAddress = async (req, res) => {
@@ -154,8 +212,9 @@ export const checkExistingVanityAddress = async (req, res) => {
       console.log("address found----------", existingEntry);
       return res.status(200).json({
         message: "Vanity address found",
-        vanityAddress: existingEntry.vanityAddress,
-        vanityPrivateKey: existingEntry.vanityPrivateKey,
+        // vanityAddress: existingEntry.vanityAddress,
+        // vanityPrivateKey: existingEntry.vanityPrivateKey,
+        vanityDetails: existingEntry.vanityDetails,
       });
     } else {
       return res
@@ -170,11 +229,11 @@ export const checkExistingVanityAddress = async (req, res) => {
 };
 
 // Track dowanload vanity data dowanload
-export const trackDownload= async( req, res)=> {
+export const trackDownload = async (req, res) => {
   const { vanityAddress } = req.body;
 
   if (!vanityAddress) {
-    return res.status(400).json({ error: 'Vanity address is required' });
+    return res.status(400).json({ error: "Vanity address is required" });
   }
 
   try {
@@ -196,18 +255,17 @@ export const trackDownload= async( req, res)=> {
     await totalCallCounter.save();
 
     res.json({
-      message: 'Call tracked successfully',
+      message: "Call tracked successfully",
       log,
       totalCallCount: totalCallCounter.count,
     });
   } catch (error) {
-    console.error('Error tracking call:', error);
-    res.status(500).json({ error: 'Failed to track the call' });
+    console.error("Error tracking call:", error);
+    res.status(500).json({ error: "Failed to track the call" });
   }
-}
+};
 
-export const VanityCallcount= async( req, res)=>{
-
+export const VanityCallcount = async (req, res) => {
   try {
     // Aggregate the total call count by summing the callCount field across all documents in VanityCallLog
     const result = await VanityCallLogData.aggregate([
@@ -224,8 +282,8 @@ export const VanityCallcount= async( req, res)=>{
 
     res.json({ totalCallCount });
   } catch (error) {
-    console.error('Error fetching total call count:', error);
-    res.status(500).json({ error: 'Failed to retrieve total call count' });
+    console.error("Error fetching total call count:", error);
+    res.status(500).json({ error: "Failed to retrieve total call count" });
   }
 
   // try {
@@ -241,5 +299,4 @@ export const VanityCallcount= async( req, res)=>{
   //   console.error('Error fetching total call count:', error);
   //   res.status(500).json({ error: 'Failed to retrieve total call count' });
   // }
-}
-
+};

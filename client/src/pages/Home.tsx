@@ -31,6 +31,7 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useBalanceUpdate } from "../context/BalanceUpdateContext";
+import axios from "axios";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -78,6 +79,8 @@ const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 const ApiKey = process.env.REACT_APP_OPENSEA_API_KEY;
 // const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
+// Server API Base URL
+const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 interface NFT {
   asset_contract: {
@@ -111,7 +114,7 @@ interface CountdownRendererProps {
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
-  const { triggerUpdate ,resetBalances} = useBalanceUpdate();
+  const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const [balances, setBalances] = useState<any>({
     wallet: [],
     vanity: [],
@@ -135,17 +138,57 @@ const Home = () => {
     string | null
   >(null);
   const [nftSocketed, setNftSocketed] = useState(false);
-  const { vanityAddress } = useVanityContext();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const { vanityAddress, setVanityAddress } = useVanityContext();
   const [value, setValue] = React.useState(0);
-  const isDropdownOpen = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // const isDropdownOpen = Boolean(anchorEl);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const targetDate = new Date("2024-12-31T23:59:59");
+  const [vanityAddresses, setVanityAddresses] = useState([]);
 
-  const handleDropdownToggle = (event: any) => {
+  const handleDropdownToggle = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    setIsDropdownOpen((prev) => !prev);
   };
 
+  const handleAddressSelect = (address: string) => {
+    setVanityAddress(address);
+    setIsDropdownOpen(false); // Close the dropdown after selection
+    setAnchorEl(null);
+  };
+
+  // fetch the vanity Address list
+  useEffect(() => {
+    const fetchVanityAddresses = async () => {
+      if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `${server_api_base_url}/api/vanity/downloadVanityAddress`
+        );
+        // Extract the vanityAddresses from the response
+        if (response.data && response.data.data && response.data.data[0]) {
+          const vanityDetails = response.data.data[0].vanityDetails;
+          const vanityAddresses = vanityDetails.map(
+            (detail: any) => detail.vanityAddress
+          );
+          setVanityAddresses(vanityAddresses); 
+          console.log("Extracted Vanity Addresses:", vanityAddresses);
+        } else {
+          console.error("Invalid API response structure", response.data);
+          setVanityAddresses([]); 
+        }
+      } catch (err) {
+        console.error("Error fetching vanity addresses:", err);
+      }
+    };
+
+    fetchVanityAddresses();
+  }, [vanityAddress]);
+
   const handleClose = () => {
+    setIsDropdownOpen(false);
     setAnchorEl(null);
   };
 
@@ -169,7 +212,12 @@ const Home = () => {
   // Fetch connected user wallet token balance
   const fetchTokenBalance = useCallback(async () => {
     try {
-      if (!isConnected || !address || !vanityAddress || vanityAddress === "0x0000000000000000000000000000000000000000") {
+      if (
+        !isConnected ||
+        !address ||
+        !vanityAddress ||
+        vanityAddress === "0x0000000000000000000000000000000000000000"
+      ) {
         resetBalances();
         setBalances({
           wallet: [],
@@ -251,7 +299,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [isConnected, address, vanityAddress,resetBalances]);
+  }, [isConnected, address, vanityAddress, resetBalances]);
 
   // Function to fetch Gullybuddy specific NFTs
   const fetchGullyBuddyNFTs = useCallback(async () => {
@@ -430,11 +478,11 @@ const Home = () => {
 
   //fetch Token Balance
   useEffect(() => {
-      fetchTokenBalance();
+    fetchTokenBalance();
   }, [triggerUpdate, fetchTokenBalance]);
 
-   // Reset balances when triggerUpdate is true
-   useEffect(() => {
+  // Reset balances when triggerUpdate is true
+  useEffect(() => {
     if (triggerUpdate) {
       setBalances({
         wallet: [],
@@ -444,7 +492,6 @@ const Home = () => {
       setTestTIMBalance(0);
     }
   }, [triggerUpdate]);
-
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
@@ -546,6 +593,7 @@ const Home = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
   return (
     <>
       {/* second Navbar */}
@@ -695,6 +743,7 @@ const Home = () => {
             <span className="text-blue-400 mr-2">Total Value :</span>{" "}
             <span>{calculateTotalNFTValue()} USD</span>
           </div>
+          {/* Wallet Balance */}
           <div className="flex flex-col gap-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
               <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 items-center sm:justify-center md:justify-start">
@@ -725,7 +774,7 @@ const Home = () => {
               );
             })}
           </div>
-
+          {/* Vanity Balance */}
           <div className="flex flex-col gap-2 mt-2">
             <div className="md:mb-0 lg:mb-2 flex flex-col">
               <span className="md:text-sm lg:text-md font-sans text-blue-400 font-bold flex gap-3 sm:justify-center md:justify-start items-center">
@@ -771,15 +820,27 @@ const Home = () => {
                 </Tooltip>
 
                 {/* Dropdown Toggle Button */}
-                <IconButton
-                  aria-label="more"
-                  aria-controls={isDropdownOpen ? "long-menu" : undefined}
-                  aria-haspopup="true"
-                  onClick={handleDropdownToggle}
-                  className="text-[#5692D9] mt-1 cursor-pointer"
-                >
-                  <IoMdArrowDropdown />
-                </IconButton>
+                <Tooltip title="Select Vanity Address">
+                  <IconButton
+                    aria-label="more"
+                    // size="medium"
+                    aria-expanded={isDropdownOpen ? "true" : undefined}
+                    aria-controls={isDropdownOpen ? "long-menu" : undefined}
+                    aria-haspopup="true"
+                    onClick={handleDropdownToggle}
+                    sx={{
+                      color: "#5692D9",
+                      "&:hover": {
+                        color: "#4682B4",
+                      },
+                      fontSize: "1.5rem",
+                      marginTop: "0.4rem",
+                    }}
+                    className="mt-1.5 cursor-pointer"
+                  >
+                    <IoMdArrowDropdown />
+                  </IconButton>
+                </Tooltip>
               </span>
 
               {/* Material-UI Dropdown */}
@@ -790,24 +851,52 @@ const Home = () => {
                 onClose={handleClose}
                 slotProps={{
                   paper: {
-                    style: {
-                      maxHeight: 200,
-                      width: "20ch",
-                      marginTop: "8px",
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      mt: 1.5,
+                      "& .MuiAvatar-root": {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1,
+                      },
+                      "&::before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "translateY(-50%) rotate(45deg)",
+                        zIndex: 0,
+                      },
                     },
                   },
                 }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                {/* {vanityAddresses.map((address) => (
-          <MenuItem
-            key={address}
-            onClick={() => handleAddressSelect(address)}
-          >
-            {address}
-          </MenuItem>
-        ))} */}
+                {/* Check if vanityAddresses is empty */}
+                {vanityAddress && vanityAddresses.length > 0 ? (
+                  vanityAddresses?.map((address:any) => (
+                    <MenuItem
+                      key={address}
+                      onClick={() => handleAddressSelect(address)}
+                    >
+                      {`${address.slice(0, 10)}...${address.slice(-7)}`} 
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>
+                    Wallet not connected. Please connect wallet first.
+                  </MenuItem>
+                )}
                 {/* Disabled option */}
-                <MenuItem disabled>Prestige this Account</MenuItem>
+                {/* <MenuItem disabled>Prestige this Account</MenuItem> */}
               </Menu>
 
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />

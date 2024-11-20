@@ -130,6 +130,8 @@ createWeb3Modal({
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
+  // Server API Base URL
+  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 // 6. Interface to get vanity details
 interface VanityData {
@@ -151,9 +153,6 @@ export default function App() {
   const { walletProvider } = useWeb3ModalProvider();
   const [showModal, setShowModal] = useState(false);
 
-  // Server API Base URL
-  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-  // const Track_Download_url: any = process.env.REACT_APP_TRACK_DOWNLOAD;
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
     setShowModal(false);
@@ -168,6 +167,8 @@ export default function App() {
       const response = await axios.get(
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
+
+      console.log("response--------------",response);
 
       const responseCountLog = await axios.post(
         `${server_api_base_url}/proxyVanityDataDownload`,
@@ -188,15 +189,28 @@ export default function App() {
       if (response.data.data && Array.isArray(response.data.data)) {
         console.log("Setting data", response.data.data);
 
+        // // Filter data to exclude fields like _id and vanityPrivateKey
+        // const filteredData = response.data.data.map(
+        //   (item: {
+        //     walletAddress: string;
+        //     vanityAddress: string;
+        //     createdAt: string;
+        //   }) => {
+        //     const { walletAddress, vanityAddress, createdAt } = item;
+        //     return { walletAddress, vanityAddress, createdAt };
+        //   }
+        // );
+
         // Filter data to exclude fields like _id and vanityPrivateKey
         const filteredData = response.data.data.map(
           (item: {
             walletAddress: string;
-            vanityAddress: string;
+            vanityDetails: { vanityAddress: string; vanityPrivateKey: string; }[];
             createdAt: string;
           }) => {
-            const { walletAddress, vanityAddress, createdAt } = item;
-            return { walletAddress, vanityAddress, createdAt };
+            const { walletAddress, vanityDetails, createdAt } = item;
+            const vanityAddresses = vanityDetails.map(detail => detail.vanityAddress);
+            return { walletAddress, vanityAddresses, createdAt };
           }
         );
 
@@ -250,7 +264,8 @@ export default function App() {
         console.log("existingAddress", existingAddress);
 
         if (existingAddress != null) {
-          setVanityAddress(existingAddress.vanityAddress);
+          // setVanityAddress(existingAddress.vanityAddress);
+          setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
         } else {
           // Generate a new vanity address
           const generateResponse = await generateVanityWallet(
@@ -259,7 +274,7 @@ export default function App() {
           );
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
-            // Store the generated address using the helper function
+            // // Store the generated address using the helper function
             const sender = address!;
             const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
               generatedAddress.address || "N/A"
@@ -281,6 +296,11 @@ export default function App() {
               return;
             }
           }
+          // else {
+          //   setIsLoading(false);
+          //   toast.error("Error sending notification and Generate vanity Address!");
+          //   return;
+          // }
         }
         setIsLoading(false);
       }
@@ -371,7 +391,7 @@ export default function App() {
                   {/* Download link */}
                   <Tooltip title="Download Vanity address csv" arrow>
                     <a
-                      href={`/#`}
+                      // href={`/#`}
                       onClick={() => setShowModal(true)}
                       target="_blank"
                       rel="noopener noreferrer"
