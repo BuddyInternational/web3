@@ -10,81 +10,134 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import {
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from "@web3modal/ethers/react";
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { Link } from "react-router-dom";
-import { checkExistingVanityAddress, generateVanityWallet, storeVanityWallet } from "../../../api/vanityAPI";
+import {
+  checkExistingVanityAddress,
+  generateVanityWallet,
+  storeVanityWallet,
+} from "../../../api/vanityAPI";
 import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
-
+import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import { ethers } from "ethers";
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
+const nftMarketContractAddress: string | undefined =
+  process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
+const ANTTokenAmount = process.env.REACT_APP_ANNOTATION_TOKEN_TRANSFER_AMOUNT;
 
 const Leadership: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
   const [isChecked, setIsChecked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const { isConnected, address } = useWeb3ModalAccount();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
+  const { walletProvider } = useWeb3ModalProvider();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
   };
 
-  const handleGenerateVanityAddress = async() => {
+  const handleGenerateVanityAddress = async () => {
     if (isConnected && address) {
       // setIsLoading(true);
-        // Check if the wallet already has a vanity address
-        const existingAddress = await checkExistingVanityAddress(address);
-        console.log("existingAddress", existingAddress);
+      // Check if the wallet already has a vanity address
+      const existingAddress = await checkExistingVanityAddress(address);
+      console.log("existingAddress", existingAddress);
 
-        if (existingAddress != null) {
-          console.log("inside the Existing Address");
-          // setVanityAddress(existingAddress.vanityAddress);
-          // Generate a new vanity address
-          const generateResponse = await generateVanityWallet(
-            vanity_suffix!,
-            1
+      if (existingAddress != null) {
+        console.log("inside the Existing Address");
+        // setVanityAddress(existingAddress.vanityAddress);
+        // Generate a new vanity address
+        const generateResponse = await generateVanityWallet(vanity_suffix!, 1);
+        if (generateResponse?.data?.[0]?.address) {
+          const generatedAddress = generateResponse.data[0];
+          // Store the generated address using the helper function
+          const sender = address!;
+          const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+            generatedAddress.address || "N/A"
+          }**.`;
+          const feesAmount = 10;
+          const vanityAccountType = "Prestige";
+          const notificationResult = await notifyGullyBuddy(
+            sender,
+            message,
+            feesAmount
           );
-          if (generateResponse?.data?.[0]?.address) {
-            const generatedAddress = generateResponse.data[0];
-            // Store the generated address using the helper function
-            const sender = address!;
-            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-              generatedAddress.address || "N/A"
-            }**.`;
-            const feesAmount = 10;
-            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
-            console.log("notificationResult", notificationResult);
-            if (notificationResult && notificationResult.hash) {
-              await storeVanityWallet(
-                address,
-                generatedAddress.address,
-                generatedAddress.privKey
+          console.log("notificationResult", notificationResult);
+          if (notificationResult && notificationResult.hash) {
+            await storeVanityWallet(
+              address,
+              generatedAddress.address,
+              generatedAddress.privKey,
+              vanityAccountType
+            );
+            // setVanityAddress(generatedAddress.address);
+            // toast.success("Generate Prestige Account Successfully!");
+            console.log("Generate Prestige Account Successfully!");
+
+            // Transfer Annotation Token to the new Vanity Address
+            const ethersProvider = new ethers.BrowserProvider(
+              walletProvider as ethers.Eip1193Provider
+            );
+            const signer = await ethersProvider.getSigner();
+            const nftMarketContract = new ethers.Contract(
+              nftMarketContractAddress!,
+              nftMarketAbi.abi,
+              signer
+            );
+
+            try {
+              // Transfer Annotation Token to prestige Account
+              const transferToken =
+                await nftMarketContract.transferANTTokenToPrestige(
+                  generatedAddress.address,
+                  ANTTokenAmount
+                );
+              console.log("Transaction sent:", transferToken);
+              // Wait for the transaction to be confirmed
+              await transferToken.wait();
+              console.log("Transaction confirmed:", transferToken.hash);
+              toast.success(
+                "Transfer Annotation Token to Prestige Account Successfully!"
               );
-              // setVanityAddress(generatedAddress.address);
-              toast.success("Generate Prestige Account Successfully!");
-            } 
-            else {
-              setIsLoading(false);
-              toast.error("Error sending notification and Generate vanity Address!");
-              return;
+            } catch (error: any) {
+              console.error(
+                "Error in Transfering Annotation Token to Prestige Account:",
+                error
+              );
+              toast.error(
+                "Error in Transfering Annotation Token to Prestige Account"
+              );
             }
+          } else {
+            // setIsLoading(false);
+            toast.error(
+              "Error sending notification and Generate vanity Address!"
+            );
+            return;
           }
-          // else {
-          //   setIsLoading(false);
-          //   toast.error("Error sending notification and Generate vanity Address!");
-          //   return;
-          // }
         }
-        setIsLoading(false);
-        onClose();
+        //  else {
+        //   setIsLoading(false);
+        //   toast.error(
+        //     "Error sending notification and Generate vanity Address!"
+        //   );
+        //   return;
+        // }
+      }
+      // setIsLoading(false);
+      onClose();
     }
-  }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -189,12 +242,12 @@ const Leadership: React.FC<{
               sx={{ marginBottom: 3 }}
             >
               <strong>Prestige NFTs</strong> are based on endorsement agreements
-              for <strong>"Managers"</strong> of the Gully Buddy International organization’s
-              partners. They can be issued to you at any time based on
-              user-contributed and/or generated content, participation earnings,
-              or interactions with <strong>"Team Members"</strong> NFTs. These are distributed
-              daily or monthly and may be limited to special events, which can
-              vary.
+              for <strong>"Managers"</strong> of the Gully Buddy International
+              organization’s partners. They can be issued to you at any time
+              based on user-contributed and/or generated content, participation
+              earnings, or interactions with <strong>"Team Members"</strong>{" "}
+              NFTs. These are distributed daily or monthly and may be limited to
+              special events, which can vary.
             </Typography>
 
             <FormControlLabel

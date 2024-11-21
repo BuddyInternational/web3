@@ -81,7 +81,8 @@ interface StoreVanityResponse {
 export const storeVanityWallet = async (
   walletAddress: string,
   vanityAddress: string,
-  vanityPrivateKey: string
+  vanityPrivateKey: string,
+  vanityAccountType: string,
 ): Promise<StoreVanityResponse | null> => {
   try {
     const response: AxiosResponse<StoreVanityResponse> = await axios.post(
@@ -90,6 +91,7 @@ export const storeVanityWallet = async (
         walletAddress,
         vanityAddress,
         vanityPrivateKey,
+        vanityAccountType,
       }
     );
     return response.data;

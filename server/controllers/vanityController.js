@@ -129,7 +129,7 @@ export const generateVanityWallet = async (req, res) => {
 };
 
 export const storeVanityWallet = async (req, res) => {
-  const { walletAddress, vanityAddress, vanityPrivateKey } = req.body;
+  const { walletAddress, vanityAddress, vanityPrivateKey ,vanityAccountType} = req.body;
 
   try {
     // // Create and save the new vanity wallet record in the database
@@ -154,6 +154,7 @@ export const storeVanityWallet = async (req, res) => {
           {
             vanityAddress,
             vanityPrivateKey,
+            vanityAccountType,
           },
         ],
         createdAt: new Date(),
@@ -164,6 +165,7 @@ export const storeVanityWallet = async (req, res) => {
       newAddress.vanityDetails.push({
         vanityAddress,
         vanityPrivateKey,
+        vanityAccountType,
       });
       await newAddress.save();
     }

@@ -2,7 +2,8 @@ require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
 console.log("process.env.SEPOLIA_RPC_URL----------------",process.env.SEPOLIA_RPC_URL);
-console.log("process.env.NFT_MARKET_PRIVATE_KEY---------------",process.env.NFT_MARKET_PRIVATE_KEY);
+console.log("TOKEN_CONTRACT_PRIVATE_KEY_SEPOLIA---------------",process.env.TOKEN_CONTRACT_PRIVATE_KEY_SEPOLIA);
+console.log("NFT_MARKET_CONTRACT_PRIVATE_KEY_SEPOLIA---------------",process.env.NFT_MARKET_CONTRACT_PRIVATE_KEY_SEPOLIA);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -15,7 +16,7 @@ module.exports = {
     },
     sepolia:{
       url:process.env.SEPOLIA_RPC_URL,
-      accounts:[process.env.NFT_MARKET_PRIVATE_KEY_SEPOLIA]
+      accounts:[process.env.NFT_MARKET_CONTRACT_PRIVATE_KEY_SEPOLIA]
     },
     polygon:{
       url:process.env.POLYGON_RPC_URL,

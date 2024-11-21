@@ -72,6 +72,8 @@ const TestCDEAddress: any =
   process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS;
 const TestTIMAddress: any =
   process.env.REACT_APP_TESTTIM_TOKEN_CONTRACT_ADDRESS;
+const TestANTAddress: any =
+  process.env.REACT_APP_TESTANT_TOKEN_CONTRACT_ADDRESS;
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
@@ -122,6 +124,7 @@ const Home = () => {
 
   const [testCDEBalance, setTestCDEBalance] = useState(0);
   const [testTIMBalance, setTestTIMBalance] = useState(0);
+  const [testANTBalance, setTestANTBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [NFTdata2, setNFTdata2] = useState<NFTDetails[]>([]);
   const [NFTdata3, setNFTdata3] = useState<NFTDetails[]>([]);
@@ -170,14 +173,16 @@ const Home = () => {
         // Extract the vanityAddresses from the response
         if (response.data && response.data.data && response.data.data[0]) {
           const vanityDetails = response.data.data[0].vanityDetails;
-          const vanityAddresses = vanityDetails.map(
-            (detail: any) => detail.vanityAddress
-          );
-          setVanityAddresses(vanityAddresses); 
+          // Map each detail to include both vanityAddress and accountType
+          const vanityAddresses = vanityDetails.map((detail: any) => ({
+            vanityAddress: detail.vanityAddress,
+            vanityAccountType: detail.vanityAccountType,
+          }));
+          setVanityAddresses(vanityAddresses);
           console.log("Extracted Vanity Addresses:", vanityAddresses);
         } else {
           console.error("Invalid API response structure", response.data);
-          setVanityAddresses([]); 
+          setVanityAddresses([]);
         }
       } catch (err) {
         console.error("Error fetching vanity addresses:", err);
@@ -225,6 +230,7 @@ const Home = () => {
         });
         setTestCDEBalance(0);
         setTestTIMBalance(0);
+        setTestANTBalance(0);
         return;
       }
 
@@ -241,6 +247,11 @@ const Home = () => {
       );
       const testTIMTokenContract = new Contract(
         TestTIMAddress,
+        testTokenAbi.abi,
+        testTokenProvider
+      );
+      const testANTTokenContract = new Contract(
+        TestANTAddress,
         testTokenAbi.abi,
         testTokenProvider
       );
@@ -288,14 +299,22 @@ const Home = () => {
         Web3.utils.fromWei(testTIMTokenBalance, "ether")
       ).toFixed(4);
 
-      // set all token Balance
+      // ***********************  Test ANT address balance  *********************************
+      const testANTTokenBalance = await testANTTokenContract.balanceOf(
+        vanityAddress
+      );
+      const formattedTestANTBalance = Number(
+        Web3.utils.fromWei(testANTTokenBalance, "ether")
+      ).toFixed(4);
 
+      // set all token Balance
       setBalances({
         wallet: formattedWalletBalances,
         vanity: formattedVanityBalances,
       });
       setTestCDEBalance(Number(formattedTestCDEBalance));
       setTestTIMBalance(Number(formattedTestTIMBalance));
+      setTestANTBalance(Number(formattedTestANTBalance));
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
@@ -594,6 +613,8 @@ const Home = () => {
     setValue(newValue);
   };
 
+  console.log("vanityAddresse-------------------", vanityAddress);
+
   return (
     <>
       {/* second Navbar */}
@@ -882,12 +903,24 @@ const Home = () => {
               >
                 {/* Check if vanityAddresses is empty */}
                 {vanityAddress && vanityAddresses.length > 0 ? (
-                  vanityAddresses?.map((address:any) => (
+                  vanityAddresses?.map((vanityData: any) => (
                     <MenuItem
-                      key={address}
-                      onClick={() => handleAddressSelect(address)}
+                      key={vanityData.vanityAddress}
+                      onClick={() =>
+                        handleAddressSelect(vanityData.vanityAddress)
+                      }
                     >
-                      {`${address.slice(0, 10)}...${address.slice(-7)}`} 
+                      {/* Vanity Address and Type */}
+                      <div className="text-sm text-gray-800 flex gap-2">
+                        <p>
+                          {" "}
+                          {`${vanityData.vanityAddress.slice(
+                            0,
+                            10
+                          )}...${vanityData.vanityAddress.slice(-7)}`}
+                        </p>
+                        <p>({vanityData.vanityAccountType})</p>
+                      </div>
                     </MenuItem>
                   ))
                 ) : (
@@ -895,14 +928,12 @@ const Home = () => {
                     Wallet not connected. Please connect wallet first.
                   </MenuItem>
                 )}
-                {/* Disabled option */}
-                {/* <MenuItem disabled>Prestige this Account</MenuItem> */}
               </Menu>
 
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
 
-            {/* Loop through tokenDetails for vanity address */}
+            {/* Loop through tokenDetails for vanity address
             {Object.keys(tokenDetails).map((tokenAddress, idx) => {
               const vanityToken = balances.vanity.find(
                 (token: any) => tokenAddress === token.address
@@ -935,7 +966,70 @@ const Home = () => {
                 Test TIM Token Balance:
               </span>{" "}
               <span>{testTIMBalance} TTIM</span>
-            </div>
+            </div> */}
+
+            {/* Determine Selected Vanity Address's Type */}
+            {(() => {
+              const selectedVanity:any = vanityAddresses.find(
+                (item: any) => item.vanityAddress === vanityAddress
+              );
+
+              console.log("selectedVanity=============",selectedVanity);
+              const vanityAccountType = selectedVanity?.vanityAccountType || "unknown";
+
+              if (vanityAccountType === "Prestige") {
+                // Show only ANT Token Balance
+                return (
+                  <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+                    <span className="text-[#5692D9] mr-2">
+                      ANT Token Balance:
+                    </span>
+                    <span>{testANTBalance} TANT</span>
+                  </div>
+                );
+              } else  {
+                // Show all balances
+                return (
+                  <>
+                    {Object.keys(tokenDetails).map((tokenAddress, idx) => {
+                      const vanityToken = balances.vanity.find(
+                        (token: any) => tokenAddress === token.address
+                      );
+                      const vanityBalance = vanityToken
+                        ? vanityToken.balance
+                        : "0";
+
+                      return (
+                        <div
+                          key={idx}
+                          className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                        >
+                          <span className="text-[#5692D9] mr-2 flex gap-1">
+                            <p>{tokenDetails[tokenAddress].name}</p>
+                            <p>Token Balance:</p>
+                          </span>
+                          <span>
+                            {vanityBalance} {tokenDetails[tokenAddress].symbol}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+                      <span className="text-[#5692D9] mr-2">
+                        Test CDE Token Balance:
+                      </span>
+                      <span>{testCDEBalance} TCDE</span>
+                    </div>
+                    <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+                      <span className="text-[#5692D9] mr-2">
+                        Test TIM Token Balance:
+                      </span>
+                      <span>{testTIMBalance} TTIM</span>
+                    </div>
+                  </>
+                );
+              } 
+            })()}
           </div>
         </div>
       </div>

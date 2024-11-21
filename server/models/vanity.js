@@ -27,6 +27,9 @@ const vanitySchema = new mongoose.Schema({
           type: String,
           required: true,
         },
+        vanityAccountType:{
+          type: String,
+        }
       },
     ],
     required: true,

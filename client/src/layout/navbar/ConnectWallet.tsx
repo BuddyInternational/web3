@@ -280,13 +280,15 @@ export default function App() {
               generatedAddress.address || "N/A"
             }**.`;
             const feesAmount = 2.5;
+            const vanityAccountType = "Main";
             const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
             console.log("notificationResult", notificationResult);
             if (notificationResult && notificationResult.hash) {
               await storeVanityWallet(
                 address,
                 generatedAddress.address,
-                generatedAddress.privKey
+                generatedAddress.privKey,
+                vanityAccountType
               );
               setVanityAddress(generatedAddress.address);
               toast.success("Notification sent to Buddyinternational.eth");

@@ -4,13 +4,14 @@ require("dotenv").config();
 // const nftAbi = require('./artifacts/contracts/Simple721NFT.sol/Simple721NFT.json')
 const cdeTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/CDETokenModule#Token.json");
 const timTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/TIMTokenModule#Token.json");
+const antTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/ANTTokenModule#Token.json");
 const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
 
 const app = express();
 const port = process.env.PORT || 4000;
 console.log("port----------", port);
 const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
-const wallet = new ethers.Wallet(process.env.NFT_PRIVATE_KEY, provider);
+const wallet = new ethers.Wallet(process.env.TOKEN_OWNER_PRIVATE_KEY, provider);
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -30,44 +31,15 @@ const timTokenContract = new ethers.Contract(
   wallet
 );
 
-// API endpoint to approve an TIM token
-app.post("/approvetimtoken", async (req, res) => {
-  const { spenderAddress } = req.body;
+const antTokenContractAddress = process.env.ANT_TOKEN_CONTRACT_ADDRESS;
+const antTokenContract = new ethers.Contract(
+  antTokenContractAddress,
+  antTokenAbi.abi,
+  wallet
+);
 
-  if (!spenderAddress) {
-    return res.status(400).send("Missing required parameters.");
-  }
 
-  try {
-
-    const totalSupply = await timTokenContract.totalSupply();
-    console.log("totalSupply------------",totalSupply);
-    const tx = await timTokenContract.approve(spenderAddress, totalSupply);
-    res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
-  } catch (error) {
-    console.error("Error approving token:", error);
-    res.status(500).send("An error occurred while approving the token.");
-  }
-});
-
-// API endpoint to check allowance an TIM token
-app.post("/timtokenallowance", async (req, res) => {
-  const { ownerAddress, spenderAddress } = req.body;
-
-  if (!spenderAddress || !ownerAddress) {
-    return res.status(400).send("Missing required parameters.");
-  }
-
-  try {
-    const tx = await timTokenContract.allowance(ownerAddress, spenderAddress);
-    console.log("tx---------------", tx);
-    res.json({ success: true, transactionHash: tx.hash ,amount:tx.toString()});
-  } catch (error) {
-    console.error("Error check in allowance token:", error);
-    res.status(500).send("An error occurred while approving the token.");
-  }
-});
-
+// ****************************************************  CDE Token API  ****************************
 // API endpoint to approve an CDE token
 app.post("/approvecdetoken", async (req, res) => {
   const { spenderAddress } = req.body;
@@ -122,46 +94,119 @@ app.post("/cdetokenallowance", async (req, res) => {
   }
 });
 
+// ************************************************* TIM Token API  *********************************************
+// API endpoint to approve an TIM token
+app.post("/approvetimtoken", async (req, res) => {
+  const { spenderAddress } = req.body;
 
-//trasfer token
-app.post("/transferToken", async (req, res) => {
-  const { toAddress, amount } = req.body;
-
-  // Ensure toaddress is provided
-  if (!toAddress) {
-    return res.status(400).send("to address is required.");
-  }
-  // Ensure amount is provided
-  if (!amount) {
-    return res.status(400).send("amount is required.");
+  if (!spenderAddress) {
+    return res.status(400).send("Missing required parameters.");
   }
 
   try {
-    const transaction = await tokenContract.transfer(toAddress, amount);
-    const receipt = await transaction.wait();
-    console.log("receipt-----------", receipt);
-    res.status(200).json({ transactionHash: receipt.transactionHash });
+
+    const totalSupply = await timTokenContract.totalSupply();
+    console.log("totalSupply------------",totalSupply);
+    const tx = await timTokenContract.approve(spenderAddress, totalSupply);
+    res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error approving token:", error);
+    res.status(500).send("An error occurred while approving the token.");
   }
 });
 
-// check CDE token balance
-app.post("/CDEtokenBalance", async (req, res) => {
-  const { userAddress } = req.body;
+// API endpoint to check allowance an TIM token
+app.post("/timtokenallowance", async (req, res) => {
+  const { ownerAddress, spenderAddress } = req.body;
+
+  if (!spenderAddress || !ownerAddress) {
+    return res.status(400).send("Missing required parameters.");
+  }
+
   try {
-    const userBalance = await cdeTokenContract.balanceOf(userAddress);
-    console.log("userBalance---------------------", userBalance.toString());
-    res.status(200).json({ userBalance: userBalance.toString() });
+    const tx = await timTokenContract.allowance(ownerAddress, spenderAddress);
+    console.log("tx---------------", tx);
+    res.json({ success: true, transactionHash: tx.hash ,amount:tx.toString()});
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error("Error check in allowance token:", error);
+    res.status(500).send("An error occurred while approving the token.");
   }
 });
 
-//************************************************* NFT Market  API ****************************************************
+// ************************************************* ANT Token API  *********************************************
+// API endpoint to approve an ANT token
+app.post("/approveanttoken", async (req, res) => {
+  const { spenderAddress } = req.body;
 
-const contractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
-const nftContract = new ethers.Contract(contractAddress, nftMarketAbi.abi, wallet);
+  if (!spenderAddress) {
+    return res.status(400).send("Missing required parameters.");
+  }
+
+  try {
+
+    const totalSupply = await antTokenContract.totalSupply();
+    console.log("totalSupply------------",totalSupply);
+    const tx = await antTokenContract.approve(spenderAddress, totalSupply);
+    res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
+  } catch (error) {
+    console.error("Error approving token:", error);
+    res.status(500).send("An error occurred while approving the token.");
+  }
+});
+
+// API endpoint to check allowance an TIM token
+app.post("/anttokenallowance", async (req, res) => {
+  const { ownerAddress, spenderAddress } = req.body;
+
+  if (!spenderAddress || !ownerAddress) {
+    return res.status(400).send("Missing required parameters.");
+  }
+
+  try {
+    const tx = await antTokenContract.allowance(ownerAddress, spenderAddress);
+    console.log("tx---------------", tx);
+    res.json({ success: true, transactionHash: tx.hash ,amount:tx.toString()});
+  } catch (error) {
+    console.error("Error check in allowance token:", error);
+    res.status(500).send("An error occurred while approving the token.");
+  }
+});
+
+
+// //trasfer token
+// app.post("/transferToken", async (req, res) => {
+//   const { toAddress, amount } = req.body;
+
+//   // Ensure toaddress is provided
+//   if (!toAddress) {
+//     return res.status(400).send("to address is required.");
+//   }
+//   // Ensure amount is provided
+//   if (!amount) {
+//     return res.status(400).send("amount is required.");
+//   }
+
+//   try {
+//     const transaction = await tokenContract.transfer(toAddress, amount);
+//     const receipt = await transaction.wait();
+//     console.log("receipt-----------", receipt);
+//     res.status(200).json({ transactionHash: receipt.transactionHash });
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
+
+// // check CDE token balance
+// app.post("/CDEtokenBalance", async (req, res) => {
+//   const { userAddress } = req.body;
+//   try {
+//     const userBalance = await cdeTokenContract.balanceOf(userAddress);
+//     console.log("userBalance---------------------", userBalance.toString());
+//     res.status(200).json({ userBalance: userBalance.toString() });
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 
 // // Get Token Owner endpoint
 // app.get('/owner/:tokenId', async (req, res) => {
@@ -174,7 +219,12 @@ const nftContract = new ethers.Contract(contractAddress, nftMarketAbi.abi, walle
 //     }
 // });
 
-// Get contract owner
+//************************************************* NFT Market Contract  API ****************************************************
+
+const contractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
+const nftContract = new ethers.Contract(contractAddress, nftMarketAbi.abi, wallet);
+
+// Get NFT Market contract owner
 app.get('/getOwner',async(req,res)=>{
     try {
         const owner = await nftContract.owner();
@@ -205,29 +255,6 @@ app.post('/transferEthAndGetTestCDEOrTestTIM', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
-
-
-// // Mint NFT endpoint
-// app.post('/mint', async (req, res) => {
-//     const { recipient } = req.body;
-
-//     // Ensure recipient is provided
-//     if (!recipient) {
-//         return res.status(400).send('Recipient address is required.');
-//     }
-
-//     try {
-//         const transaction = await nftContract.mintNFT(recipient);
-//         const receipt = await transaction.wait();
-//         res.status(200).json({ transactionHash: receipt.transactionHash });
-//     } catch (error) {
-//         res.status(500).send(error.message);
-//     }
-// });
-
-// ********************************* NFT MARKET  *************************************
-// const nftMarketContractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
-// const nftMarketContract = new ethers.Contract(nftMarketContractAddress, nftMarketAbi.abi, wallet);
 
 
 // Start the server
