@@ -12,6 +12,7 @@ import {
 import { IoClose } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import ApplyMeeting from "./ApplyMeeting";
+import MeetingLayerOperatorsModal from "./MeetingLayerOperatorsModal";
 
 const MeetingRoom: React.FC<{
   open: boolean;
@@ -20,15 +21,30 @@ const MeetingRoom: React.FC<{
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openApplyModal, setOpenApplyModal] = React.useState(false);
+  const [openLayerOperatorsModal, setOpenLayerOperatorsModal] = React.useState(false);
   
-
+ // open Apply meeting modal
   const handleOpenApplyMeetingModal = () => {
     setOpenApplyModal(true);
     setAnchorEl(null);
   };
 
+  // close Apply meeting modal
   const handleCloseApplyMeetingModal = () => {
     setOpenApplyModal(false);
+    setAnchorEl(null);
+    onClose();
+  };
+
+   // open Layer Opeartors modal
+   const handleOpenLayerOperatorsModal = () => {
+    setOpenLayerOperatorsModal(true);
+    setAnchorEl(null);
+  };
+
+  // close Layer Opeartors modal
+  const handleCloseLayerOperatorsModal = () => {
+    setOpenLayerOperatorsModal(false);
     setAnchorEl(null);
     onClose();
   };
@@ -74,7 +90,7 @@ const MeetingRoom: React.FC<{
           <DialogContent dividers>
             <Typography variant="body1" color="text.secondary"sx={{ marginTop: 2,marginBottom:2}}>
               Meeting Room (Endorsed) :{" "}
-              <Link to="/#" className="underline text-blue-400">
+              <Link to="/#" className="underline text-blue-400" onClick={handleOpenLayerOperatorsModal}>
                 The Layer Operators ®
               </Link>
             </Typography>
@@ -106,10 +122,18 @@ const MeetingRoom: React.FC<{
         </Box>
       </Fade>
     </Modal>
+    {/* open Apply Meeting room modal */}
     {openApplyModal &&(
       <ApplyMeeting
       open={openApplyModal}
       onClose={handleCloseApplyMeetingModal}
+    />
+    )}
+    {/* open Layer Operators modal */}
+    {openLayerOperatorsModal &&(
+      <MeetingLayerOperatorsModal
+      open={openLayerOperatorsModal}
+      onClose={handleCloseLayerOperatorsModal}
     />
     )}
     </>
