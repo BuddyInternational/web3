@@ -16,6 +16,7 @@ import { IoClose } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { checkExistingVanityAddress, generateVanityWallet, storeVanityWallet } from "../../../api/vanityAPI";
 import { toast } from "react-toastify";
+import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
 
 
 // vanity address suffix
@@ -28,6 +29,7 @@ const Leadership: React.FC<{
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { isConnected, address } = useWeb3ModalAccount();
+  const { notifyGullyBuddy } = useGullyBuddyNotifier();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
@@ -50,14 +52,15 @@ const Leadership: React.FC<{
           );
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
-            // // Store the generated address using the helper function
-            // const sender = address!;
-            // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-            //   generatedAddress.address || "N/A"
-            // }**.`;
-            // const notificationResult = await notifyGullyBuddy(sender, message);
-            // console.log("notificationResult", notificationResult);
-            // if (notificationResult && notificationResult.hash) {
+            // Store the generated address using the helper function
+            const sender = address!;
+            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+              generatedAddress.address || "N/A"
+            }**.`;
+            const feesAmount = 10;
+            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+            console.log("notificationResult", notificationResult);
+            if (notificationResult && notificationResult.hash) {
               await storeVanityWallet(
                 address,
                 generatedAddress.address,
@@ -65,18 +68,18 @@ const Leadership: React.FC<{
               );
               // setVanityAddress(generatedAddress.address);
               toast.success("Generate Prestige Account Successfully!");
-            // } 
-            // else {
-              // setIsLoading(false);
-              // toast.error("Error sending notification and Generate vanity Address!");
-              // return;
-            // }
+            } 
+            else {
+              setIsLoading(false);
+              toast.error("Error sending notification and Generate vanity Address!");
+              return;
+            }
           }
-          else {
-            setIsLoading(false);
-            toast.error("Error sending notification and Generate vanity Address!");
-            return;
-          }
+          // else {
+          //   setIsLoading(false);
+          //   toast.error("Error sending notification and Generate vanity Address!");
+          //   return;
+          // }
         }
         setIsLoading(false);
         onClose();

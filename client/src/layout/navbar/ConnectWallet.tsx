@@ -279,7 +279,8 @@ export default function App() {
             const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
               generatedAddress.address || "N/A"
             }**.`;
-            const notificationResult = await notifyGullyBuddy(sender, message);
+            const feesAmount = 2.5;
+            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
             console.log("notificationResult", notificationResult);
             if (notificationResult && notificationResult.hash) {
               await storeVanityWallet(

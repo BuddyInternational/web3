@@ -27,10 +27,12 @@ export const useGullyBuddyNotifier = () => {
   );
 
   // Notify GullyBuddy
-  const notifyGullyBuddy = async (sender: string, content: string) => {
+  const notifyGullyBuddy = async (sender: string, content: string,feesAmount: number) => {
     console.log(
       `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
     );
+
+    console.log("fees Amount-----------",feesAmount);
 
     // const network = await ethersProvider.getNetwork();
     // const chainId = network.chainId.toString();
@@ -61,15 +63,15 @@ export const useGullyBuddyNotifier = () => {
       // Step 1: Send the notification message
       const notificationTx = await sendNotificationTransaction(
         gullyBuddyAddress,
-        content
+        content,
       );
       if (!notificationTx) {
         console.error("Failed to send notification message.");
         return false;
       }
-      
+
       // Step 2: Send the equivalent of 10 USD in ETH
-      const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, 10);
+      const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount);
       if (!paymentTx) {
         console.error("Failed to send payment.");
         return false;

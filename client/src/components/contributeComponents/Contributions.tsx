@@ -31,8 +31,9 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
     try {
       const sender = address!;
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
+      const feesAmount = 10;
       // Send notification
-      const notificationResult = await notifyGullyBuddy(sender, message);
+      const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
       if (notificationResult && notificationResult.hash) {
         toast.success("Notification sent to Buddyinternational.eth");
         // Update the content detail
