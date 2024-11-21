@@ -127,7 +127,7 @@ const Leadership: React.FC<{
           }
         }
         //  else {
-        //   setIsLoading(false);
+        //   // setIsLoading(false);
         //   toast.error(
         //     "Error sending notification and Generate vanity Address!"
         //   );
