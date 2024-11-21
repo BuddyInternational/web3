@@ -249,15 +249,15 @@ export default function App() {
         const network = await ethersProvider.getNetwork();
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
 
-        if (!isMainnet) {
-          // User is not on Mainnet, show a warning
-          toast.warning(
-            "Please switch to the Ethereum Mainnet to generate a vanity address."
-          );
-          disconnect(); // Disconnect from the wallet
-          setIsLoading(false);
-          return;
-        }
+        // if (!isMainnet) {
+        //   // User is not on Mainnet, show a warning
+        //   toast.warning(
+        //     "Please switch to the Ethereum Mainnet to generate a vanity address."
+        //   );
+        //   disconnect(); // Disconnect from the wallet
+        //   setIsLoading(false);
+        //   return;
+        // }
 
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
@@ -275,15 +275,15 @@ export default function App() {
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
             // // Store the generated address using the helper function
-            const sender = address!;
-            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-              generatedAddress.address || "N/A"
-            }**.`;
-            const feesAmount = 2.5;
+            // const sender = address!;
+            // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+            //   generatedAddress.address || "N/A"
+            // }**.`;
+            // const feesAmount = 2.5;
             const vanityAccountType = "Main";
-            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
-            console.log("notificationResult", notificationResult);
-            if (notificationResult && notificationResult.hash) {
+            // const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+            // console.log("notificationResult", notificationResult);
+            // if (notificationResult && notificationResult.hash) {
               await storeVanityWallet(
                 address,
                 generatedAddress.address,
@@ -292,18 +292,18 @@ export default function App() {
               );
               setVanityAddress(generatedAddress.address);
               toast.success("Notification sent to Buddyinternational.eth");
-            } 
-            else {
-              setIsLoading(false);
-              toast.error("Error sending notification and Generate vanity Address!");
-              return;
-            }
+            // } 
+            // else {
+            //   setIsLoading(false);
+            //   toast.error("Error sending notification and Generate vanity Address!");
+            //   return;
+            // }
           }
-          // else {
-          //   setIsLoading(false);
-          //   toast.error("Error sending notification and Generate vanity Address!");
-          //   return;
-          // }
+          else {
+            setIsLoading(false);
+            toast.error("Error sending notification and Generate vanity Address!");
+            return;
+          }
         }
         setIsLoading(false);
       }

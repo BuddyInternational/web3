@@ -175,18 +175,18 @@ const ModalNFTCard: React.FC<{
             savedLatestTransfer
           );
           // Send notification to Buddyinternational.eth
-          try {
-            const sender = address!;
-            const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitteda new contribution to Gully Buddy International [All Rights Reserved].`;
-            const feesAmount = 10;
-            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
-            if (notificationResult && notificationResult.hash) {
-              toast.success("Notification sent to Buddyinternational.eth");
-              onClose();
-            }
-          } catch (error: any) {
-            toast.error("Error sending notification:", error);
-          }
+          // try {
+          //   const sender = address!;
+          //   const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitteda new contribution to Gully Buddy International [All Rights Reserved].`;
+          //   const feesAmount = 10;
+          //   const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+          //   if (notificationResult && notificationResult.hash) {
+          //     toast.success("Notification sent to Buddyinternational.eth");
+          //     onClose();
+          //   }
+          // } catch (error: any) {
+          //   toast.error("Error sending notification:", error);
+          // }
         } else {
           console.log("Error in save Latest NFT Transfer");
         }

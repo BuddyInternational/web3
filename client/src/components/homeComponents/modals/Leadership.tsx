@@ -61,19 +61,19 @@ const Leadership: React.FC<{
         if (generateResponse?.data?.[0]?.address) {
           const generatedAddress = generateResponse.data[0];
           // Store the generated address using the helper function
-          const sender = address!;
-          const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-            generatedAddress.address || "N/A"
-          }**.`;
-          const feesAmount = 10;
+          // const sender = address!;
+          // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+          //   generatedAddress.address || "N/A"
+          // }**.`;
+          // const feesAmount = 10;
           const vanityAccountType = "Prestige";
-          const notificationResult = await notifyGullyBuddy(
-            sender,
-            message,
-            feesAmount
-          );
-          console.log("notificationResult", notificationResult);
-          if (notificationResult && notificationResult.hash) {
+          // const notificationResult = await notifyGullyBuddy(
+          //   sender,
+          //   message,
+          //   feesAmount
+          // );
+          // console.log("notificationResult", notificationResult);
+          // if (notificationResult && notificationResult.hash) {
             await storeVanityWallet(
               address,
               generatedAddress.address,
@@ -118,21 +118,21 @@ const Leadership: React.FC<{
                 "Error in Transfering Annotation Token to Prestige Account"
               );
             }
-          } else {
-            // setIsLoading(false);
-            toast.error(
-              "Error sending notification and Generate vanity Address!"
-            );
-            return;
-          }
+          // } else {
+          //   // setIsLoading(false);
+          //   toast.error(
+          //     "Error sending notification and Generate vanity Address!"
+          //   );
+          //   return;
+          // }
         }
-        //  else {
-        //   // setIsLoading(false);
-        //   toast.error(
-        //     "Error sending notification and Generate vanity Address!"
-        //   );
-        //   return;
-        // }
+         else {
+          // setIsLoading(false);
+          toast.error(
+            "Error sending notification and Generate vanity Address!"
+          );
+          return;
+        }
       }
       // setIsLoading(false);
       onClose();
