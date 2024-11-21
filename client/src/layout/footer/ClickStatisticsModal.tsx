@@ -97,8 +97,8 @@ interface VanityData {
 // const LINK_STATISTICS_API_KEY = process.env.REACT_APP_LINK_STATISTICS_API;
 // const LINK_ID = process.env.REACT_APP_LINK_STATISTICS_LINKID;
 const google_map_api_key = process.env.REACT_APP_GOOGLE_MAP_API;
- // Server API Base URL
- const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
+// Server API Base URL
+const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 const ClickStatisticsModal: React.FC = () => {
   // Static Data (replace API call with this)
@@ -163,7 +163,7 @@ const ClickStatisticsModal: React.FC = () => {
     ],
   };
 
-  const {vanityAddress} = useVanityContext();
+  const { vanityAddress } = useVanityContext();
   const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
   const [osData, setOsData] = useState<OSData[]>([]);
   const [countryData, setCountryData] = useState<CountryData[]>([]);
@@ -297,7 +297,6 @@ const ClickStatisticsModal: React.FC = () => {
 
   // dowanload Statistics Data
   const downloadCsv = () => {
-
     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
       toast.error("Please connect your wallet to Download Statistics Data.");
       return;
@@ -363,15 +362,20 @@ const ClickStatisticsModal: React.FC = () => {
         //   }
         // );
 
-         // Filter data to exclude fields like _id and vanityPrivateKey
-         const filteredData = response.data.data.map(
+        // Filter data to exclude fields like _id and vanityPrivateKey
+        const filteredData = response.data.data.map(
           (item: {
             walletAddress: string;
-            vanityDetails: { vanityAddress: string; vanityPrivateKey: string; }[];
+            vanityDetails: {
+              vanityAddress: string;
+              vanityPrivateKey: string;
+            }[];
             createdAt: string;
           }) => {
             const { walletAddress, vanityDetails, createdAt } = item;
-            const vanityAddresses = vanityDetails.map(detail => detail.vanityAddress);
+            const vanityAddresses = vanityDetails.map(
+              (detail) => detail.vanityAddress
+            );
             return { walletAddress, vanityAddresses, createdAt };
           }
         );
@@ -500,21 +504,48 @@ const ClickStatisticsModal: React.FC = () => {
       <div className="my-4">
         <ImageCarousel />
       </div>
+      {/* Divider */}
+      <div className="">
+        <hr className="border-t border-gray-300 my-4" />
+      </div>
 
-      {/* CSV Download Button */}
-      <div className="flex justify-between mt-4 sm:mt-28 md:mt-12">
-        <button
-          onClick={downloadCsv}
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-        >
-          Download CSV
-        </button>
-        <button
-          onClick={downloadVanityData}
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-        >
-          Download Global Vanity Data
-        </button>
+      {/* Informational Text and Buttons */}
+      <div className="flex flex-col justify-between mt-1 sm:mt-20 md:mt-6">
+        {/* Informational Text */}
+        <div className="mb-2 sm:mb-0 sm:mr-4">
+          <p className="text-left text-gray-700 text-sm">
+            For more information on{" "}
+            <span className="font-bold">
+              "Retail Gully Buddy International Merchandise"
+            </span>
+            ,{" "}
+            <a href="#" className="text-blue-500 underline hover:text-blue-700" onClick={() => alert('This needs to be discuss.')}>
+              click here
+            </a>
+            . <br />
+            1st retail purchase gets you the program benefits as a Gully Buddy
+            International <span className="font-bold">
+              "Retail Ambassador"
+            </span>{" "}
+            to receive monthly rewards directly to your managing account.
+          </p>
+        </div>
+
+        {/* CSV Download Buttons */}
+        <div className="flex justify-between mt-2 sm:mt-24 md:mt-8">
+          <button
+            onClick={downloadCsv}
+            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+          >
+            Download CSV
+          </button>
+          <button
+            onClick={downloadVanityData}
+            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+          >
+            Download Global Vanity Data
+          </button>
+        </div>
       </div>
     </div>
   );

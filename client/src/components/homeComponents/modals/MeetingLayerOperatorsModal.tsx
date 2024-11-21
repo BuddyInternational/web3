@@ -39,7 +39,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               lg: "70vw",
               xl: "50vw",
             },
-            maxHeight: "85%",
+            height: "70%",
             overflow: "hidden",
             borderRadius: "5px",
             boxShadow: 2,
@@ -81,15 +81,11 @@ const MeetingLayerOperatorsModal: React.FC<{
               color: "white", // Optional: Text color
             }}
           >
-            {/* Text */}
-            <Typography variant="subtitle1" sx={{ color: "gray" }}>
-             This Meeting Room has Earned TIM.
-            </Typography>
             {/* Full-Width GIF Section */}
             <Box
               sx={{
                 width: "90%", // Full width of modal
-                maxHeight: "250px", // Restrict the height to a reasonable value
+                height: "70%", // Restrict the height to a reasonable value
                 overflow: "hidden", // Ensure no overflow if the image aspect ratio varies
                 borderRadius: "8px",
                 margin: "auto",
@@ -121,8 +117,8 @@ const MeetingLayerOperatorsModal: React.FC<{
               {/* Song Cover Image */}
               <Box
                 sx={{
-                  width: "80px",
-                  height: "80px",
+                  width: "90px",
+                  height: "90px",
                   borderRadius: "8px",
                   overflow: "hidden",
                   flexShrink: 0,
