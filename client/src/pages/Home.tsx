@@ -540,14 +540,14 @@ const Home = () => {
       }
     };
     if (address && isConnected && vanityAddress) {
-      // fetchNFTs();
+      fetchNFTs();
       fetchAccountPersonaNFT();
     }
   }, [
     address,
     isConnected,
     vanityAddress,
-    // fetchNFTs,
+    fetchNFTs,
     testCDEBalance,
     testTIMBalance,
     socketNFTImageURL,
@@ -656,10 +656,10 @@ const Home = () => {
   // Fetch NFTs on load or when the user connects wallet
   useEffect(() => {
     if (address) {
-      // fetchNFTs();
+      fetchNFTs();
     }
   }, [address, 
-    // fetchNFTs
+    fetchNFTs
   ]);
 
   // handle Change tab
