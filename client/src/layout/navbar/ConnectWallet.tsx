@@ -310,7 +310,7 @@ export default function App() {
     };
 
     handleWalletConnect();
-  }, [isConnected, address, vanityAddress, setVanityAddress]);
+  }, [isConnected, address]);
 
   const handleCancel = () => {
     // Close the modal if user cancels

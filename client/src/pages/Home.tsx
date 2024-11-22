@@ -144,16 +144,23 @@ const Home = () => {
   const { vanityAddress, setVanityAddress } = useVanityContext();
   const [value, setValue] = React.useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  // const isDropdownOpen = Boolean(anchorEl);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const targetDate = new Date("2024-12-31T23:59:59");
   const [vanityAddresses, setVanityAddresses] = useState([]);
 
+  // open dropdown menu
   const handleDropdownToggle = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     setIsDropdownOpen((prev) => !prev);
   };
 
+  // handle vanity address dropDown closed
+  const handleClose = () => {
+    setIsDropdownOpen(false);
+    setAnchorEl(null);
+  };
+
+  // handle select vanity address drop down into menu
   const handleAddressSelect = (address: string) => {
     setVanityAddress(address);
     setIsDropdownOpen(false); // Close the dropdown after selection
@@ -164,6 +171,7 @@ const Home = () => {
   useEffect(() => {
     const fetchVanityAddresses = async () => {
       if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+        setVanityAddresses([]);
         return;
       }
       try {
@@ -191,11 +199,6 @@ const Home = () => {
 
     fetchVanityAddresses();
   }, [vanityAddress]);
-
-  const handleClose = () => {
-    setIsDropdownOpen(false);
-    setAnchorEl(null);
-  };
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
