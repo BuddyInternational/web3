@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { useDisconnect, useWeb3ModalAccount } from "@web3modal/ethers/react";
 import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
@@ -80,6 +80,10 @@ const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 const ApiKey = process.env.REACT_APP_OPENSEA_API_KEY;
+const gullyBuddyNFTAddress =
+  process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!;
+// const gullyBuddyNFTAddress = "0x89bcfa8273c6017b9c5c8d5d272808ee0df3fb11";
+
 // const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
@@ -116,6 +120,7 @@ interface CountdownRendererProps {
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
+  const { disconnect } = useDisconnect(); 
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const [balances, setBalances] = useState<any>({
     wallet: [],
@@ -147,6 +152,7 @@ const Home = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const targetDate = new Date("2024-12-31T23:59:59");
   const [vanityAddresses, setVanityAddresses] = useState([]);
+  const [isHoldGullyBuddyNFT, setIsHoldGullyBuddyNFT] = useState(false);
 
   // open dropdown menu
   const handleDropdownToggle = (event: React.MouseEvent<HTMLElement>) => {
@@ -178,23 +184,18 @@ const Home = () => {
         const response = await axios.get(
           `${server_api_base_url}/api/vanity/downloadVanityAddress`
         );
-
-        console.log("response download------------",response.data.data);
         // Extract the vanityAddresses from the response
         if (response.data && response.data.data) {
-
-
-          // const vanityDetails = response.data.data[0].vanityDetails;
           const vanityDetails = response.data.data.find(
             (vanityData: any) => vanityData.walletAddress === address
           );
-
-          console.log("vanityDetails in download===========",vanityDetails);
           // Map each detail to include both vanityAddress and accountType
-          const vanityAddresses = vanityDetails.vanityDetails.map((detail: any) => ({
-            vanityAddress: detail.vanityAddress,
-            vanityAccountType: detail.vanityAccountType,
-          }));
+          const vanityAddresses = vanityDetails.vanityDetails.map(
+            (detail: any) => ({
+              vanityAddress: detail.vanityAddress,
+              vanityAccountType: detail.vanityAccountType,
+            })
+          );
           setVanityAddresses(vanityAddresses);
           console.log("Extracted Vanity Addresses:", vanityAddresses);
         } else {
@@ -207,7 +208,7 @@ const Home = () => {
     };
 
     fetchVanityAddresses();
-  }, [vanityAddress,setVanityAddress]);
+  }, [vanityAddress, setVanityAddress]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -280,7 +281,6 @@ const Home = () => {
           tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
       }));
-      // console.log("formattedWalletBalances------------",formattedWalletBalances);
 
       // ************************** vanity address balance  ********************************
       const vanitybalances = await Promise.all(
@@ -391,17 +391,10 @@ const Home = () => {
       if (!Moralis.Core.isStarted) {
         await Moralis.start({ apiKey: api_key });
       }
-      // console.log("address--------",address);
       if (
         address &&
         vanityAddress !== "0x0000000000000000000000000000000000000000"
       ) {
-        // const testWalletAddressNFT = "0x4f59CE7bb4777b536F09116b66C95A5d1Ea8a8E6";
-        // const testWalletAddressNFT = "0x796B6E8F542B9AF20Ec8dd2095a2F6DEb5a0E6eD";
-        // const testWalletAddressNFT = "0x3f88C36C69199FAa7298815a4e8aa7119d089448"; // sepolia
-        // const testWalletAddressNFT = "0xf8b02EE855D5136ed1D782fC0a53a0CDdA65c946"; // sepolia
-        // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // sepolia
-        // const testWalletAddressNFT = "0x7049577ABAea053257Bf235bFDCa57036Aed6AdD"; // polygon amoy
         const chains = [
           { chain: "0x1", name: "Mainnet" },
           { chain: "0x89", name: "Matic" },
@@ -487,6 +480,15 @@ const Home = () => {
           setNftSocketed(true);
           setsocketNFTImageURL(response.imageUrl);
           setsocketNFTImageMediaType(response.mediaType);
+          // Filter based on the contract address
+          const gullyBuddyNFT = NFTdata.filter(
+            (nft) =>
+              nft?.contractAddress?.toLowerCase() ===
+              gullyBuddyNFTAddress.toLowerCase()
+          );
+          if (gullyBuddyNFT.length > 0) {
+            setIsHoldGullyBuddyNFT(true);
+          }
         }
       } else {
         setsocketNFTImageURL(null);
@@ -505,7 +507,21 @@ const Home = () => {
     testCDEBalance,
     testTIMBalance,
     socketNFTImageURL,
+    isHoldGullyBuddyNFT,
+    NFTdata,
   ]);
+
+  // handle dissconnect to reset the holding gullybudday state
+  useEffect(() => {
+    if (!isConnected) {
+      // If the wallet is disconnected, reset state
+      setNftSocketed(false);
+      setIsHoldGullyBuddyNFT(false);
+      setsocketNFTImageURL(null);
+        setsocketNFTImageMediaType(null);
+    }
+  }, [isConnected]);
+  
 
   //fetch Token Balance
   useEffect(() => {
@@ -621,18 +637,16 @@ const Home = () => {
     }
   }, [address, fetchNFTs]);
 
-  // handle change tab 
+  // handle change tab
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
-  // console.log("vanityAddresse-------------------", vanityAddress);
 
   return (
     <>
       {/* second Navbar */}
       <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3 ">
-        {/* Start section */}
+        {/* Start section  : Account Persona Details */}
         <div className="flex flex-col gap-8 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
           {/* Terms of use */}
           <div className="">
@@ -668,12 +682,20 @@ const Home = () => {
               />
             )}
             {nftSocketed ? (
-              <p className="text-green-600 text-md mx-4">
-                Monthly Bonus Active 📈
-              </p>
+              isHoldGullyBuddyNFT ? (
+                <p className="text-green-600 text-md mx-4">
+                  Monthly Bonus Active 📈
+                </p>
+              ) : (
+                <p className="text-yellow-600 text-md mx-2">
+                  To activate Monthly Bonus, you need a minimum of 1 Passport
+                  NFT 🛂
+                </p>
+              )
             ) : (
               <p className="text-red-700 text-md mx-4">No Bonus Active 😕</p>
             )}
+
             <Link
               to={`/nft/socketNFT/${vanityAddress}`}
               className="hover:text-[#5692D9] cursor-pointer underline text-white"
@@ -693,7 +715,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* middle section : Links */}
+        {/* Middle section : Links */}
         <div className="flex flex-col text-white text-sm gap-3 items-center w-full md:w-1/2">
           <div className="flex flex-col gap-3 font-sans font-normal sm: ml-4 md:ml-10 lg:ml-0">
             <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
@@ -948,13 +970,11 @@ const Home = () => {
 
             {/* Determine Selected Vanity Address's Type */}
             {(() => {
-              const selectedVanity:any = vanityAddresses.find(
+              const selectedVanity: any = vanityAddresses.find(
                 (item: any) => item.vanityAddress === vanityAddress
               );
-
-              // console.log("selectedVanity=============",selectedVanity);
-              const vanityAccountType = selectedVanity?.vanityAccountType || "unknown";
-
+              const vanityAccountType =
+                selectedVanity?.vanityAccountType || "unknown";
               if (vanityAccountType === "Prestige") {
                 // Show only ANT Token Balance
                 return (
@@ -965,7 +985,7 @@ const Home = () => {
                     <span>{testANTBalance} TANT</span>
                   </div>
                 );
-              } else  {
+              } else {
                 // Show all balances
                 return (
                   <>
@@ -1006,7 +1026,7 @@ const Home = () => {
                     </div>
                   </>
                 );
-              } 
+              }
             })()}
           </div>
         </div>
