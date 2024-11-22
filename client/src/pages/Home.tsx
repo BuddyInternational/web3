@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useDisconnect, useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
@@ -84,6 +84,17 @@ const gullyBuddyNFTAddress =
   process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!;
 // const gullyBuddyNFTAddress = "0x89bcfa8273c6017b9c5c8d5d272808ee0df3fb11";
 
+const gullyBuddyNFTCollectionAddress = [
+  process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!,
+  process.env.REACT_APP_TEAM_NFT_COLLECTION_ADDRESS!,
+  process.env.REACT_APP_MANAGER_NFT_COLLECTION_ADDRESS!,
+];
+// const gullyBuddyNFTCollectionAddress =[
+//  "0x89bcfa8273c6017b9c5c8d5d272808ee0df3fb11",
+//  "0x7d551e93e8db94a89f94b7fdcbe004a170384eaf"
+
+// ]
+
 // const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
@@ -120,7 +131,6 @@ interface CountdownRendererProps {
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
-  const { disconnect } = useDisconnect(); 
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const [balances, setBalances] = useState<any>({
     wallet: [],
@@ -131,8 +141,11 @@ const Home = () => {
   const [testTIMBalance, setTestTIMBalance] = useState(0);
   const [testANTBalance, setTestANTBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
-  const [NFTdata2, setNFTdata2] = useState<NFTDetails[]>([]);
-  const [NFTdata3, setNFTdata3] = useState<NFTDetails[]>([]);
+  const [otherNFTs, setOtherNFTs] = useState<NFTDetails[]>([]);
+  const [gullyBuddyNFTs, setGullyBuddyNFTs] = useState<NFTDetails[]>([]);
+  const [gullyBuddyCollectionNFTs, setGullyBuddyCollectionNFTs] = useState<
+    NFTDetails[]
+  >([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
@@ -208,7 +221,7 @@ const Home = () => {
     };
 
     fetchVanityAddresses();
-  }, [vanityAddress, setVanityAddress]);
+  }, [vanityAddress, setVanityAddress, address]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -348,17 +361,24 @@ const Home = () => {
         options
       );
 
-      const buddyCollection = await fetch(
+      const buddyTeamCollection = await fetch(
         `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
         options
       );
 
+      const buddyManagerCollection = await fetch(
+        `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
+        options
+      );
+
       const buddyPassportData = await buddyPassportCollection.json();
-      const buddyCollectionData = await buddyCollection.json();
+      const buddyTeamData = await buddyTeamCollection.json();
+      const buddyManagerData = await buddyManagerCollection.json();
 
       const combinedNFTs = [
         ...(buddyPassportData.nfts || []),
-        ...(buddyCollectionData.nfts || []),
+        ...(buddyTeamData.nfts || []),
+        ...(buddyManagerData.nfts || []),
       ];
 
       const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
@@ -379,7 +399,7 @@ const Home = () => {
         totalClaimedRewardHash: nft.claim_hashes || [],
       }));
 
-      setNFTdata3(formattedNFTs); // Update Gullybuddy specific NFTs
+      setGullyBuddyCollectionNFTs(formattedNFTs); // Update Gullybuddy specific NFTs
     } catch (err) {
       console.error("Error fetching Gullybuddy NFTs:", err);
     }
@@ -438,7 +458,31 @@ const Home = () => {
         const combinedNFTs: NFTDetails[] = (
           await Promise.all(nftPromises)
         ).flat();
+        // set All NFTs
         setNFTdata(combinedNFTs);
+
+        // Define the array of contract addresses
+        const targetContractAddresses = gullyBuddyNFTCollectionAddress.map(
+          (addr) => addr.toLowerCase()
+        );
+
+        // Filter for GullyBuddy NFTs (matching one of the target addresses)
+        const gullyBuddyNFTsData = combinedNFTs.filter((nft: any) =>
+          targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
+        );
+
+        // Filter for other NFTs (not matching any of the target addresses)
+        const otherNFTsData = combinedNFTs.filter(
+          (nft: any) =>
+            !targetContractAddresses.includes(
+              nft.contractAddress?.toLowerCase()
+            )
+        );
+
+        // Set the filtered states
+        setGullyBuddyNFTs(gullyBuddyNFTsData);
+        setOtherNFTs(otherNFTsData);
+
         // Fetch existing NFTs from the database to check for duplicates
         let existingNFTs: NFTDetails[] = await getNFTDetails(address);
 
@@ -518,17 +562,11 @@ const Home = () => {
       setNftSocketed(false);
       setIsHoldGullyBuddyNFT(false);
       setsocketNFTImageURL(null);
-        setsocketNFTImageMediaType(null);
+      setsocketNFTImageMediaType(null);
     }
   }, [isConnected]);
-  
 
   //fetch Token Balance
-  useEffect(() => {
-    fetchTokenBalance();
-  }, [triggerUpdate, fetchTokenBalance]);
-
-  // Reset balances when triggerUpdate is true
   useEffect(() => {
     if (triggerUpdate) {
       setBalances({
@@ -538,7 +576,8 @@ const Home = () => {
       setTestCDEBalance(0);
       setTestTIMBalance(0);
     }
-  }, [triggerUpdate]);
+    fetchTokenBalance();
+  }, [triggerUpdate, fetchTokenBalance]);
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
@@ -577,7 +616,6 @@ const Home = () => {
       return (
         <div className="text-center">
           {/* Heading for the countdown */}
-
           {/* Countdown timer display */}
           <div className="text-3xl font-semibold text-gray-800">
             <div className="text-xl font-semibold text-white mb-1">
@@ -610,21 +648,6 @@ const Home = () => {
     }
   };
 
-  // useEffect to filter common NFTs between NFTdata and NFTdata3
-  useEffect(() => {
-    if (NFTdata.length > 0 && NFTdata3.length > 0) {
-      const commonNFTs = NFTdata.filter((nft) =>
-        NFTdata3.some(
-          (nft3) =>
-            nft3.tokenId === nft.tokenId &&
-            nft3.contractAddress === nft.contractAddress
-        )
-      );
-
-      setNFTdata2(commonNFTs);
-    }
-  }, [NFTdata, NFTdata3]);
-
   // fetch NFT data Collection from OpenSea on load
   useEffect(() => {
     fetchGullyBuddyNFTs();
@@ -637,7 +660,7 @@ const Home = () => {
     }
   }, [address, fetchNFTs]);
 
-  // handle change tab
+  // handle Change tab
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -687,7 +710,7 @@ const Home = () => {
                   Monthly Bonus Active 📈
                 </p>
               ) : (
-                <p className="text-yellow-600 text-md mx-2">
+                <p className="text-yellow-600 text-md">
                   To activate Monthly Bonus, you need a minimum of 1 Passport
                   NFT 🛂
                 </p>
@@ -1073,43 +1096,68 @@ const Home = () => {
 
       {/* Holding options */}
       <div className="container m-auto flex flex-col gap-3 py-2 mt-3 px-4 w-full">
-        <Box sx={{ width: "100%" }}>
-          <Tabs value={value} onChange={handleTabChange} centered>
-            <Tab label="All NFT Holdings" sx={{ color: "white" }} />
-            <Tab label="Gullybuddy's holdings" sx={{ color: "white" }} />
-          </Tabs>
-        </Box>
+        {isConnected && (
+          <>
+            <Box sx={{ width: "100%" }}>
+              <Tabs value={value} onChange={handleTabChange} centered>
+                <Tab label="All NFT Holdings" sx={{ color: "white" }} />
+                <Tab label="Gullybuddy's holdings" sx={{ color: "white" }} />
+              </Tabs>
+            </Box>
+          </>
+        )}
 
         {/* NFT cards */}
         <div className="mt-3 w-full">
+          {/* Render Tabs Based on Wallet Connection Status */}
           {isConnected ? (
-            vanityAddress === "0x0000000000000000000000000000000000000000" ? (
-              <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
-                Vanity Address not generated
-              </h1>
-            ) : value === 0 ? ( // All NFTs
-              NFTdata.length > 0 ? (
-                <div className="w-full flex flex-wrap">
-                  <NftCard NFTDetails={NFTdata} CardType={"walletNFT"} />
-                </div>
-              ) : (
-                <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
-                  No NFTs in your account at the moment
-                </h1>
-              )
-            ) : value === 1 ? ( // Gullybuddy's holdings
-              NFTdata.length > 0 ? (
-                <div className="w-full flex flex-wrap">
-                  <NftCard NFTDetails={NFTdata2} CardType={"walletNFT"} />
-                </div>
-              ) : (
-                <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
-                  No NFTs in your account at the moment
-                </h1>
-              )
-            ) : null
+            <>
+              {/* Render Other Socketed NFTs */}
+              {value === 0 &&
+                (otherNFTs.length > 0 ? (
+                  <div className="w-full flex flex-wrap">
+                    <NftCard NFTDetails={otherNFTs} CardType={"walletNFT"} />
+                  </div>
+                ) : (
+                  <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                    No NFTs in your wallet at the moment
+                  </h1>
+                ))}
+
+              {/* Render Gullybuddy's Socketed NFTs */}
+              {value === 1 &&
+                (gullyBuddyNFTs.length > 0 ? (
+                  <div className="w-full flex flex-wrap">
+                    <NftCard
+                      NFTDetails={gullyBuddyNFTs}
+                      CardType={"walletNFT"}
+                    />
+                  </div>
+                ) : (
+                  <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                    No Gullybuddy's NFTs in your wallet at the moment
+                  </h1>
+                ))}
+            </>
           ) : (
-            <ShopeNftcard NFTDetails={NFTdata3} CardType={"BuyNft"} />
+            <>
+              {/* Wallet Not Connected - Display Gullybuddy Collection */}
+              <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-gray-500">
+                Connect your wallet to explore your wallet NFTs
+              </h1>
+              {gullyBuddyCollectionNFTs.length > 0 ? (
+                <div className="w-full flex flex-wrap">
+                  <ShopeNftcard
+                    NFTDetails={gullyBuddyCollectionNFTs}
+                    CardType={"BuyNft"}
+                  />
+                </div>
+              ) : (
+                <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                  No NFTs in the Gullybuddy collection at the moment
+                </h1>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -1161,7 +1209,6 @@ const Home = () => {
             open={openSocketNFTModal}
             onClose={handleCloseModal(setOpenSocketNFTModal)}
             NFTDetails={NFTdata}
-            // ConnecteNetworkname={}
           />
         </>
       )}
