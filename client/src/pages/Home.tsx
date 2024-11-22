@@ -621,7 +621,8 @@ const Home = () => {
     }
   }, [address, fetchNFTs]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  // handle change tab 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -1053,7 +1054,7 @@ const Home = () => {
       {/* Holding options */}
       <div className="container m-auto flex flex-col gap-3 py-2 mt-3 px-4 w-full">
         <Box sx={{ width: "100%" }}>
-          <Tabs value={value} onChange={handleChange} centered>
+          <Tabs value={value} onChange={handleTabChange} centered>
             <Tab label="All NFT Holdings" sx={{ color: "white" }} />
             <Tab label="Gullybuddy's holdings" sx={{ color: "white" }} />
           </Tabs>

@@ -9,7 +9,7 @@ export interface NFTData {
   mediaType?: any;
   timeLastUpdated?: string;
   floorPrice?: number | null;
-  floorPriceUsd?: number;
+  floorPriceUsd?: number | null;
   priceCurrency?: string | null;
 }
 
@@ -46,7 +46,7 @@ export interface NFTDetails {
   mediaType?: any;
   timeLastUpdated?: string;
   floorPrice?: number | null;
-  floorPriceUsd?: number;
+  floorPriceUsd?: number | null ;
   priceCurrency?: string | null;
   lastclaimedAt: Date | null;
   totalClaimedRewardCount: number;

@@ -6,14 +6,146 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useVanityContext } from "../context/VanityContext";
 import Moralis from "moralis";
 import { NFTDetails } from "../utils/Types";
+import { Box, Tab, Tabs } from "@mui/material";
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
+const gullyBuddyNFTAddress =
+  process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!;
+
+// const staticNFTData = [
+//   {
+//     chainName: "Sepolia",
+//     contractAddress: "0x7d551e93e8db94a89f94b7fdcbe004a170384eaf",
+//     tokenId: "1",
+//     name: "chamardi",
+//     tokenType: "ERC721",
+//     tokenUri:
+//       "https://ipfs.moralis.io:2053/ipfs/Qman3jDc7jZmycLcW633hiGoSqeNZgSCEANT9YpsvUC2Tm?_gl=1*1uz6vt*_ga*ODcxMDc2NzUzLjE2OTM0NzE3MjY.*_ga_5RMPXG14TE*MTY5MzQ3MTcyNS4xLjEuMTY5MzQ3Mjc0My42MC4wLjA.",
+//     imageUrl:
+//       "https://maroon-fierce-dog-206.mypinata.cloud/ipfs/QmYP9YYrb1D22EiDJEhaVi21sEdEncFib1iPfWFgqcUCh5?_gl=1*bnlfiw*_ga*ODcxMDc2NzUzLjE2OTM0NzE3MjY.*_ga_5RMPXG14TE*MTY5MzQ3MTcyNS4xLjEuMTY5MzQ3MTkzOS4yMi4wLjA.",
+//     mediaType: "image/jpeg",
+//     timeLastUpdated: "2024-11-22T08:45:22.104Z",
+//     floorPrice: 0.5,
+//     floorPriceUsd: 23,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 0,
+//     totalClaimedRewardHash: [],
+//   },
+//   {
+//     chainName: "Matic",
+//     contractAddress: "0xabc1234567890fedcba0987654321abcdeffedcb",
+//     tokenId: "2",
+//     name: "CryptoArt",
+//     tokenType: "ERC721",
+//     tokenUri: "https://ipfs.example.com/ipfs/QmExampleTokenUri",
+//     imageUrl: "https://example.com/images/nft2.jpeg",
+//     mediaType: "image/jpeg",
+//     timeLastUpdated: "2024-11-21T12:00:00.000Z",
+//     floorPrice: 0.2,
+//     floorPriceUsd: 3,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 5,
+//     totalClaimedRewardHash: ["0xhash1", "0xhash2", "0xhash3"],
+//   },
+//   {
+//     chainName: "Matic",
+//     contractAddress: "0x446c44b7b01d689e794820e13ec251fe63098e19",
+//     tokenId: "1",
+//     name: "CryptoArt",
+//     tokenType: "ERC721",
+//     tokenUri: "https://ipfs.example.com/ipfs/QmExampleTokenUri",
+//     imageUrl: "https://example.com/images/nft2.jpeg",
+//     mediaType: "image/jpeg",
+//     timeLastUpdated: "2024-11-21T12:00:00.000Z",
+//     floorPrice: 0.5,
+//     floorPriceUsd: 5,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 5,
+//     totalClaimedRewardHash: ["0xhash1", "0xhash2", "0xhash3"],
+//   },
+//   {
+//     chainName: "Matic",
+//     contractAddress: "0x446c44b7b01d689e794820e13ec251fe63098e19",
+//     tokenId: "5",
+//     name: "CryptoArt",
+//     tokenType: "ERC721",
+//     tokenUri: "https://ipfs.example.com/ipfs/QmExampleTokenUri",
+//     imageUrl: "https://example.com/images/nft2.jpeg",
+//     mediaType: "image/jpeg",
+//     timeLastUpdated: "2024-11-21T12:00:00.000Z",
+//     floorPrice: null,
+//     floorPriceUsd: null,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 5,
+//     totalClaimedRewardHash: ["0xhash1", "0xhash2", "0xhash3"],
+//   },
+//   {
+//     chainName: "Ethereum",
+//     contractAddress: "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+//     tokenId: "3",
+//     name: "PixelPunk",
+//     tokenType: "ERC1155",
+//     tokenUri: "https://ipfs.example.com/ipfs/QmAnotherExampleTokenUri",
+//     imageUrl: "https://example.com/images/nft3.png",
+//     mediaType: "image/png",
+//     timeLastUpdated: "2024-11-19T10:30:00.000Z",
+//     floorPrice: null,
+//     floorPriceUsd: null,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 10,
+//     totalClaimedRewardHash: ["0xhashA", "0xhashB"],
+//   },
+//   {
+//     chainName: "Sepolia",
+//     contractAddress: "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+//     tokenId: "1",
+//     name: "PixelPunk",
+//     tokenType: "ERC1155",
+//     tokenUri: "https://ipfs.example.com/ipfs/QmAnotherExampleTokenUri",
+//     imageUrl: "https://example.com/images/nft3.png",
+//     mediaType: "image/png",
+//     timeLastUpdated: "2024-11-19T10:30:00.000Z",
+//     floorPrice: null,
+//     floorPriceUsd: null,
+//     lastclaimedAt: null,
+//     totalClaimedRewardCount: 10,
+//     totalClaimedRewardHash: ["0xhashA", "0xhashB"],
+//   },
+// ];
 
 const SocketNFTDetails = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
-  const [socketNFTdata, setSocketNFTdata] = useState<NFTDetails[]>([]);
+  const [gullyBuddyNFTs, setGullyBuddyNFTs] = useState<NFTDetails[]>([]); // set GullyBuddy NFTs
+  const [otherNFTs, setOtherNFTs] = useState<NFTDetails[]>([]); // set Other NFTs
+  const [value, setValue] = React.useState(0);
+
+  // Function to calculate the total USD value of other Socketed NFTs
+  const calculateTotalOtherSocketedNFTValue = () => {
+    if (!otherNFTs.length) return 0;
+
+    let totalFloorPriceUsd = 0;
+    for (const nft of otherNFTs) {
+      if (nft.floorPriceUsd !== null) {
+        totalFloorPriceUsd += Number(nft.floorPriceUsd);
+      }
+    }
+    return Number(totalFloorPriceUsd).toFixed(4);
+  };
+
+  // Function to calculate the total USD value of GullyBuddy NFTs
+  const calculateTotalGullyBuddySocketedNFTValue = () => {
+    if (!gullyBuddyNFTs.length) return 0;
+
+    let totalFloorPriceUsd = 0;
+    for (const nft of gullyBuddyNFTs) {
+      if (nft.floorPriceUsd !== null) {
+        totalFloorPriceUsd += Number(nft.floorPriceUsd);
+      }
+    }
+    return Number(totalFloorPriceUsd).toFixed(4);
+  };
 
   // Fetch Socket NFTs from all chains using moralis
   const fetchSocketNFTs = useCallback(async () => {
@@ -63,31 +195,58 @@ const SocketNFTDetails = () => {
         );
 
         const combinedNFTs = (await Promise.all(nftPromises)).flat();
-        setSocketNFTdata(combinedNFTs);
+        // Filter based on the contract address
+        const gullyBuddyNFTsData = combinedNFTs.filter(
+          (nft) =>
+            nft.contractAddress.toLowerCase() ===
+            gullyBuddyNFTAddress.toLowerCase()
+        );
+
+        const otherNFTsData = combinedNFTs.filter(
+          (nft) =>
+            nft.contractAddress.toLowerCase() !==
+            gullyBuddyNFTAddress.toLowerCase()
+        );
+
+        // Set the filtered states
+        setGullyBuddyNFTs(gullyBuddyNFTsData);
+        setOtherNFTs(otherNFTsData);
       }
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
   }, [vanityAddress]);
 
-  // Function to calculate the total USD value of all Socketed NFTs
-  const calculateTotalSocketedNFTValue = () => {
-    if (!socketNFTdata.length) return 0;
-
-    let totalFloorPriceUsd = 0;
-    for (const nft of socketNFTdata) {
-      if (nft.floorPriceUsd !== null) {
-        totalFloorPriceUsd += Number(nft.floorPriceUsd);
-      }
-    }
-    return Number(totalFloorPriceUsd).toFixed(4);
-  };
-
+  // Fetch socket NFTs useEffect
   useEffect(() => {
     if (address && isConnected && vanityAddress) {
       fetchSocketNFTs();
     }
   }, [address, isConnected, vanityAddress, fetchSocketNFTs]);
+
+  // Handle change tab
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+
+  // static Data
+  // useEffect(() => {
+  //   // Filter based on the contract address
+  //   const gullyBuddyNFTsData = staticNFTData.filter(
+  //     (nft) =>
+  //       nft.contractAddress.toLowerCase() === gullyBuddyNFTAddress.toLowerCase()
+  //   );
+
+  //   const otherNFTsData = staticNFTData.filter(
+  //     (nft) =>
+  //       nft.contractAddress.toLowerCase() !== gullyBuddyNFTAddress.toLowerCase()
+  //   );
+
+  //   // Set the filtered states
+  //   setGullyBuddyNFTs(gullyBuddyNFTsData);
+  //   setOtherNFTs(otherNFTsData);
+  // }, []);
 
   return (
     <div className="container m-auto flex flex-col mt-2 gap-3 ">
@@ -97,23 +256,61 @@ const SocketNFTDetails = () => {
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
-      {/* Socket NFT cards */}
-      {socketNFTdata &&
-      socketNFTdata.length > 0 &&
-      vanityAddress !== "0x0000000000000000000000000000000000000000" ? (
-        <div className="mt-3">
-          <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
-            <p className="text-[#5692D9]">Total Value:</p>
-            <p>{calculateTotalSocketedNFTValue()} USD</p>
-          </span>
-          <NftCard NFTDetails={socketNFTdata} CardType={"vanityNFT"} />
+      {/* Total Valuation */}
+      <div className="mt-2">
+        {/* Other Socketed NFT Total Value */}
+        <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
+          <p className="text-[#5692D9]">Total Value(Other Socketd NFTs):</p>
+          <p>{calculateTotalOtherSocketedNFTValue()} USD</p>
+        </span>
+        {/* GullyBuddy's Socketed NFT Total Value */}
+        <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
+          <p className="text-[#5692D9]">
+            Total Value(GullyBuddy's Socketd NFTs):
+          </p>
+          <p>{calculateTotalGullyBuddySocketedNFTValue()} USD</p>
+        </span>
+      </div>
+
+      {/* Holding options */}
+      <div className="container m-auto flex flex-col gap-3 py-1 mt-1 px-4 w-full">
+        <Box sx={{ width: "100%" }}>
+          <Tabs value={value} onChange={handleTabChange} centered>
+            <Tab label="Socketed NFT Holdings" sx={{ color: "white" }} />
+            <Tab
+              label="Gullybuddy's Socketed NFT holdings"
+              sx={{ color: "white" }}
+            />
+          </Tabs>
+        </Box>
+
+        {/* Socketed  NFT cards */}
+        <div className="mt-3 w-full">
+          {/* Render Other Socketed NFTs */}
+          {value === 0 &&
+            (otherNFTs.length > 0 ? (
+              <div className="w-full flex flex-wrap">
+                <NftCard NFTDetails={otherNFTs} CardType={"vanityNFT"} />
+              </div>
+            ) : (
+              <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                No Socketed NFTs in your account at the moment
+              </h1>
+            ))}
+
+          {/* Render Gullybuddy's Socketed NFTs */}
+          {value === 1 &&
+            (gullyBuddyNFTs.length > 0 ? (
+              <div className="w-full flex flex-wrap">
+                <NftCard NFTDetails={gullyBuddyNFTs} CardType={"vanityNFT"} />
+              </div>
+            ) : (
+              <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
+                No Gullybuddy's Socketed NFTs in your account at the moment
+              </h1>
+            ))}
         </div>
-      ) : (
-        <p className="text-2xl text-white m-auto my-6">
-          You don’t have any socketed NFTs at the moment. Explore and add some
-          NFTs to see them here!
-        </p>
-      )}
+      </div>
     </div>
   );
 };
