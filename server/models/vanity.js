@@ -6,34 +6,13 @@ const vanitySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  // vanityAddress: {
-  //   type: String,
-  //   required:true,
-  //   unique: true,
-  // },
-  // vanityPrivateKey: {
-  //   type: String,
-  //   required: true,
-  // },
-  vanityDetails: {
-    type: [
-      {
-        vanityAddress: {
-          type: String,
-          required: true,
-          unique: true,
-        },
-        vanityPrivateKey: {
-          type: String,
-          required: true,
-        },
-        vanityAccountType:{
-          type: String,
-        }
-      },
-    ],
-    required: true,
-  },
+  vanityDetails: [
+    {
+      vanityAddress: { type: String, required: true },
+      vanityPrivateKey: { type: String, required: true },
+      vanityAccountType: { type: String, required: true },
+    },
+  ],
   createdAt: {
     type: Date,
   }

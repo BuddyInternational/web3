@@ -178,11 +178,20 @@ const Home = () => {
         const response = await axios.get(
           `${server_api_base_url}/api/vanity/downloadVanityAddress`
         );
+
+        console.log("response download------------",response.data.data);
         // Extract the vanityAddresses from the response
-        if (response.data && response.data.data && response.data.data[0]) {
-          const vanityDetails = response.data.data[0].vanityDetails;
+        if (response.data && response.data.data) {
+
+
+          // const vanityDetails = response.data.data[0].vanityDetails;
+          const vanityDetails = response.data.data.find(
+            (vanityData: any) => vanityData.walletAddress === address
+          );
+
+          console.log("vanityDetails in download===========",vanityDetails);
           // Map each detail to include both vanityAddress and accountType
-          const vanityAddresses = vanityDetails.map((detail: any) => ({
+          const vanityAddresses = vanityDetails.vanityDetails.map((detail: any) => ({
             vanityAddress: detail.vanityAddress,
             vanityAccountType: detail.vanityAccountType,
           }));
@@ -198,7 +207,7 @@ const Home = () => {
     };
 
     fetchVanityAddresses();
-  }, [vanityAddress]);
+  }, [vanityAddress,setVanityAddress]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -616,7 +625,7 @@ const Home = () => {
     setValue(newValue);
   };
 
-  console.log("vanityAddresse-------------------", vanityAddress);
+  // console.log("vanityAddresse-------------------", vanityAddress);
 
   return (
     <>
@@ -936,48 +945,13 @@ const Home = () => {
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
 
-            {/* Loop through tokenDetails for vanity address
-            {Object.keys(tokenDetails).map((tokenAddress, idx) => {
-              const vanityToken = balances.vanity.find(
-                (token: any) => tokenAddress === token.address
-              );
-              const vanityBalance = vanityToken ? vanityToken.balance : "0";
-
-              return (
-                <div
-                  key={idx}
-                  className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-                >
-                  <span className="text-[#5692D9] mr-2 flex gap-1">
-                    <p>{tokenDetails[tokenAddress].name}</p>
-                    <p>Token Balance:</p>
-                  </span>{" "}
-                  <span>
-                    {vanityBalance} {tokenDetails[tokenAddress].symbol}
-                  </span>
-                </div>
-              );
-            })}
-            <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-              <span className="text-[#5692D9] mr-2">
-                Test CDE Token Balance:
-              </span>{" "}
-              <span>{testCDEBalance} TCDE</span>
-            </div>
-            <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-              <span className="text-[#5692D9] mr-2">
-                Test TIM Token Balance:
-              </span>{" "}
-              <span>{testTIMBalance} TTIM</span>
-            </div> */}
-
             {/* Determine Selected Vanity Address's Type */}
             {(() => {
               const selectedVanity:any = vanityAddresses.find(
                 (item: any) => item.vanityAddress === vanityAddress
               );
 
-              console.log("selectedVanity=============",selectedVanity);
+              // console.log("selectedVanity=============",selectedVanity);
               const vanityAccountType = selectedVanity?.vanityAccountType || "unknown";
 
               if (vanityAccountType === "Prestige") {

@@ -237,6 +237,7 @@ export default function App() {
     return headers + rows;
   };
 
+  // handle wallet connect
   useEffect(() => {
     const handleWalletConnect = async () => {
       if (isConnected && address) {
@@ -272,6 +273,7 @@ export default function App() {
             vanity_suffix!,
             1
           );
+          console.log("generateResponse---------",generateResponse);
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
             // // Store the generated address using the helper function
@@ -301,7 +303,7 @@ export default function App() {
           }
           else {
             setIsLoading(false);
-            toast.error("Error sending notification and Generate vanity Address!");
+            toast.error("Error Generate vanity Address!");
             return;
           }
         }
@@ -317,6 +319,7 @@ export default function App() {
     setShowModal(false);
   };
 
+  // download vanityData confirm modal
   const Modal = ({ message, onConfirm, onCancel }: any) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

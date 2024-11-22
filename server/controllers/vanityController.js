@@ -146,6 +146,7 @@ export const storeVanityWallet = async (req, res) => {
     // Find or create the vanity address entry in the database
     let newAddress = await VanityData.findOne({ walletAddress });
 
+    console.log("newAddress------------",newAddress);
     if (!newAddress) {
       // If wallet address is not found, create a new record
       newAddress = new VanityData({

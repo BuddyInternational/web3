@@ -72,20 +72,14 @@ export const generateVanityWallet = async (
   }
 };
 
-interface StoreVanityResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
-
 export const storeVanityWallet = async (
   walletAddress: string,
   vanityAddress: string,
   vanityPrivateKey: string,
   vanityAccountType: string,
-): Promise<StoreVanityResponse | null> => {
+) => {
   try {
-    const response: AxiosResponse<StoreVanityResponse> = await axios.post(
+    const response = await axios.post(
       `${server_api_base_url}/api/vanity/storeVanityWallet`,
       {
         walletAddress,
@@ -94,6 +88,7 @@ export const storeVanityWallet = async (
         vanityAccountType,
       }
     );
+    console.log(" store VanityWallet response:", response);
     return response.data;
   } catch (error) {
     console.error("Error storing vanity wallet:", error);
