@@ -218,11 +218,11 @@ const SocketNFTDetails = () => {
   }, [vanityAddress]);
 
   // Fetch socket NFTs useEffect
-  useEffect(() => {
-    if (address && isConnected && vanityAddress) {
-      fetchSocketNFTs();
-    }
-  }, [address, isConnected, vanityAddress, fetchSocketNFTs]);
+  // useEffect(() => {
+  //   if (address && isConnected && vanityAddress) {
+  //     fetchSocketNFTs();
+  //   }
+  // }, [address, isConnected, vanityAddress, fetchSocketNFTs]);
 
   // Handle change tab
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
