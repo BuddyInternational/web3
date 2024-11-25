@@ -1017,11 +1017,23 @@ const Home = () => {
               if (vanityAccountType === "Prestige") {
                 // Show only ANT Token Balance
                 return (
+                  // <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
+                  //   <span className="text-[#5692D9] mr-2">
+                  //     Test ANT Token Balance:
+                  //   </span>
+                  //   <span>{testANTBalance} TANT</span>
+                  // </div>
                   <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-                    <span className="text-[#5692D9] mr-2">
-                      ANT Token Balance:
+                    <span className="text-[#5692D9] mr-2 flex items-center">
+                      Test ANT
+                      <img
+                        src="/Annotation.png"
+                        alt="TANT Symbol"
+                        className="w-4 h-4 mx-1 rounded-md"
+                      />
+                      Token Balance:
                     </span>
-                    <span>{testANTBalance} TANT</span>
+                    <span>{testANTBalance}</span>
                   </div>
                 );
               } else {

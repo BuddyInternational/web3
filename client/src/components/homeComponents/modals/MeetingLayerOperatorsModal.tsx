@@ -104,7 +104,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               />
             </Box>
 
-            {/* Bottom Section */}
+            {/* Middle Section */}
             <Box
               sx={{
                 display: "flex",
@@ -156,6 +156,23 @@ const MeetingLayerOperatorsModal: React.FC<{
                   {songData.artistName}
                 </Typography>
               </Box>
+            </Box>
+            {/* Bottom Section */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 2,
+              }}
+            >
+              {/* All right Reserved */}
+              <Typography
+                variant="caption"
+                sx={{ color: "white", textAlign: "center" }}
+              >
+                ® All Rights Reserved
+              </Typography>
             </Box>
           </DialogContent>
         </Box>
