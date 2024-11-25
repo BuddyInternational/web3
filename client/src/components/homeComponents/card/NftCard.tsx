@@ -296,7 +296,7 @@ const NftCard: React.FC<{ NFTDetails: NFTDetails[]; CardType: string }> = ({
       </div>
 
       {/* Pagination at the bottom */}
-      <div className="text-white py-4">
+      <div className="text-white py-4 m-auto">
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
