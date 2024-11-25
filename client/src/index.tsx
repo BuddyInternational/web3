@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { VanityProvider } from "./context/VanityContext";
 import { BalanceUpdateProvider } from "./context/BalanceUpdateContext";
+import { VanityAddressUpdateProvider } from "./context/VanityAddressesListContext";
 
 // Disable right-click globally
 document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -16,7 +17,9 @@ root.render(
   // <React.StrictMode>
   <VanityProvider>
     <BalanceUpdateProvider>
-      <App />
+      <VanityAddressUpdateProvider>
+        <App />
+      </VanityAddressUpdateProvider>
     </BalanceUpdateProvider>
   </VanityProvider>
   // </React.StrictMode>

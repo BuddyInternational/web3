@@ -32,6 +32,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useBalanceUpdate } from "../context/BalanceUpdateContext";
 import axios from "axios";
+import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -132,6 +133,7 @@ interface CountdownRendererProps {
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
+  const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
   const [balances, setBalances] = useState<any>({
     wallet: [],
     vanity: [],
@@ -221,7 +223,7 @@ const Home = () => {
     };
 
     fetchVanityAddresses();
-  }, [vanityAddress, setVanityAddress, address]);
+  }, [vanityAddress, setVanityAddress, address,triggerVanityAddressUpdate]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -514,7 +516,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address, vanityAddress]);
+  }, [address]);
 
   // fetch the Account persona NFT and Token Details
   useEffect(() => {

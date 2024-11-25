@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
 import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { ethers } from "ethers";
+import { useVanityAddressUpdate } from "../../../context/VanityAddressesListContext";
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
@@ -41,6 +42,7 @@ const Leadership: React.FC<{
   const { isConnected, address } = useWeb3ModalAccount();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
+  const { setTriggerVanityAddressUpdate } = useVanityAddressUpdate();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
@@ -105,6 +107,9 @@ const Leadership: React.FC<{
             console.log("Transaction sent:", transferToken);
             // Wait for the transaction to be confirmed
             await transferToken.wait();
+
+            // Trigger the VanityAddressUpdate
+            setTriggerVanityAddressUpdate((prev) => !prev);
             console.log("Transaction confirmed:", transferToken.hash);
             toast.success(
               "Transfer Annotation Token to Prestige Account Successfully!"
