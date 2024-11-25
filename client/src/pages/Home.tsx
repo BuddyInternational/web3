@@ -1033,7 +1033,7 @@ const Home = () => {
                       />
                       Token Balance:
                     </span>
-                    <span>{testANTBalance}</span>
+                    <span>{testANTBalance} TANT</span>
                   </div>
                 );
               } else {

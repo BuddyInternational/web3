@@ -11,6 +11,7 @@ import { FaCheck, FaRegCopy } from "react-icons/fa";
 import { ContentSubmission } from "../utils/Types";
 import { saveAs } from "file-saver";
 import axios from "axios";
+import { Slider } from "@mui/material";
 
 // Define mood options
 const moodOptions = [
@@ -51,6 +52,7 @@ const ContributeContent: React.FC = () => {
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
+  const [age, setAge] = useState<number>(25);
   const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [wordCount, setWordCount] = useState<number>(0);
@@ -79,19 +81,30 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
+  // Fetch user Content from Database
+  const fetchUserContent = async () => {
+    if (address && isConnected) {
+      const userContent = await getUserContent(address!);
+      if (userContent && userContent.data) {
+        setSubmissions(userContent.data.contentDetails || []);
+      }
+    }
+  };
+  
   //save the content in Databse and also send onChain notification
   const handleSubmit = async () => {
     if (mood && content) {
       setLoading(true);
       try {
         const timestamp = new Date().toISOString();
-        const submissionData = { mood, content, timestamp };
+        const submissionData = { mood, content,age, timestamp };
         const buffer = Buffer.from(JSON.stringify(submissionData));
         const result = await ipfs.add(buffer);
         console.log("IPFS Hash:", result.path);
         const contentDetails = {
           mood,
           content,
+          age,
           ipfsHash: result.path,
           generateContentDate: timestamp,
           contentWordCount: wordCount,
@@ -108,10 +121,14 @@ const ContributeContent: React.FC = () => {
           contentDetails
         );
 
+        console.log("response-------------",response);
+
         if (response) {
-          toast.success("Content saved successfully");
+          toast.success(response.message);
           setContent("");
           setMood("");
+          setAge(25);
+          fetchUserContent();
         }
       } catch (error: any) {
         toast.error("Error uploading to IPFS:", error);
@@ -122,19 +139,6 @@ const ContributeContent: React.FC = () => {
       toast.error("Please select a Mood & Enter content.");
     }
   };
-
-  useEffect(() => {
-    const fetchUserContent = async () => {
-      if (address && isConnected) {
-        const userContent = await getUserContent(address!);
-        if (userContent && userContent.data) {
-          setSubmissions(userContent.data.contentDetails || []);
-        }
-      }
-    };
-
-    fetchUserContent();
-  }, [address, isConnected, submissions, setSubmissions]);
 
   const convertToCSV = (data: any[]) => {
     if (!data || data.length === 0) return "";
@@ -154,18 +158,12 @@ const ContributeContent: React.FC = () => {
 
   // Function to download the CSV file
   const downloadUserContent = async (data: any[]) => {
-    console.log("download data-------------", data);
-    // /api/user-content/trackDownloadUserContent
     const responseUserContentCountLog = await axios.post(
       `${server_api_base_url}/proxyUserContentDownload`,
       { vanityAddress },
       {
         headers: { "Content-Type": "application/json" },
       }
-    );
-    console.log(
-      "responseUserContentCountLog==========",
-      responseUserContentCountLog
     );
     const filteredData = data.map(({ _id, ...rest }) => rest);
     const csvData = convertToCSV(filteredData);
@@ -175,8 +173,12 @@ const ContributeContent: React.FC = () => {
 
     saveAs(blob, "user_submissions.csv");
     toast.success("The CSV file has been downloaded successfully.");
-
   };
+
+  // Initial fetch of user content when component mounts
+  useEffect(() => {
+    fetchUserContent();
+  }, [address, isConnected]);
 
   return (
     <>
@@ -235,6 +237,50 @@ const ContributeContent: React.FC = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Age Slider */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-6">
+          <p className="text-md font-semibold mb-4 text-blue-400">Select Age</p>
+          <div className="flex items-center justify-between">
+            {/* <p className="text-sm text-gray-400">0</p> */}
+            <Slider
+             value={age}
+             onChange={(e, newValue) => setAge(newValue as number)}
+              valueLabelDisplay="on"
+              min={0}
+              max={100}
+              defaultValue={25}
+              step={1}
+              marks={[
+                { value: 0, label: "0" },
+                { value: 18, label: "18" },
+                { value: 25, label: "25" },
+                { value: 30, label: "30" },
+                { value: 40, label: "40" },
+                { value: 50, label: "50" },
+                { value: 65, label: "65" },
+                { value: 75, label: "75" },
+                { value: 85, label: "85" },
+                { value: 100, label: "100" },
+              ]}
+              sx={{
+                color: "#5692D9", 
+                "& .MuiSlider-thumb": {
+                  backgroundColor: "#fff", 
+                  border: "2px solid #5692D9", 
+                },
+                "& .MuiSlider-markLabel": {
+                  color: "#fff", 
+                },
+                "& .MuiSlider-valueLabel": {
+                  backgroundColor: "#5692D9", 
+                  color: "#fff", 
+                },
+              }}
+            />
+            {/* <p className="text-sm text-gray-400">100</p> */}
+          </div>
         </div>
 
         {/* Content Section */}

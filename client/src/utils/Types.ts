@@ -56,6 +56,7 @@ export interface NFTDetails {
 export interface ContentSubmission {
   mood: string;
   content: string;
+  age: number;
   ipfsHash?: string;
   generateContentDate: string;
   contentWordCount: number;

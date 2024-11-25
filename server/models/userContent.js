@@ -14,6 +14,7 @@ const UserContentSchema = new mongoose.Schema(
     contentDetails: [{
       mood: { type: String },
       content: {type: String}, 
+      age: {type: Number}, 
       ipfsHash : {type: String},
       generateContentDate: { type: Date },
       contentWordCount: {type: Number},
