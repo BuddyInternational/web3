@@ -17,9 +17,9 @@ import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
 
 const ModalNFTCard: React.FC<{
   nft: NFTData;
-  key: number;
+  nftKey: number;
   onClose: () => void;
-}> = ({ nft, key, onClose }) => {
+}> = ({ nft, nftKey, onClose }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
@@ -151,6 +151,7 @@ const ModalNFTCard: React.FC<{
       // Wait for the transaction to be confirmed
       await tx.wait();
       console.log("Transaction confirmed:", tx.hash);
+      toast.success("Socket NFT to Vanity Address successful!");
 
       // Saved In Database
       if (isConnected && address) {
@@ -185,8 +186,9 @@ const ModalNFTCard: React.FC<{
           console.log("Error in save Latest NFT Transfer");
         }
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error executing transaction:", error);
+      toast.error("Error executing transaction:", error.reason);
     } finally {
       setLoading(false);
       onClose();
@@ -209,11 +211,11 @@ const ModalNFTCard: React.FC<{
           <p className="flex gap-1">
             {nft.contractAddress?.slice(0, 6)}...
             {nft.contractAddress?.slice(-4)}
-            {isContractAddressCopied === key ? (
+            {isContractAddressCopied === nftKey ? (
               <FaCheck className="ml-1 mt-1 text-green-500 cursor-pointer" />
             ) : (
               <FaRegCopy
-                onClick={() => handleCopyAddress(key)}
+                onClick={() => handleCopyAddress(nftKey)}
                 className="ml-1 mt-1 cursor-pointer"
                 data-tip="Copy Address"
                 data-tip-content=".tooltip"
@@ -272,11 +274,11 @@ const ModalNFTCard: React.FC<{
                   )}
                 </p>
                 <p>
-                  {isTokenIdCopied === key ? (
+                  {isTokenIdCopied === nftKey ? (
                     <FaCheck className="mt-0.5 text-green-500 cursor-pointer" />
                   ) : (
                     <FaRegCopy
-                      onClick={() => handleCopyTokenID(key)}
+                      onClick={() => handleCopyTokenID(nftKey)}
                       className="mt-0.5 cursor-pointer"
                       data-tip="Copy Token ID"
                       data-tip-content=".tooltip"
