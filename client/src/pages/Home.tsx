@@ -516,7 +516,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address]);
+  }, [address,vanityAddress]);
 
   // fetch the Account persona NFT and Token Details
   useEffect(() => {

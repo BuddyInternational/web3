@@ -71,11 +71,12 @@ const ModalNFTCard: React.FC<{
   // handle socket button click
   const handleButtonClick = async (nftData: NFTData) => {
     console.log("NFT Data:", nftData);
+    setLoading(true);
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
-      // setLoading(false);
+      setLoading(false);
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
@@ -85,7 +86,6 @@ const ModalNFTCard: React.FC<{
     const network = await ethersProvider.getNetwork();
     const networkName = network.name.toLowerCase();
     console.log(networkName);
-    // return;
 
     const networkContracts = contracts[networkName];
     if (
@@ -99,17 +99,11 @@ const ModalNFTCard: React.FC<{
       );
       return;
     }
-
-    // const nftMarketContractAddressget = networkContracts.contract1.address;
-    // const nftMarketAbi1 = networkContracts.contract1.abi;
-
     const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress!,
       nftMarketAbi.abi,
       signer
     );
-    setLoading(false);
-    // return;
     try {
       const tokenStandard: string | undefined = nftData.tokenType;
       // Approve the NFT to the smart contract
