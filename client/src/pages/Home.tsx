@@ -223,7 +223,7 @@ const Home = () => {
     };
 
     fetchVanityAddresses();
-  }, [vanityAddress, setVanityAddress, address,triggerVanityAddressUpdate]);
+  }, [vanityAddress, setVanityAddress, address, triggerVanityAddressUpdate]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -349,174 +349,190 @@ const Home = () => {
 
   // Function to fetch Gullybuddy specific NFTs
   const fetchGullyBuddyNFTs = useCallback(async () => {
-    if(!isConnected){
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          "x-api-key": `${ApiKey}`,
-        },
-      };
+    if (!isConnected) {
+      try {
+        const options = {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            "x-api-key": `${ApiKey}`,
+          },
+        };
 
-      const buddyPassportCollection = await fetch(
-        `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
-        options
-      );
+        const buddyPassportCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts`,
+          options
+        );
 
-      const buddyTeamCollection = await fetch(
-        `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
-        options
-      );
+        const buddyTeamCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts`,
+          options
+        );
 
-      const buddyManagerCollection = await fetch(
-        `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
-        options
-      );
+        const buddyManagerCollection = await fetch(
+          `https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts`,
+          options
+        );
 
-      const buddyPassportData = await buddyPassportCollection.json();
-      const buddyTeamData = await buddyTeamCollection.json();
-      const buddyManagerData = await buddyManagerCollection.json();
+        const buddyPassportData = await buddyPassportCollection.json();
+        const buddyTeamData = await buddyTeamCollection.json();
+        const buddyManagerData = await buddyManagerCollection.json();
 
-      const combinedNFTs = [
-        ...(buddyPassportData.nfts || []),
-        ...(buddyTeamData.nfts || []),
-        ...(buddyManagerData.nfts || []),
-      ];
+        const combinedNFTs = [
+          ...(buddyPassportData.nfts || []),
+          ...(buddyTeamData.nfts || []),
+          ...(buddyManagerData.nfts || []),
+        ];
 
-      const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
-        chainName: nft.asset_contract?.chain || "Matic",
-        contractAddress: nft.contract || "",
-        tokenId: nft.identifier || "",
-        name: nft.name || "Unnamed NFT",
-        tokenType: nft.asset_contract?.schema_name || "ERC721",
-        tokenUri: nft.permalink || "",
-        imageUrl: nft.display_image_url || "",
-        mediaType: nft.display_animation_url ? "video" : "image",
-        timeLastUpdated: nft.updated_at || new Date().toISOString(),
-        floorPrice: nft.floor_price || 0,
-        floorPriceUsd: nft.floor_price_usd || 0,
-        priceCurrency: nft.payment_token?.symbol || "ETH",
-        lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
-        totalClaimedRewardCount: nft.claim_count || 0,
-        totalClaimedRewardHash: nft.claim_hashes || [],
-      }));
+        const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
+          chainName: nft.asset_contract?.chain || "Matic",
+          contractAddress: nft.contract || "",
+          tokenId: nft.identifier || "",
+          name: nft.name || "Unnamed NFT",
+          tokenType: nft.asset_contract?.schema_name || "ERC721",
+          tokenUri: nft.permalink || "",
+          imageUrl: nft.display_image_url || "",
+          mediaType: nft.display_animation_url ? "video" : "image",
+          timeLastUpdated: nft.updated_at || new Date().toISOString(),
+          floorPrice: nft.floor_price || 0,
+          floorPriceUsd: nft.floor_price_usd || 0,
+          priceCurrency: nft.payment_token?.symbol || "ETH",
+          lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
+          totalClaimedRewardCount: nft.claim_count || 0,
+          totalClaimedRewardHash: nft.claim_hashes || [],
+        }));
 
-      setGullyBuddyCollectionNFTs(formattedNFTs); // Update Gullybuddy specific NFTs
-    } catch (err) {
-      console.error("Error fetching Gullybuddy NFTs:", err);
+        setGullyBuddyCollectionNFTs(formattedNFTs); // Update Gullybuddy specific NFTs
+      } catch (err) {
+        console.error("Error fetching Gullybuddy NFTs:", err);
+      }
     }
-  }
   }, [isConnected]);
 
   // Fetch NFTs from all chains using moralis
   const fetchNFTs = useCallback(async () => {
     try {
+      // Initialize Moralis if not already started
       if (!Moralis.Core.isStarted) {
         await Moralis.start({ apiKey: api_key });
       }
+      // Ensure the required address and vanityAddress are valid
       if (
-        address &&
-        vanityAddress !== "0x0000000000000000000000000000000000000000"
+        !address ||
+        vanityAddress === "0x0000000000000000000000000000000000000000"
       ) {
-        const chains = [
-          { chain: "0x1", name: "Mainnet" },
-          { chain: "0x89", name: "Matic" },
-          { chain: "0xa4b1", name: "Arbitrum" },
-          // { chain: "0x2105", name: "Base" },
-          { chain: "0xaa36a7", name: "Sepolia" },
-          // { chain: "0x13882", name: "Matic-Amoy" },
-          // { chain: "0x14a34", name: "Base-Sepolia" },
-        ];
+        console.warn("Invalid address or vanity address.");
+        return;
+      }
+      // Define blockchain networks
+      const chains = [
+        { chain: "0x1", name: "Mainnet" },
+        { chain: "0x89", name: "Matic" },
+        { chain: "0xa4b1", name: "Arbitrum" },
+        // { chain: "0x2105", name: "Base" },
+        { chain: "0xaa36a7", name: "Sepolia" },
+        // { chain: "0x13882", name: "Matic-Amoy" },
+        // { chain: "0x14a34", name: "Base-Sepolia" },
+      ];
+      // Fetch NFTs from all chains
+      const nftPromises = chains.map((chain) =>
+        Moralis.EvmApi.nft
+          .getWalletNFTs({
+            chain: chain.chain,
+            format: "decimal",
+            mediaItems: true,
+            normalizeMetadata: true,
+            limit: 10,
+            address: address!,
+          })
+          .then((res) =>
+            res.raw.result.map((nft: any) => ({
+              chainName: chain.name,
+              contractAddress: nft.token_address,
+              tokenId: nft.token_id,
+              name: nft.name,
+              tokenType: nft.contract_type,
+              tokenUri: nft.token_uri,
+              imageUrl: nft.media?.original_media_url,
+              mediaType: nft.media?.mimetype,
+              timeLastUpdated: nft.last_metadata_sync,
+              floorPrice: nft?.floor_price,
+              floorPriceUsd: nft?.floor_price_usd,
+              lastclaimedAt: null,
+              totalClaimedRewardCount: 0,
+              totalClaimedRewardHash: [],
+            }))
+          )
+          .catch((err) => {
+            console.error(`Error fetching NFTs for chain ${chain.name}:`, err);
+            return [];
+          })
+      );
 
-        const nftPromises = chains.map((chain) =>
-          Moralis.EvmApi.nft
-            .getWalletNFTs({
-              chain: chain.chain,
-              format: "decimal",
-              mediaItems: true,
-              normalizeMetadata: true,
-              limit: 10,
-              address: address!,
-            })
-            .then((res) =>
-              res.raw.result.map((nft: any) => ({
-                chainName: chain.name,
-                contractAddress: nft.token_address,
-                tokenId: nft.token_id,
-                name: nft.name,
-                tokenType: nft.contract_type,
-                tokenUri: nft.token_uri,
-                imageUrl: nft.media?.original_media_url,
-                mediaType: nft.media?.mimetype,
-                timeLastUpdated: nft.last_metadata_sync,
-                floorPrice: nft?.floor_price,
-                floorPriceUsd: nft?.floor_price_usd,
-                lastclaimedAt: null,
-                totalClaimedRewardCount: 0,
-                totalClaimedRewardHash: [],
-              }))
-            )
-        );
+      const combinedNFTs: NFTDetails[] = (
+        await Promise.all(nftPromises)
+      ).flat();
+      if (combinedNFTs.length === 0) {
+        console.warn("No NFTs found across all chains.");
+        return;
+      }
 
-        const combinedNFTs: NFTDetails[] = (
-          await Promise.all(nftPromises)
-        ).flat();
-        // set All NFTs
-        setNFTdata(combinedNFTs);
+      // set All NFTs
+      setNFTdata(combinedNFTs);
 
-        // Define the array of contract addresses
-        const targetContractAddresses = gullyBuddyNFTCollectionAddress.map(
-          (addr) => addr.toLowerCase()
-        );
+      // Define the array of contract addresses
+      const targetContractAddresses = gullyBuddyNFTCollectionAddress.map(
+        (addr) => addr.toLowerCase()
+      );
 
-        // Filter for GullyBuddy NFTs (matching one of the target addresses)
-        const gullyBuddyNFTsData = combinedNFTs.filter((nft: any) =>
-          targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
-        );
+      // Filter for GullyBuddy NFTs (matching one of the target addresses)
+      const gullyBuddyNFTsData = combinedNFTs.filter((nft: any) =>
+        targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
+      );
 
-        // Filter for other NFTs (not matching any of the target addresses)
-        const otherNFTsData = combinedNFTs.filter(
-          (nft: any) =>
-            !targetContractAddresses.includes(
-              nft.contractAddress?.toLowerCase()
-            )
-        );
+      // Filter for other NFTs (not matching any of the target addresses)
+      const otherNFTsData = combinedNFTs.filter(
+        (nft: any) =>
+          !targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
+      );
 
-        // Set the filtered states
-        setGullyBuddyNFTs(gullyBuddyNFTsData);
-        setOtherNFTs(otherNFTsData);
+      // Set the filtered states
+      setGullyBuddyNFTs(gullyBuddyNFTsData);
+      setOtherNFTs(otherNFTsData);
 
-        // Fetch existing NFTs from the database to check for duplicates
-        let existingNFTs: NFTDetails[] = await getNFTDetails(address);
-
-        // Ensure existingNFTs is an array
+      // Fetch existing NFTs from the database
+      let existingNFTs: NFTDetails[] = [];
+      try {
+        existingNFTs = await getNFTDetails(address);
         if (!Array.isArray(existingNFTs)) {
-          console.error(
-            "existingNFTs is not an array. Setting it to an empty array."
+          console.warn(
+            "Existing NFTs fetched are not an array. Defaulting to empty."
           );
           existingNFTs = [];
         }
+      } catch (err) {
+        console.error("Error fetching existing NFTs from the database:", err);
+        existingNFTs = [];
+      }
 
-        for (const nft of combinedNFTs) {
-          const exists = existingNFTs.some(
-            (existingNft) =>
-              existingNft.tokenId === nft.tokenId &&
-              existingNft.contractAddress === nft.contractAddress
-          );
+      for (const nft of combinedNFTs) {
+        const exists = existingNFTs.some(
+          (existingNft) =>
+            existingNft.tokenId === nft.tokenId &&
+            existingNft.contractAddress === nft.contractAddress
+        );
 
-          if (!exists) {
-            const result = await saveNFTDetails(nft, address, vanityAddress);
-            if (result) {
-              console.log("NFTs saved successfully:", result);
-            }
+        if (!exists) {
+          const result = await saveNFTDetails(nft, address, vanityAddress);
+          if (result) {
+            console.log("NFTs saved successfully:", result);
           }
         }
       }
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address,vanityAddress]);
+  }, [address, vanityAddress]);
 
   // fetch the Account persona NFT and Token Details
   useEffect(() => {
@@ -539,24 +555,20 @@ const Home = () => {
           }
         }
       } else {
+        setNftSocketed(false);
         setsocketNFTImageURL(null);
         setsocketNFTImageMediaType(null);
       }
     };
     if (address && isConnected && vanityAddress) {
-      fetchNFTs();
       fetchAccountPersonaNFT();
     }
   }, [
     address,
     isConnected,
     vanityAddress,
-    fetchNFTs,
-    testCDEBalance,
-    testTIMBalance,
     socketNFTImageURL,
     isHoldGullyBuddyNFT,
-    NFTdata,
   ]);
 
   // handle dissconnect to reset the holding gullybudday state
@@ -662,9 +674,7 @@ const Home = () => {
     if (address) {
       fetchNFTs();
     }
-  }, [address, 
-    fetchNFTs
-  ]);
+  }, [address, fetchNFTs]);
 
   // handle Change tab
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {

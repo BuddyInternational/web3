@@ -17,7 +17,7 @@ export const useGullyBuddyNotifier = () => {
 
   // Ensure walletProvider is defined before using it
   if (!walletProvider) {
-    console.error("Wallet provider is not initialized.");
+    console.log("Wallet provider is not initialized.");
     return {
       notifyGullyBuddy: () => Promise.reject("Provider not initialized"),
     };

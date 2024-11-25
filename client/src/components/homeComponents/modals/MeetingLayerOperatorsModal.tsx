@@ -55,7 +55,7 @@ const MeetingLayerOperatorsModal: React.FC<{
             sx={{ m: 0, p: 2, textAlign: "center", color: "white" }}
             id="customized-dialog-title"
           >
-            This Meeting Room Earned TIM
+            This Meeting Room has Earned 152 TIM
           </DialogTitle>
 
           {/* Close Button */}

@@ -15,7 +15,7 @@ const ShopeNftcard: React.FC<{
   CardType: string;
 }> = ({ NFTDetails, CardType }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
-    useState<number>(-1);
+    useState<number | null>(null);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
   const copyTimeoutRef: any = useRef(null);
   const { isConnected } = useWeb3ModalAccount();
@@ -143,6 +143,7 @@ const ShopeNftcard: React.FC<{
         }}
       >
         {slicedNFTDetails?.map((nft, index) => {
+          const globalIndex = (currentPage - 1) * itemsPerPage + index;
           const selectedNFT: NFTDetails = {
             chainName: nft.chainName || "",
             contractAddress: nft.contractAddress || "",
@@ -162,7 +163,7 @@ const ShopeNftcard: React.FC<{
           };
           return (
             <div
-              key={index + 1}
+              key={globalIndex}
               className="relative flex flex-col my-4 bg-[#F5F5F5] shadow-sm border border-slate-200 rounded-lg w-full"
             >
               <div className="p-2 mt-2 text-sm flex flex-column justify-between">
@@ -173,11 +174,11 @@ const ShopeNftcard: React.FC<{
                 <p className="flex gap-1">
                   {nft.contractAddress?.slice(0, 6)}...
                   {nft.contractAddress?.slice(-4)}
-                  {isContractAddressCopied === index ? (
+                  {isContractAddressCopied === globalIndex ? (
                     <FaCheck className="ml-1 mt-1 text-green-500 cursor-pointer" />
                   ) : (
                     <FaCopy
-                      onClick={() => handleCopyAddress(index)}
+                      onClick={() => handleCopyAddress(globalIndex)}
                       className="ml-1 mt-1 cursor-pointer"
                       data-tip="Copy Address"
                       data-tip-content=".tooltip"
@@ -235,11 +236,11 @@ const ShopeNftcard: React.FC<{
                       )}
                     </p>
                     <p>
-                      {isTokenIdCopied === index ? (
+                      {isTokenIdCopied === globalIndex ? (
                         <FaCheck className="mt-0.5 text-green-500 cursor-pointer" />
                       ) : (
                         <FaRegCopy
-                          onClick={() => handleCopyTokenID(index)}
+                          onClick={() => handleCopyTokenID(globalIndex)}
                           className="mt-0.5 cursor-pointer"
                           data-tip="Copy Token ID"
                           data-tip-content=".tooltip"
