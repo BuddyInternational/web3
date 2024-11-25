@@ -11,7 +11,10 @@ import { IoClose } from "react-icons/io5";
 import { NFTData } from "../../../utils/Types";
 import ModalNFTCard from "../card/ModalNFTCard";
 import { ethers } from "ethers";
-import { useWeb3ModalProvider } from "@web3modal/ethers/react";
+import {
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from "@web3modal/ethers/react";
 
 const SocketNFT: React.FC<{
   open: boolean;
@@ -22,17 +25,20 @@ const SocketNFT: React.FC<{
   const [connectedNetwork, setConnectedNetwork] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState<string>("All");
   const { walletProvider } = useWeb3ModalProvider();
+  const { isConnected } = useWeb3ModalAccount();
 
   useEffect(() => {
     const getConnectedNetwork = async () => {
-      if (typeof window.ethereum !== "undefined") {
-        const ethersProvider = new ethers.BrowserProvider(
-          walletProvider as ethers.Eip1193Provider
-        );
-        const network = await ethersProvider.getNetwork();
-        setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
-      } else {
-        console.error("Ethereum provider is not available.");
+      if (isConnected) {
+        if (typeof window.ethereum !== "undefined") {
+          const ethersProvider = new ethers.BrowserProvider(
+            walletProvider as ethers.Eip1193Provider
+          );
+          const network = await ethersProvider.getNetwork();
+          setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
+        } else {
+          console.error("Ethereum provider is not available.");
+        }
       }
     };
     getConnectedNetwork();
@@ -59,7 +65,6 @@ const SocketNFT: React.FC<{
       nft.chainName?.toLowerCase() === connectedNetwork &&
       (selectedChain === "All" || nft.chainName === selectedChain)
   );
-
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -110,7 +115,7 @@ const SocketNFT: React.FC<{
           <DialogContent dividers>
             {/* Dropdown for filtering by chain */}
             <div className="flex justify-end sm:mb-1 md:mb-3 container mx-auto px-4 gap-2">
-             {/* <label
+              {/* <label
                 htmlFor="chainSelect"
                 className="text-md font-bold text-[#191818] sm:py-2 md:py-4 "
               >

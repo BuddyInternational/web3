@@ -168,7 +168,7 @@ const ShopeNftcard: React.FC<{
             >
               <div className="p-2 mt-2 text-sm flex flex-column justify-between">
                 <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded dark:bg-blue-900 dark:text-blue-300">
-                  {nft.chainName}
+                {nft.chainName === "Matic" ? "Polygon" : nft.chainName}
                 </span>
                 <span></span>
                 <p className="flex gap-1">
