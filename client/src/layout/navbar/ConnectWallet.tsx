@@ -130,8 +130,8 @@ createWeb3Modal({
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
-  // Server API Base URL
-  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
+// Server API Base URL
+const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 // 6. Interface to get vanity details
 interface VanityData {
@@ -168,7 +168,7 @@ export default function App() {
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
 
-      console.log("response--------------",response);
+      console.log("response--------------", response);
 
       const responseCountLog = await axios.post(
         `${server_api_base_url}/proxyVanityDataDownload`,
@@ -205,11 +205,16 @@ export default function App() {
         const filteredData = response.data.data.map(
           (item: {
             walletAddress: string;
-            vanityDetails: { vanityAddress: string; vanityPrivateKey: string; }[];
+            vanityDetails: {
+              vanityAddress: string;
+              vanityPrivateKey: string;
+            }[];
             createdAt: string;
           }) => {
             const { walletAddress, vanityDetails, createdAt } = item;
-            const vanityAddresses = vanityDetails.map(detail => detail.vanityAddress);
+            const vanityAddresses = vanityDetails.map(
+              (detail) => detail.vanityAddress
+            );
             return { walletAddress, vanityAddresses, createdAt };
           }
         );
@@ -273,7 +278,7 @@ export default function App() {
             vanity_suffix!,
             1
           );
-          console.log("generateResponse---------",generateResponse);
+          console.log("generateResponse---------", generateResponse);
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
             // // Store the generated address using the helper function
@@ -286,22 +291,21 @@ export default function App() {
             // const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
             // console.log("notificationResult", notificationResult);
             // if (notificationResult && notificationResult.hash) {
-              await storeVanityWallet(
-                address,
-                generatedAddress.address,
-                generatedAddress.privKey,
-                vanityAccountType
-              );
-              setVanityAddress(generatedAddress.address);
-              toast.success("Notification sent to Buddyinternational.eth");
-            // } 
+            await storeVanityWallet(
+              address,
+              generatedAddress.address,
+              generatedAddress.privKey,
+              vanityAccountType
+            );
+            setVanityAddress(generatedAddress.address);
+            toast.success("Notification sent to Buddyinternational.eth");
+            // }
             // else {
             //   setIsLoading(false);
             //   toast.error("Error sending notification and Generate vanity Address!");
             //   return;
             // }
-          }
-          else {
+          } else {
             setIsLoading(false);
             toast.error("Error Generate vanity Address!");
             return;
@@ -356,6 +360,7 @@ export default function App() {
             onCancel={handleCancel}
           />
         )}
+        {/* vanity Address Section */}
         <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
           {isLoading ? (
             <Skeleton
@@ -453,10 +458,12 @@ export default function App() {
             </>
           )}
         </div>
+
         {/* connect/disconnect button */}
         <div className="flex flex-row justify-end px-2 py-6 mx-5">
           {!isConnected ? (
-            <w3m-button />
+            // <w3m-button />
+            <w3m-connect-button />
           ) : (
             <div className="flex gap-3 sm:flex-col md:flex-row items-center ">
               <w3m-network-button />
@@ -480,20 +487,6 @@ export default function App() {
             </div>
           )}
         </div>
-        {/* <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
-          <Button
-            variant="contained"
-            onClick={downloadVanityData}
-            sx={{
-              borderRadius: "22px",
-              textTransform: "capitalize",
-              background: "#5773FF",
-              mx: "10px",
-            }}
-          >
-            Download Vanity Data
-          </Button>
-        </div> */}
       </div>
     </>
   );
