@@ -12,6 +12,8 @@ import { ContentSubmission } from "../utils/Types";
 import { saveAs } from "file-saver";
 import axios from "axios";
 import { Slider } from "@mui/material";
+import { useLoader } from "../context/LoaderContext";
+import Loader from "../utils/Loader";
 
 // Define mood options
 const moodOptions = [
@@ -54,7 +56,8 @@ const ContributeContent: React.FC = () => {
   const [mood, setMood] = useState<string>("");
   const [age, setAge] = useState<number>(25);
   const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
+  const { isLoading, setIsLoading } = useLoader();
   const [wordCount, setWordCount] = useState<number>(0);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
   const [isVanityAddressCopied, setIsVanityAddressCopied] = useState(false);
@@ -94,7 +97,7 @@ const ContributeContent: React.FC = () => {
   //save the content in Databse and also send onChain notification
   const handleSubmit = async () => {
     if (mood && content) {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const timestamp = new Date().toISOString();
         const submissionData = { mood, content,age, timestamp };
@@ -133,7 +136,7 @@ const ContributeContent: React.FC = () => {
       } catch (error: any) {
         toast.error("Error uploading to IPFS:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     } else {
       toast.error("Please select a Mood & Enter content.");
@@ -190,12 +193,7 @@ const ContributeContent: React.FC = () => {
       </Link>
       <div className="container mx-auto min-h-screen py-10 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
         {/* Display Loader */}
-        {loading && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="loader border-8 border-t-8 border-gray-400 border-t-white rounded-full w-20 h-20 animate-spin"></div>
-          </div>
-        )}
-
+        {isLoading && <Loader />}
         {/* Wallet and Vanity Address */}
         <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
           <div className="bg-gray-800 p-3 rounded-lg w-full max-w-xs text-center border-2 border-blue-400">

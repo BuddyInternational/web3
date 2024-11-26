@@ -24,6 +24,8 @@ import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.j
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { useBalanceUpdate } from "../../../context/BalanceUpdateContext";
+import { useLoader } from "../../../context/LoaderContext";
+import Loader from "../../../utils/Loader";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -35,8 +37,7 @@ const CDEReward: React.FC<{
   const { setTriggerUpdate } = useBalanceUpdate();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-
-  const [loading, setLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoader();
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
     vanityAddress: vanityAddress,
@@ -123,11 +124,12 @@ const CDEReward: React.FC<{
     e.preventDefault();
 
     console.log("Submitted values:", inputValues);
+    setIsLoading(true);
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
@@ -141,7 +143,6 @@ const CDEReward: React.FC<{
       signer
     );
 
-    setLoading(true);
     try {
       // Convert the price from Ether to Wei
       const amountInEther = inputValues?.amount;
@@ -252,15 +253,11 @@ const CDEReward: React.FC<{
           }
         );
       } else {
-        console.error(
-          "Error Purchasing Tokens."
-        );
-        toast.error(
-          "Error Purchasing Tokens,"
-        );
+        console.error("Error Purchasing Tokens.");
+        toast.error("Error Purchasing Tokens,");
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       onClose();
     }
   };
@@ -272,6 +269,8 @@ const CDEReward: React.FC<{
 
   return (
     <>
+      {isLoading && <Loader />}
+
       <Modal open={open} onClose={onClose}>
         <Fade in={open}>
           <Box
@@ -396,11 +395,6 @@ const CDEReward: React.FC<{
                 </Box>
               </form>
             </DialogContent>
-            {loading && (
-              <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-10 z-50">
-                <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-12 h-12 animate-spin"></div>
-              </div>
-            )}
           </Box>
         </Fade>
       </Modal>

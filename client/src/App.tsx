@@ -5,7 +5,6 @@ import Footer from "./layout/footer/Footer";
 import AllRoutes from "./routes/AllRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Loader from "./utils/Loader";
 
 const App: React.FC = () => {
 
@@ -24,7 +23,6 @@ const App: React.FC = () => {
         <ConnectWallet />
         <AllRoutes />
       </div>
-      <Loader />
       <Footer />
       <ToastContainer />
     </div>

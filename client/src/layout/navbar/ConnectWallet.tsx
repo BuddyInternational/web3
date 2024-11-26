@@ -308,6 +308,7 @@ export default function App() {
           } else {
             setIsLoading(false);
             toast.error("Error Generate vanity Address!");
+            disconnect();
             return;
           }
         }

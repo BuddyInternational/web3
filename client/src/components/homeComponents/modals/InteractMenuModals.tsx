@@ -21,6 +21,8 @@ import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.j
 import { getClaimDetails, updateNFTClaimDetails } from "../../../api/nftAPI";
 import { NFTDetails } from "../../../utils/Types";
 import axios from "axios";
+import { useLoader } from "../../../context/LoaderContext";
+import Loader from "../../../utils/Loader";
 
 interface ModalContents {
   title: string;
@@ -62,7 +64,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const { walletProvider } = useWeb3ModalProvider();
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-  const [loading, setLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoader();
   const [timeLeft, setTimeLeft] = useState(30);
   const [isPlaying, setIsPlaying] = useState(false);
   const [lastClaimedAt, setLastClaimedAt] = useState<Date | null>(null);
@@ -74,15 +76,10 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
-
-    console.log("connected network==========",connectedNetwork?.toLowerCase());
-    console.log("chain network==========",ChainName?.toLowerCase());
-    console.log("isCorrectNetwork==========",isCorrectNetwork);
-
   // Server API Base URL
   const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-  
-  // fetch the connected network 
+
+  // fetch the connected network
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (typeof window.ethereum !== "undefined") {
@@ -90,7 +87,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
           walletProvider as ethers.Eip1193Provider
         );
         const network = await ethersProvider.getNetwork();
-        console.log("network==========",network);
         setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
       } else {
         console.error("Ethereum provider is not available.");
@@ -104,7 +100,6 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     const now = new Date();
     const timeDiff = now.getTime() - new Date(lastClaimed).getTime();
     const secondsSinceLastClaim = timeDiff / 1000;
-    console.log("secondsSinceLastClaim--------", secondsSinceLastClaim);
     const secondsIn24Hours = 86400; // 24 hours in seconds 86400
 
     if (secondsSinceLastClaim < secondsIn24Hours) {
@@ -117,13 +112,13 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   };
 
   const claimRewards = async () => {
-    setLoading(true);
+    setIsLoading(true);
     // Check if window.ethereum is available
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
-      setLoading(false); // Reset loading on error
+      setIsLoading(false); // Reset loading on error
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
@@ -164,7 +159,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     } catch (error) {
       console.log("Error Claiming Rewards", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -255,7 +250,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
               params: { shortUrl: modalContents.videoUrl },
             }
           );
-          console.log("response============",response);
+          console.log("response============", response);
           console.log(
             "response url===================",
             response.data.resolvedUrl
@@ -275,7 +270,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       resolveUrl();
       setHasFetched(true);
     }
-  }, [modalContents.videoUrl, hasFetched,server_api_base_url]);
+  }, [modalContents.videoUrl, hasFetched, server_api_base_url]);
 
   // Reset hasFetched to false when modal is closed (optional)
   useEffect(() => {
@@ -285,75 +280,77 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   }, [open]);
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Fade in={open}>
-        <Box sx={style}>
-          <DialogTitle
-            sx={{
-              m: 0,
-              p: 2,
-              textAlign: "center",
-              borderBottom: "1px solid #e0e0e0",
-            }}
-            id="customized-dialog-title"
-          >
-            <Typography variant="h4" component="h4">
-              {modalContents.title}
-            </Typography>
-          </DialogTitle>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{
-              position: "absolute",
-              right: 16,
-              top: 16,
-              fontSize: "24px",
-              bgcolor: "rgba(0, 0, 0, 0.05)",
-              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" },
-              borderRadius: "50%",
-            }}
-          >
-            <IoClose />
-          </IconButton>
-          <DialogContent dividers sx={{ padding: "24px" }}>
-            {modalContents.videoUrl ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                <ReactPlayer
-                  style={{
+    <>
+      {isLoading && <Loader />}
+      <Modal open={open} onClose={onClose}>
+        <Fade in={open}>
+          <Box sx={style}>
+            <DialogTitle
+              sx={{
+                m: 0,
+                p: 2,
+                textAlign: "center",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+              id="customized-dialog-title"
+            >
+              <Typography variant="h4" component="h4">
+                {modalContents.title}
+              </Typography>
+            </DialogTitle>
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={{
+                position: "absolute",
+                right: 16,
+                top: 16,
+                fontSize: "24px",
+                bgcolor: "rgba(0, 0, 0, 0.05)",
+                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.1)" },
+                borderRadius: "50%",
+              }}
+            >
+              <IoClose />
+            </IconButton>
+            <DialogContent dividers sx={{ padding: "24px" }}>
+              {modalContents.videoUrl ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
                     width: "100%",
-                    height: "100%",
-                    minHeight: "400px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                   }}
-                  width={"100%"}
-                  controls={true}
-                  // url={modalContents.videoUrl}
-                  url={videoUrl}
-                  loop={true}
-                  playing={isPlaying}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  config={{
-                    file: {
-                      attributes: {
-                        crossOrigin: "anonymous", // Allows cross-origin access if supported by server
+                >
+                  <ReactPlayer
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      minHeight: "400px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+                    }}
+                    width={"100%"}
+                    controls={true}
+                    // url={modalContents.videoUrl}
+                    url={videoUrl}
+                    loop={true}
+                    playing={isPlaying}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    config={{
+                      file: {
+                        attributes: {
+                          crossOrigin: "anonymous", // Allows cross-origin access if supported by server
+                        },
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
 
-                {/* <Button
+                  {/* <Button
                   variant="contained"
                   onClick={claimRewards}
                   disabled={timeLeft > 0 || !canClaim } // Disable based on 30s timer or 24h rule
@@ -373,58 +370,55 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
                     ? `Claim Reward in ${timeLeft} Seconds`
                     : "Claim Reward"}
                 </Button> */}
-                {isCorrectNetwork ? (
-                  <Button
-                    variant="contained"
-                    onClick={claimRewards}
-                    disabled={timeLeft > 0 || !canClaim}
-                    sx={{
-                      width: "100%",
-                      m: 3,
-                      p: 1,
-                    }}
-                  >
-                    {timeUntilNextClaim > 0
-                      ? `Next Claim Reward After ${Math.floor(
-                          timeUntilNextClaim / 3600
-                        )}h ${Math.floor(
-                          (timeUntilNextClaim % 3600) / 60
-                        )}m ${Math.floor(timeUntilNextClaim % 60)}s`
-                      : timeLeft > 0
-                      ? `Claim Reward in ${timeLeft} Seconds`
-                      : "Claim Reward"}
-                  </Button>
-                ) : (
-                  <Typography
-                    variant="h6"
-                    color="textSecondary"
-                    align="center"
-                    sx={{ mt: 2 }}
-                  >
-                    You can only claim rewards on the connected network's NFTs.
-                  </Typography>
-                )}
-              </Box>
-            ) : modalContents.content ? (
-              // Render custom content if available
-              modalContents.content
-            ) : (
-              <Typography
-                variant="h6"
-                sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}
-              >
-                {modalContents.description}
-              </Typography>
-            )}
-          </DialogContent>
-          {loading && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-80 z-50">
-              <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-16 h-16 animate-spin"></div>
-            </div>
-          )}
-        </Box>
-      </Fade>
-    </Modal>
+                  {isCorrectNetwork ? (
+                    <Button
+                      variant="contained"
+                      onClick={claimRewards}
+                      disabled={timeLeft > 0 || !canClaim}
+                      sx={{
+                        width: "100%",
+                        m: 3,
+                        p: 1,
+                      }}
+                    >
+                      {timeUntilNextClaim > 0
+                        ? `Next Claim Reward After ${Math.floor(
+                            timeUntilNextClaim / 3600
+                          )}h ${Math.floor(
+                            (timeUntilNextClaim % 3600) / 60
+                          )}m ${Math.floor(timeUntilNextClaim % 60)}s`
+                        : timeLeft > 0
+                        ? `Claim Reward in ${timeLeft} Seconds`
+                        : "Claim Reward"}
+                    </Button>
+                  ) : (
+                    <Typography
+                      variant="h6"
+                      color="textSecondary"
+                      align="center"
+                      sx={{ mt: 2 }}
+                    >
+                      You can only claim rewards on the connected network's
+                      NFTs.
+                    </Typography>
+                  )}
+                </Box>
+              ) : modalContents.content ? (
+                // Render custom content if available
+                modalContents.content
+              ) : (
+                <Typography
+                  variant="h6"
+                  sx={{ color: "text.secondary", mt: 2, textAlign: "center" }}
+                >
+                  {modalContents.description}
+                </Typography>
+              )}
+            </DialogContent>
+          </Box>
+        </Fade>
+      </Modal>
+    </>
   );
 };
 

@@ -15,6 +15,8 @@ import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
+import { useLoader } from "../../../context/LoaderContext";
+import Loader from "../../../utils/Loader";
 
 const SocketNFT: React.FC<{
   open: boolean;
@@ -26,6 +28,7 @@ const SocketNFT: React.FC<{
   const [selectedChain, setSelectedChain] = useState<string>("All");
   const { walletProvider } = useWeb3ModalProvider();
   const { isConnected } = useWeb3ModalAccount();
+  const { isLoading, setIsLoading } = useLoader();
   useEffect(() => {
     const getConnectedNetwork = async () => {
       if (isConnected) {
@@ -66,6 +69,8 @@ const SocketNFT: React.FC<{
   );
 
   return (
+    <>
+      {isLoading && <Loader />}
       <Modal open={open} onClose={onClose}>
         <Fade in={open}>
           <Box
@@ -142,12 +147,14 @@ const SocketNFT: React.FC<{
                   nft={nft}
                   nftKey={index}
                   onClose={onClose}
+                  setIsLoading={setIsLoading}
                 />
               ))}
             </DialogContent>
           </Box>
         </Fade>
       </Modal>
+    </>
   );
 };
 

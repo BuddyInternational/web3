@@ -1,5 +1,6 @@
 import React from "react";
 import { useLoader } from "../context/LoaderContext";
+import "./Loader.css"; // Assuming the CSS is saved here
 
 const Loader: React.FC = () => {
   const { isLoading } = useLoader();
@@ -7,12 +8,21 @@ const Loader: React.FC = () => {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
-      {/* Full-page overlay */}
-      <div className="absolute inset-0 bg-gray-700 bg-opacity-50 pointer-events-auto"></div>
-
-      {/* Loader animation */}
-      <div className="w-20 h-20 border-8 border-dashed rounded-full animate-spin border-blue-600 pointer-events-none"></div>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 2000,
+      }}
+    >
+      <div className="loader" />
     </div>
   );
 };

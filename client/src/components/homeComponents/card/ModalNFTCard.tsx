@@ -19,11 +19,11 @@ const ModalNFTCard: React.FC<{
   nft: NFTData;
   nftKey: number;
   onClose: () => void;
-}> = ({ nft, nftKey, onClose }) => {
+  setIsLoading: (loading: boolean) => void;
+}> = ({ nft, nftKey, onClose ,setIsLoading}) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
-  const [loading, setLoading] = useState(false);
   const { walletProvider } = useWeb3ModalProvider();
   const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
@@ -71,12 +71,12 @@ const ModalNFTCard: React.FC<{
   // handle socket button click
   const handleButtonClick = async (nftData: NFTData) => {
     console.log("NFT Data:", nftData);
-    setLoading(true);
+    setIsLoading(true);
     if (typeof window.ethereum === "undefined") {
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(
@@ -190,30 +190,13 @@ const ModalNFTCard: React.FC<{
       console.error("Error executing transaction:", error);
       toast.error("Error executing transaction:", error.reason);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       onClose();
     }
   };
 
   return (
     <>
-      {/* {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-10 z-50">
-          <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-12 h-12 animate-spin"></div>
-          <div className="w-20 h-20 border-8 border-dashed rounded-full animate-spin border-blue-600"></div>
-        </div>
-      )} */}
-
-      {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
-          {/* Full-page overlay */}
-          <div className="absolute inset-0 bg-gray-700 bg-opacity-50 pointer-events-auto"></div>
-
-          {/* Loader animation */}
-          <div className="w-20 h-20 border-8 border-dashed rounded-full animate-spin border-blue-600 pointer-events-none"></div>
-        </div>
-      )}
-
       <div className="max-w-screen sm:w-auto md:w-auto mx-2 my-4 p-2 border border-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
         {/* Chain and NFT Address */}
         <div className="p-2 mx-5 text-sm flex sm:flex-col md:flex-row gap-2 justify-between items-center">
