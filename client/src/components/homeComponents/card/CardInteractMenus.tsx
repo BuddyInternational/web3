@@ -124,12 +124,12 @@ const CardInteractMenus: React.FC<CardInteractMenusProps> = ({
       label: "Order This NFTs Apparel",
       onClick: () => {
         // Redirect to the provided URL instead of opening the modal
-        window.location.href = "https://retail.gullybuddyclothing.co/";
+        window.location.href = "https://retail.gullybuddy.xyz/";
       },
       title: "Gully Buddy Retail Ambassador Apparels",
       content: <OrderNFTApparel />,
       selectedNFT: selectedNFT,
-      url: "https://retail.gullybuddyclothing.co/",
+      url: "https://retail.gullybuddy.xyz/",
     },
     // {
     //   label: "Order This NFTs Apparel",

@@ -222,7 +222,7 @@ const ContributeContent: React.FC = () => {
             htmlFor="mood"
             className="text-md font-semibold mb-2 text-blue-400 block"
           >
-            Select Mood
+            Select Mood :
           </label>
           <select
             id="mood"
@@ -241,7 +241,7 @@ const ContributeContent: React.FC = () => {
 
         {/* Age Slider */}
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-6">
-          <p className="text-md font-semibold mb-4 text-blue-400">Select Age</p>
+          <p className="text-md font-semibold mb-4 text-blue-400">Select Age :</p>
           <div className="flex items-center justify-between">
             {/* <p className="text-sm text-gray-400">0</p> */}
             <Slider
@@ -285,7 +285,7 @@ const ContributeContent: React.FC = () => {
 
         {/* Content Section */}
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
-          <p className="text-md font-semibold mb-4 text-blue-400">Content</p>
+          <p className="text-md font-semibold mb-4 text-blue-400">Content :</p>
           <textarea
             className="w-full h-40 p-4 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
             placeholder="Please Enter Your Content..."

@@ -49,7 +49,7 @@ const CardChainFilterMenus: React.FC<CardChainFilterMenusProps> = ({
           </MenuItem>
           {uniqueChains.map((chain, index) => (
             <MenuItem key={index} value={chain} sx={{}}>
-              {chain}
+              {chain === "Matic" ? "Polygon" :chain}
             </MenuItem>
           ))}
         </Select>

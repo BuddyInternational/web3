@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { VanityProvider } from "./context/VanityContext";
 import { BalanceUpdateProvider } from "./context/BalanceUpdateContext";
 import { VanityAddressUpdateProvider } from "./context/VanityAddressesListContext";
+import { LoaderProvider } from "./context/LoaderContext";
 
 // Disable right-click globally
 document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -18,7 +19,9 @@ root.render(
   <VanityProvider>
     <BalanceUpdateProvider>
       <VanityAddressUpdateProvider>
-        <App />
+        <LoaderProvider>
+          <App />
+        </LoaderProvider>
       </VanityAddressUpdateProvider>
     </BalanceUpdateProvider>
   </VanityProvider>

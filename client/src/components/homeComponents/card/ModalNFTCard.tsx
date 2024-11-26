@@ -186,7 +186,7 @@ const ModalNFTCard: React.FC<{
           console.log("Error in save Latest NFT Transfer");
         }
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error executing transaction:", error);
       toast.error("Error executing transaction:", error.reason);
     } finally {
@@ -197,16 +197,28 @@ const ModalNFTCard: React.FC<{
 
   return (
     <>
-      {loading && (
+      {/* {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-10 z-50">
           <div className="loader border-8 border-t-8 border-gray-300 border-t-white rounded-full w-12 h-12 animate-spin"></div>
+          <div className="w-20 h-20 border-8 border-dashed rounded-full animate-spin border-blue-600"></div>
+        </div>
+      )} */}
+
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
+          {/* Full-page overlay */}
+          <div className="absolute inset-0 bg-gray-700 bg-opacity-50 pointer-events-auto"></div>
+
+          {/* Loader animation */}
+          <div className="w-20 h-20 border-8 border-dashed rounded-full animate-spin border-blue-600 pointer-events-none"></div>
         </div>
       )}
+
       <div className="max-w-screen sm:w-auto md:w-auto mx-2 my-4 p-2 border border-gray-300 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
         {/* Chain and NFT Address */}
         <div className="p-2 mx-5 text-sm flex sm:flex-col md:flex-row gap-2 justify-between items-center">
           <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded dark:bg-blue-900 dark:text-blue-300">
-          {nft.chainName === "Matic" ? "Polygon" : nft.chainName}
+            {nft.chainName === "Matic" ? "Polygon" : nft.chainName}
           </span>
           <p className="flex gap-1">
             {nft.contractAddress?.slice(0, 6)}...
