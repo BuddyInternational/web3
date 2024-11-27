@@ -10,23 +10,20 @@ import {
   useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../context/VanityContext";
-import {
-  deleteUserContent,
-  updateContentDetail,
-} from "../../api/userContentAPI";
-import { ContentSubmission } from "../../utils/Types";
+import { deleteStoryLineContent , updateStoryLineContentDetail } from "../../api/storyLineContentAPI";
+import { StoryLineContentSubmission } from "../../utils/Types";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 
-interface ContributionsProps {
-  submissions: ContentSubmission[];
+interface StoryLineContributionsProps {
+  submissions: StoryLineContentSubmission[];
 }
 
-const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
+const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({ submissions }) => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
 
-  // submit user content onchain
+  // submit story Line content onchain message
   const handleSubmit = async (ipfsHash: string) => {
     try {
       // const sender = address!;
@@ -37,7 +34,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
       // if (notificationResult && notificationResult.hash) {
         // toast.success("Notification sent to Buddyinternational.eth");
         // Update the content detail
-        const updateResponse = await updateContentDetail(
+        const updateResponse = await updateStoryLineContentDetail(
           address!,
           ipfsHash,
           true,
@@ -47,7 +44,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
         );
 
         if (updateResponse) {
-          toast.success("Content detail updated successfully!");
+          toast.success("Story Line Content detail updated successfully!");
         } else {
           toast.error("Failed to update content detail.");
         }
@@ -62,7 +59,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
     walletAddress: string,
     ipfsHash: string
   ) => {
-    const response = await deleteUserContent(walletAddress, ipfsHash);
+    const response = await deleteStoryLineContent(walletAddress, ipfsHash);
     if (response) {
       console.log(response.message);
       toast.success("Delete Content Succefully");
@@ -185,4 +182,4 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   );
 };
 
-export default Contributions;
+export default StoryLineContributions;

@@ -4,6 +4,7 @@ import { vanityRoutes } from "./routes/vanityRoutes.js";
 import { nftRoutes } from "./routes/nftRoutes.js";
 import { socketNFTRoutes } from "./routes/socketNFTRoutes.js";
 import { userContentRoutes } from "./routes/userContentRoutes.js";
+import { storyLineContentRoutes } from "./routes/storyLineContentRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
@@ -22,6 +23,7 @@ app.use("/api/vanity", vanityRoutes);
 app.use("/api/nft/", nftRoutes);
 app.use("/api/socket-nft/", socketNFTRoutes);
 app.use("/api/user-content/", userContentRoutes);
+app.use("/api/storyLine-content/", storyLineContentRoutes);
 
 // track download vanity data CSV using short link
 app.post("/proxyVanityDataDownload", async (req, res) => {
@@ -54,6 +56,25 @@ app.post("/proxyUserContentDownload", async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error("proxyUserContentDownload request failed:", error);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+
+// Track download Story Line Content CSV using short link
+app.post("/proxyStoryLineContentDownload", async (req, res) => {
+  try {
+    console.log("story line-----------",process.env.TRACK_DOWNLOAD_STORYLINE_CONTENT_DATA);
+    // Make the actual request to downloads.gully.app
+    const response = await axios.post(
+      process.env.TRACK_DOWNLOAD_STORYLINE_CONTENT_DATA,
+      req.body
+    );
+
+    console.log("response===========", response);
+    // Forward the response from downloads.gully.app to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error("proxyStoryLineContentDownload request failed:", error);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });

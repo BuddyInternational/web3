@@ -3,16 +3,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import Contributions from "../components/contributeComponents/Contributions";
 import { create as createIPFSClient } from "ipfs-http-client";
-import { getUserContent, saveContentDetails } from "../api/userContentAPI";
+import { getStoryLineContent ,saveStoryLineContentDetails} from "../api/storyLineContentAPI";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
-import { ContentSubmission } from "../utils/Types";
+import { StoryLineContentSubmission } from "../utils/Types";
 import { saveAs } from "file-saver";
 import axios from "axios";
+import { Slider } from "@mui/material";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
+import StoryLineContributions from "../components/contributeComponents/StoryLineContributions";
 
 // Define mood options
 const moodOptions = [
@@ -48,12 +50,13 @@ const ipfs = createIPFSClient({
   },
 });
 
-const ContributeContent: React.FC = () => {
+const CreateStoryLines: React.FC = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
-  const [submissions, setSubmissions] = useState<ContentSubmission[]>([]);
+  const [age, setAge] = useState<number>(25);
+  const [submissions, setSubmissions] = useState<StoryLineContentSubmission[]>([]);
   const { isLoading, setIsLoading } = useLoader();
   const [wordCount, setWordCount] = useState<number>(0);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
@@ -81,29 +84,30 @@ const ContributeContent: React.FC = () => {
     setMood(e.target.value);
   };
 
-  // Fetch user Content from Database
-  const fetchUserContent = async () => {
+  // Fetch story Line Content from Database
+  const fetchStoryLineContent = async () => {
     if (address && isConnected) {
-      const userContent = await getUserContent(address!);
-      if (userContent && userContent.data) {
-        setSubmissions(userContent.data.contentDetails || []);
+      const storyLineContent = await getStoryLineContent(address!);
+      if (storyLineContent && storyLineContent.data) {
+        setSubmissions(storyLineContent.data.contentDetails || []);
       }
     }
   };
 
-  //save the content in Databse and also send onChain notification
+  //save the story line content in Databse and also send onChain notification
   const handleSubmit = async () => {
-    if (mood && content) {
+    if (mood && content && age) {
       setIsLoading(true);
       try {
         const timestamp = new Date().toISOString();
-        const submissionData = { mood, content, timestamp };
+        const submissionData = { mood, content, age, timestamp };
         const buffer = Buffer.from(JSON.stringify(submissionData));
         const result = await ipfs.add(buffer);
         console.log("IPFS Hash:", result.path);
         const contentDetails = {
           mood,
           content,
+          age,
           ipfsHash: result.path,
           generateContentDate: timestamp,
           contentWordCount: wordCount,
@@ -114,7 +118,7 @@ const ContributeContent: React.FC = () => {
         };
 
         // Call the API to save content details
-        const response = await saveContentDetails(
+        const response = await saveStoryLineContentDetails(
           address!,
           vanityAddress,
           contentDetails
@@ -126,7 +130,8 @@ const ContributeContent: React.FC = () => {
           toast.success(response.message);
           setContent("");
           setMood("");
-          fetchUserContent();
+          setAge(25);
+          fetchStoryLineContent();
         }
       } catch (error: any) {
         toast.error("Error uploading to IPFS:", error);
@@ -155,27 +160,28 @@ const ContributeContent: React.FC = () => {
   };
 
   // Function to download the CSV file
-  const downloadUserContent = async (data: any[]) => {
-    const responseUserContentCountLog = await axios.post(
-      `${server_api_base_url}/proxyUserContentDownload`,
+  const downloadStoryLineContent = async (data: any[]) => {
+    const responseStoryLineContentCountLog = await axios.post(
+      `${server_api_base_url}/proxyStoryLineContentDownload`,
       { vanityAddress },
       {
         headers: { "Content-Type": "application/json" },
       }
     );
+    console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
     const filteredData = data.map(({ _id, ...rest }) => rest);
     const csvData = convertToCSV(filteredData);
 
     // Create a Blob from the CSV data
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
 
-    saveAs(blob, "user_submissions.csv");
+    saveAs(blob, "storyLine_submissions.csv");
     toast.success("The CSV file has been downloaded successfully.");
   };
 
   // Initial fetch of user content when component mounts
   useEffect(() => {
-    fetchUserContent();
+    fetchStoryLineContent();
   }, [address, isConnected]);
 
   return (
@@ -186,16 +192,10 @@ const ContributeContent: React.FC = () => {
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />
       </Link>
-      <div className="container mx-auto min-h-screen py-10 bg-[#0e0e0e] text-white flex flex-col items-center relative justify-center px-4">
+      <div className="container mx-auto min-h-screen py-10 bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4">
         {/* Display Loader */}
         {isLoading && <Loader />}
-        {/* StoryLines Button */}
-        <Link to={`/storylinescontent/${address}`}>
-        <button className="absolute top-4 right-4 p-3 bg-blue-500 text-white rounded-lg border-2 border-white">
-          Create StoryLines
-        </button>
-        </Link>
-
+        
         {/* Wallet and Vanity Address */}
         <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
           {/* Wallet Address */}
@@ -239,6 +239,52 @@ const ContributeContent: React.FC = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Age Slider */}
+        <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-6">
+          <p className="text-md font-semibold mb-4 text-blue-400">
+            Select Age :
+          </p>
+          <div className="flex items-center justify-between">
+            {/* <p className="text-sm text-gray-400">0</p> */}
+            <Slider
+              value={age}
+              onChange={(e, newValue) => setAge(newValue as number)}
+              valueLabelDisplay="on"
+              min={0}
+              max={100}
+              defaultValue={25}
+              step={1}
+              marks={[
+                { value: 0, label: "0" },
+                { value: 18, label: "18" },
+                { value: 25, label: "25" },
+                { value: 30, label: "30" },
+                { value: 40, label: "40" },
+                { value: 50, label: "50" },
+                { value: 65, label: "65" },
+                { value: 75, label: "75" },
+                { value: 85, label: "85" },
+                { value: 100, label: "100" },
+              ]}
+              sx={{
+                color: "#5692D9",
+                "& .MuiSlider-thumb": {
+                  backgroundColor: "#fff",
+                  border: "2px solid #5692D9",
+                },
+                "& .MuiSlider-markLabel": {
+                  color: "#fff",
+                },
+                "& .MuiSlider-valueLabel": {
+                  backgroundColor: "#5692D9",
+                  color: "#fff",
+                },
+              }}
+            />
+            {/* <p className="text-sm text-gray-400">100</p> */}
+          </div>
         </div>
 
         {/* Content Section */}
@@ -337,11 +383,11 @@ const ContributeContent: React.FC = () => {
         {/* Your Contributions */}
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
           <p className="text-md font-semibold mb-4 text-blue-400">
-            Your Contributions :
+            Your Contributions
           </p>
           {/* Displaying submissions in accordion */}
           {submissions.length > 0 ? (
-            <Contributions submissions={submissions} />
+            <StoryLineContributions submissions={submissions} />
           ) : (
             <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">
               No contributions yet.
@@ -353,7 +399,7 @@ const ContributeContent: React.FC = () => {
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
           <button
             className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 mt-5 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
-            onClick={() => downloadUserContent(submissions)}
+            onClick={() => downloadStoryLineContent(submissions)}
           >
             Download Contribution Data
           </button>
@@ -363,4 +409,4 @@ const ContributeContent: React.FC = () => {
   );
 };
 
-export default ContributeContent;
+export default CreateStoryLines;

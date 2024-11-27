@@ -10,6 +10,7 @@ import NotFound from "../utils/NotFound";
 import Shop from "../pages/Shop";
 import ContributeContent from "../pages/ContributeContent";
 import SocketNFTDetails from "../pages/SocketNFTDetails";
+import CreateStoryLines from "../pages/CreateStoryLines";
 
 const AllRoutes = () => {
   return (
@@ -27,6 +28,10 @@ const AllRoutes = () => {
           <Route
             path="/content/:walletAddress"
             element={<ContributeContent />}
+          />
+          <Route
+            path="/storylinescontent/:walletAddress"
+            element={<CreateStoryLines />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           <Route path="/nft/socketNFT/:vanityAddress" element={<SocketNFTDetails />} />

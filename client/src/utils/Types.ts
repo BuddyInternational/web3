@@ -56,7 +56,19 @@ export interface NFTDetails {
 export interface ContentSubmission {
   mood: string;
   content: string;
-  age: number;
+  ipfsHash?: string;
+  generateContentDate: string;
+  contentWordCount: number;
+  eligibleStatus: boolean;
+  submissionHash: string;
+  isSubbmited: boolean;
+  submissionDate: string;
+}
+
+export interface StoryLineContentSubmission {
+  mood: string;
+  content: string;
+  age:number;
   ipfsHash?: string;
   generateContentDate: string;
   contentWordCount: number;

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-// Define the schema for UserContent
-const UserContentSchema = new mongoose.Schema(
+// Define the schema for StoryLines
+const StoryLineContentSchema = new mongoose.Schema(
   {
     walletAddress: {
       type: String,
@@ -13,7 +13,8 @@ const UserContentSchema = new mongoose.Schema(
     },
     contentDetails: [{
       mood: { type: String },
-      content: {type: String},  
+      content: {type: String}, 
+      age: {type: Number}, 
       ipfsHash : {type: String},
       generateContentDate: { type: Date },
       contentWordCount: {type: Number},
@@ -25,5 +26,5 @@ const UserContentSchema = new mongoose.Schema(
   },
 );
 
-const UserContentData = mongoose.model("userContent", UserContentSchema);
-export { UserContentData };
+const StoryLineContentData = mongoose.model("storyLines", StoryLineContentSchema);
+export { StoryLineContentData };
