@@ -53,6 +53,26 @@ export interface NFTDetails {
   totalClaimedRewardHash: string[];
 }
 
+// Define NFT interface for save details in Database
+export interface ShopNFTDetails {
+  chainName?: string;
+  contractAddress?: string;
+  tokenId?: any;
+  name?: string;
+  tokenType?: string;
+  tokenUri?: string;
+  imageUrl?: string;
+  mediaType?: any;
+  timeLastUpdated?: string;
+  floorPrice?: number | null;
+  floorPriceUsd?: number | null ;
+  priceCurrency?: string | null;
+  lastclaimedAt: Date | null;
+  totalClaimedRewardCount: number;
+  totalClaimedRewardHash: string[];
+  traits: [] | undefined;
+}
+
 export interface ContentSubmission {
   mood: string;
   content: string;

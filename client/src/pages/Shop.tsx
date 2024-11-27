@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link } from "react-router-dom";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
-import { NFTDetails } from "../utils/Types";
+import { NFTDetails, ShopNFTDetails } from "../utils/Types";
 import { Box, Tab, Tabs } from "@mui/material";
+import Moralis from "moralis/.";
 
 interface NFT {
   asset_contract: {
@@ -26,21 +27,41 @@ interface NFT {
   claim_count: number;
   claim_hashes: string[];
 }
-
+// API KEY
+const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const ApiKey: string | undefined = process.env.REACT_APP_OPENSEA_API_KEY || "";
+
 const Shop = () => {
   const [buddyPassportNFTdata, setBuddyPassportNFTdata] = useState<
-    NFTDetails[]
+  ShopNFTDetails[]
   >([]);
-  const [teamNFTdata, setTeamNFTdata] = useState<NFTDetails[]>([]);
-  const [managerNFTdata, setManagerNFTdata] = useState<NFTDetails[]>([]);
+  const [teamNFTdata, setTeamNFTdata] = useState<ShopNFTDetails[]>([]);
+  const [managerNFTdata, setManagerNFTdata] = useState<ShopNFTDetails[]>([]);
+  const [teamNFTWithTraits, setTeamNFTWithTraits] = useState<ShopNFTDetails[]>([]);
   const [value, setValue] = React.useState(0);
+  const [traitsData, setTraitsData] = useState();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-// fetch Nft Collection data
+  // Fetch traits only for Team NFTs using OpenSea API
+  const fetchNFTTraits = async (nft: any) => {
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "x-api-key": ApiKey, // No need for template literal here
+      },
+    };
+    const traitApiUrl = `https://api.opensea.io/api/v2/chain/${nft.chainName}/contract/${nft.contractAddress}/nfts/${nft.tokenId}`;
+    const traitResponse = await fetch(traitApiUrl, options);
+    const traitData = await traitResponse.json();
+
+    return { ...nft, traits: traitData.nft.traits || [] };
+  };
+
+  // fetch Nft Collection data
   useEffect(() => {
     const fetchNFTsCollection = async () => {
       const options = {
@@ -50,28 +71,27 @@ const Shop = () => {
           "x-api-key": ApiKey, // No need for template literal here
         },
       };
-  
+
       // Define collection URLs
       const collectionUrls = [
         "https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts",
         "https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts",
         "https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts",
       ];
-  
+
       try {
         // Fetch all collections in parallel
         const responses = await Promise.all(
           collectionUrls.map((url) => fetch(url, options))
         );
-  
+
         // Parse JSON responses
         const collectionsData = await Promise.all(
           responses.map((response) => response.json())
         );
-  
         // Define a utility function to format NFTs
         const formatNFTs = (nfts = []) =>
-          nfts.map((nft: NFT) => ({
+          nfts.map((nft: any) => ({
             chainName: nft.asset_contract?.chain || "Matic",
             contractAddress: nft.contract || "",
             tokenId: nft.identifier || "",
@@ -87,25 +107,51 @@ const Shop = () => {
             lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
             totalClaimedRewardCount: nft.claim_count || 0,
             totalClaimedRewardHash: nft.claim_hashes || [],
+            traits: nft.traits || [],
           }));
-  
+
         // Extract and format data for each collection
         const [
           buddyPassportCollectionData,
           teamCollectionData,
           managerCollectionData,
         ] = collectionsData;
-  
+
         setBuddyPassportNFTdata(formatNFTs(buddyPassportCollectionData.nfts));
         setTeamNFTdata(formatNFTs(teamCollectionData.nfts));
         setManagerNFTdata(formatNFTs(managerCollectionData.nfts));
+
+        // Fetch traits for Team NFTs in parallel
+        const teamNFTsWithTraits = await Promise.all(
+          teamNFTdata.map(fetchNFTTraits)
+        );
+
+        if(teamNFTsWithTraits.length >0){
+          setTeamNFTdata(teamNFTsWithTraits);
+        }
+
       } catch (err) {
         console.error("Error fetching NFT data from OpenSea:", err);
       }
     };
-  
+
     fetchNFTsCollection();
   }, []);
+
+    // Fetch traits for Team NFTs after teamNFTdata is set
+    useEffect(() => {
+      const fetchTeamTraits = async () => {
+        if (teamNFTdata.length > 0) {
+          const enrichedTeamNFTs = await Promise.all(
+            teamNFTdata.map(fetchNFTTraits)
+          );
+          setTeamNFTWithTraits(enrichedTeamNFTs); // Store traits for filtering
+          setTeamNFTdata(enrichedTeamNFTs); // Update teamNFTdata with traits
+        }
+      };
+  
+      fetchTeamTraits();
+    }, [teamNFTdata]);
   
 
   return (
@@ -135,7 +181,7 @@ const Shop = () => {
 
         {value === 0 &&
           (buddyPassportNFTdata.length > 0 ? (
-            <ShopeNftcard NFTDetails={buddyPassportNFTdata} CardType="BuyNft" />
+            <ShopeNftcard NFTDetails={buddyPassportNFTdata} CardType="BuyNft" tabValue="0" />
           ) : (
             <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
               No NFTs exits at the moment
@@ -143,7 +189,7 @@ const Shop = () => {
           ))}
         {value === 1 &&
           (teamNFTdata.length > 0 ? (
-            <ShopeNftcard NFTDetails={teamNFTdata} CardType="BuyNft" />
+            <ShopeNftcard NFTDetails={teamNFTdata} CardType="BuyNft" tabValue="1" />
           ) : (
             <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
               No NFTs exits at the moment
@@ -151,7 +197,7 @@ const Shop = () => {
           ))}
         {value === 2 &&
           (managerNFTdata.length > 0 ? (
-            <ShopeNftcard NFTDetails={managerNFTdata} CardType="BuyNft" />
+            <ShopeNftcard NFTDetails={managerNFTdata} CardType="BuyNft" tabValue="2"/>
           ) : (
             <h1 className="text-center font-bold text-3xl sm:text-xl md:text-2xl lg:text-3xl my-7 text-white">
               No NFTs exits at the moment

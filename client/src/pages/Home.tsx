@@ -4,7 +4,7 @@ import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
 import Web3 from "web3";
-import { NFTDetails } from "../utils/Types";
+import { NFTDetails, ShopNFTDetails } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
 import NftCard from "../components/homeComponents/card/NftCard";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
@@ -87,7 +87,8 @@ const gullyBuddyNFTAddress =
 
 const gullyBuddyNFTCollectionAddress = [
   process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!,
-  process.env.REACT_APP_TEAM_NFT_COLLECTION_ADDRESS!,
+  process.env.REACT_APP_TEAM1_NFT_COLLECTION_ADDRESS!,
+  process.env.REACT_APP_TEAM2_NFT_COLLECTION_ADDRESS!,
   process.env.REACT_APP_MANAGER_NFT_COLLECTION_ADDRESS!,
 ];
 // const gullyBuddyNFTCollectionAddress =[
@@ -146,7 +147,7 @@ const Home = () => {
   const [otherNFTs, setOtherNFTs] = useState<NFTDetails[]>([]);
   const [gullyBuddyNFTs, setGullyBuddyNFTs] = useState<NFTDetails[]>([]);
   const [gullyBuddyCollectionNFTs, setGullyBuddyCollectionNFTs] = useState<
-    NFTDetails[]
+    ShopNFTDetails[]
   >([]);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
@@ -384,7 +385,7 @@ const Home = () => {
           ...(buddyManagerData.nfts || []),
         ];
 
-        const formattedNFTs = combinedNFTs.map((nft: NFT) => ({
+        const formattedNFTs = combinedNFTs.map((nft: any) => ({
           chainName: nft.asset_contract?.chain || "Matic",
           contractAddress: nft.contract || "",
           tokenId: nft.identifier || "",
@@ -400,6 +401,7 @@ const Home = () => {
           lastclaimedAt: new Date(nft.last_claimed_date || Date.now()),
           totalClaimedRewardCount: nft.claim_count || 0,
           totalClaimedRewardHash: nft.claim_hashes || [],
+          traits: nft.traits || [],
         }));
 
         setGullyBuddyCollectionNFTs(formattedNFTs); // Update Gullybuddy specific NFTs
@@ -1027,7 +1029,7 @@ const Home = () => {
                     <span className="text-[#5692D9] mr-2 flex items-center">
                       Test ANT
                       <img
-                        src="/Annotation.png"
+                        src="/Annotation.svg"
                         alt="TANT Symbol"
                         className="w-4 h-4 mx-1 rounded-md"
                       />
@@ -1178,6 +1180,7 @@ const Home = () => {
                   <ShopeNftcard
                     NFTDetails={gullyBuddyCollectionNFTs}
                     CardType={"BuyNft"}
+                    tabValue = "null"
                   />
                 </div>
               ) : (

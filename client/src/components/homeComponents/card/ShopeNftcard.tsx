@@ -2,20 +2,23 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { FaCheck, FaCopy } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
-import { NFTDetails } from "../../../utils/Types";
+import { ShopNFTDetails } from "../../../utils/Types";
 import Pagination from "../../../utils/Pagination";
 import ZoomedImage from "../modals/ZoomedImage";
 import { IoMdQrScanner } from "react-icons/io";
 import CardInteractMenus from "./CardInteractMenus";
 import CardChainFilterMenus from "./CardChainFilterMenus";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import CardMedianTokenFilterMenus from "./CardMedianTokenFilterMenus";
 
 const ShopeNftcard: React.FC<{
-  NFTDetails: NFTDetails[];
+  NFTDetails: ShopNFTDetails[];
   CardType: string;
-}> = ({ NFTDetails, CardType }) => {
-  const [isContractAddressCopied, setIsContractAddressCopied] =
-    useState<number | null>(null);
+  tabValue: string;
+}> = ({ NFTDetails, CardType, tabValue }) => {
+  const [isContractAddressCopied, setIsContractAddressCopied] = useState<
+    number | null
+  >(null);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
   const copyTimeoutRef: any = useRef(null);
   const { isConnected } = useWeb3ModalAccount();
@@ -24,13 +27,36 @@ const ShopeNftcard: React.FC<{
   const [open, setOpen] = useState(false);
   const [zommedImageURL, setZommedImageURL] = useState("");
   const [selectedChain, setSelectedChain] = useState<string>("All");
+  const [selectedMedianToken, setSelectedMedianToken] = useState<number | null>(-1);
+
+
+  // Extract numeric value from "value" field
+  const getNumericValue = (value: string | undefined): number => {
+    if (!value) return 0;
+    const numericPart = parseInt(value.split("_")[0], 10);
+    return isNaN(numericPart) ? 0 : numericPart;
+  };
 
   // Filter NFTs based on selected chain
-  const filteredNFTDetails =
+  // const filteredNFTDetails =
+  //   selectedChain === "All"
+  //     ? NFTDetails
+  //     : NFTDetails.filter((nft) => nft.chainName === selectedChain);
+ 
+
+  // Filter NFTs by Chain
+  const filteredByChain =
     selectedChain === "All"
       ? NFTDetails
       : NFTDetails.filter((nft) => nft.chainName === selectedChain);
-  console.log();
+
+
+  // Filter NFTs by Weighted Median Tokens
+  const filteredNFTDetails = selectedMedianToken === -1 ? filteredByChain 
+    : filteredByChain.filter((nft: any) => {
+        const tokenValue = getNumericValue(nft?.traits[4]?.value);
+        return tokenValue === selectedMedianToken;
+      });
 
   // Total number of page
   const totalPages = Math.ceil(filteredNFTDetails.length / itemsPerPage);
@@ -40,6 +66,25 @@ const ShopeNftcard: React.FC<{
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+
+// Extract unique numeric values from the "weighted median tokens" trait values
+const uniqueMedianTokenNumbers: number[] = Array.from(
+  new Set(
+    NFTDetails.flatMap((nft) =>
+      nft.traits
+        ? nft.traits
+            .filter((trait: any) => trait.trait_type === "weighted median tokens" && trait.value)
+            .map((trait: any) => {
+              // Extract the number part before '_CDE' using regex
+              const match = trait.value.match(/^(\d+)/);
+              return match ? Number(match[1]) : null;
+            })
+            .filter((value): value is number => value !== null) // TypeScript type guard to ensure only numbers remain
+        : []
+    )
+  )
+);
 
   // Get unique chains from NFTDetails
   const uniqueChains: string[] = Array.from(
@@ -116,25 +161,43 @@ const ShopeNftcard: React.FC<{
   // Reset current page on chain change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedChain]);
+  }, [selectedChain, selectedMedianToken]);
 
   return (
     <>
-      {/* Dropdown for filtering by chain */}
-      <div className="flex justify-end sm: mb-1 md:mb-3 container mx-auto px-4 gap-2">
-        <label
-          htmlFor="chainSelect"
-          className="text-md font-bold text-[#5692D9] sm:py-2 md:py-4 "
-        >
-          Filter by Chain:
-        </label>
-        <CardChainFilterMenus
-          uniqueChains={uniqueChains}
-          selectedChain={selectedChain}
-          setSelectedChain={setSelectedChain}
-          component="NFTCard"
-        />
+      {/* Dropdowns for Filters */}
+      <div className="flex justify-end items-center container mx-auto px-6 gap-4 mb-4">
+         {/* Filter by Weighted Median Tokens */}
+         {CardType === "BuyNft" && tabValue === "1" && (
+          <>
+            <div className="flex items-center gap-2">
+              <label className="text-md font-bold text-[#5692D9]">
+                Filter by Weighted Median Tokens:
+              </label>
+              <CardMedianTokenFilterMenus
+              uniqueMedianTokenNumbers={uniqueMedianTokenNumbers}
+                selectedMedianToken={selectedMedianToken}
+                setSelectedMedianToken={setSelectedMedianToken}
+                component="NFTCard"
+              />
+            </div>
+          </>
+        )}
+        {/* Filter by Chain */}
+        <div className="flex justify-end items-center gap-2">
+          <label className="text-md font-bold text-[#5692D9]">
+            Filter by Chain:
+          </label>
+          <CardChainFilterMenus
+            uniqueChains={uniqueChains}
+            selectedChain={selectedChain}
+            setSelectedChain={setSelectedChain}
+            component="NFTCard"
+          />
+        </div>
+       
       </div>
+
       {/* Grid of NFTs*/}
       <div
         className="container mx-auto px-4 mt-2 grid grid-cols-1  sm:p-0 md:px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4"
@@ -144,7 +207,7 @@ const ShopeNftcard: React.FC<{
       >
         {slicedNFTDetails?.map((nft, index) => {
           const globalIndex = (currentPage - 1) * itemsPerPage + index;
-          const selectedNFT: NFTDetails = {
+          const selectedNFT: ShopNFTDetails = {
             chainName: nft.chainName || "",
             contractAddress: nft.contractAddress || "",
             tokenId: nft.tokenId || "",
@@ -160,6 +223,7 @@ const ShopeNftcard: React.FC<{
             lastclaimedAt: nft.lastclaimedAt || null,
             totalClaimedRewardCount: nft.totalClaimedRewardCount || 0,
             totalClaimedRewardHash: nft.totalClaimedRewardHash || [],
+            traits: nft.traits || [],
           };
           return (
             <div
@@ -168,7 +232,7 @@ const ShopeNftcard: React.FC<{
             >
               <div className="p-2 mt-2 text-sm flex flex-column justify-between">
                 <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded dark:bg-blue-900 dark:text-blue-300">
-                {nft.chainName === "Matic" ? "Polygon" : nft.chainName}
+                  {nft.chainName === "Matic" ? "Polygon" : nft.chainName}
                 </span>
                 <span></span>
                 <p className="flex gap-1">
@@ -265,7 +329,7 @@ const ShopeNftcard: React.FC<{
                         <span className=" flex flex-col gap-2">
                           <p className="">
                             {Number(nft?.floorPrice).toFixed(4)}{" "}
-                            {nft?.priceCurrency} 
+                            {nft?.priceCurrency}
                           </p>
                           <p className="">
                             {Number(nft?.floorPriceUsd).toFixed(2)} USD
