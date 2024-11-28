@@ -44,7 +44,8 @@ const ModalNFTCard: React.FC<{
   const convertIpfsUrl = (imageUrl: string) => {
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
-      const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+      // const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+      const newImageUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
       return newImageUrl;
     }
     return imageUrl;

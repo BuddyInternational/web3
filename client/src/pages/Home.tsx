@@ -492,6 +492,8 @@ const Home = () => {
         targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
       );
 
+      console.log("gullyBuddyNFTsData=============",gullyBuddyNFTsData);
+
       // Filter for other NFTs (not matching any of the target addresses)
       const otherNFTsData = combinedNFTs.filter(
         (nft: any) =>
@@ -601,7 +603,8 @@ const Home = () => {
   const convertIpfsUrl = (imageUrl: string) => {
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
-      const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+      // const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+      const newImageUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
       return newImageUrl;
     }
     return imageUrl;
