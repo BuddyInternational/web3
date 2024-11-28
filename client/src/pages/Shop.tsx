@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link } from "react-router-dom";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
-import { NFTDetails, ShopNFTDetails } from "../utils/Types";
+import { ShopNFTDetails } from "../utils/Types";
 import { Box, Tab, Tabs } from "@mui/material";
-import Moralis from "moralis/.";
 
 interface NFT {
   asset_contract: {
@@ -39,28 +38,44 @@ const Shop = () => {
   const [managerNFTdata, setManagerNFTdata] = useState<ShopNFTDetails[]>([]);
   const [teamNFTWithTraits, setTeamNFTWithTraits] = useState<ShopNFTDetails[]>([]);
   const [value, setValue] = React.useState(0);
-  const [traitsData, setTraitsData] = useState();
+  const [isAPICall, setIsAPICall] = useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  // Fetch traits only for Team NFTs using OpenSea API
-  const fetchNFTTraits = async (nft: any) => {
+  const fetchNFTTraitsWithRetry = async (nft: any, retries: number = 3, delay: number = 1000) => {
     const options = {
       method: "GET",
       headers: {
         accept: "application/json",
-        "x-api-key": ApiKey, // No need for template literal here
+        "x-api-key": ApiKey,
       },
     };
+  
     const traitApiUrl = `https://api.opensea.io/api/v2/chain/${nft.chainName}/contract/${nft.contractAddress}/nfts/${nft.tokenId}`;
-    const traitResponse = await fetch(traitApiUrl, options);
-    const traitData = await traitResponse.json();
-
-    return { ...nft, traits: traitData.nft.traits || [] };
+  
+    let attempts = 0;
+    while (attempts < retries) {
+      try {
+        const traitResponse = await fetch(traitApiUrl, options);
+        if (!traitResponse.ok) {
+          throw new Error(`API Error: ${traitResponse.status}`);
+        }
+        const traitData = await traitResponse.json();
+        return { ...nft, traits: traitData?.nft?.traits || [] };
+      } catch (error) {
+        attempts++;
+        if (attempts < retries) {
+          await new Promise((resolve) => setTimeout(resolve, delay * attempts)); // Exponential backoff
+        } else {
+          console.error(`Failed to fetch traits for ${nft.tokenId}:`, error);
+          return { ...nft, traits: [] }; // Fallback to empty traits
+        }
+      }
+    }
   };
-
+  
   // fetch Nft Collection data
   useEffect(() => {
     const fetchNFTsCollection = async () => {
@@ -121,14 +136,14 @@ const Shop = () => {
         setTeamNFTdata(formatNFTs(teamCollectionData.nfts));
         setManagerNFTdata(formatNFTs(managerCollectionData.nfts));
 
-        // Fetch traits for Team NFTs in parallel
-        const teamNFTsWithTraits = await Promise.all(
-          teamNFTdata.map(fetchNFTTraits)
-        );
+        // // Fetch traits for Team NFTs in parallel
+        // const teamNFTsWithTraits = await Promise.all(
+        //   teamNFTdata.map(fetchNFTTraits)
+        // );
 
-        if(teamNFTsWithTraits.length >0){
-          setTeamNFTdata(teamNFTsWithTraits);
-        }
+        // if(teamNFTsWithTraits.length >0){
+        //   setTeamNFTdata(teamNFTsWithTraits);
+        // }
 
       } catch (err) {
         console.error("Error fetching NFT data from OpenSea:", err);
@@ -138,22 +153,22 @@ const Shop = () => {
     fetchNFTsCollection();
   }, []);
 
-    // Fetch traits for Team NFTs after teamNFTdata is set
-    useEffect(() => {
-      const fetchTeamTraits = async () => {
-        if (teamNFTdata.length > 0) {
-          const enrichedTeamNFTs = await Promise.all(
-            teamNFTdata.map(fetchNFTTraits)
-          );
-          setTeamNFTWithTraits(enrichedTeamNFTs); // Store traits for filtering
-          setTeamNFTdata(enrichedTeamNFTs); // Update teamNFTdata with traits
-        }
-      };
+  // Fetch traits for Team NFTs after teamNFTdata is set
+  useEffect(() => {
+    const fetchTeamTraits = async () => {
+      if (teamNFTdata && teamNFTdata.length > 0 && !isAPICall) {
+        setIsAPICall(true);
+        const enrichedTeamNFTs = await Promise.all(
+          teamNFTdata.map((nft, index) => fetchNFTTraitsWithRetry(nft, 3, 60000))
+        );
+        setTeamNFTWithTraits(enrichedTeamNFTs); // Store traits for filtering
+        setTeamNFTdata(enrichedTeamNFTs); // Update teamNFTdata with traits
+        setIsAPICall(false);
+      }
+    };
+    fetchTeamTraits();
+  }, [teamNFTdata,isAPICall]);
   
-      fetchTeamTraits();
-    }, [teamNFTdata]);
-  
-
   return (
     <div className="container m-auto flex flex-col mt-2 gap-3 ">
       <Link

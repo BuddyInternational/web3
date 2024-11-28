@@ -50,13 +50,20 @@ const ShopeNftcard: React.FC<{
       ? NFTDetails
       : NFTDetails.filter((nft) => nft.chainName === selectedChain);
 
-
-  // Filter NFTs by Weighted Median Tokens
   const filteredNFTDetails = selectedMedianToken === -1 ? filteredByChain 
-    : filteredByChain.filter((nft: any) => {
-        const tokenValue = getNumericValue(nft?.traits[4]?.value);
+  : filteredByChain.filter((nft: any) => {
+      
+      // Find the trait with "weighted median tokens"
+      const weightedMedianTrait = nft?.traits?.find((trait: any) => trait?.trait_type === "weighted median tokens");
+      if (weightedMedianTrait) {
+        // Get the value and extract the numeric part (e.g., "10_CDE" -> 10)
+        const tokenValue = getNumericValue(weightedMedianTrait.value);
+        
         return tokenValue === selectedMedianToken;
-      });
+      }
+
+      return false; 
+  });
 
   // Total number of page
   const totalPages = Math.ceil(filteredNFTDetails.length / itemsPerPage);
