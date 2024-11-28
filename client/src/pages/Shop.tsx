@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link } from "react-router-dom";
 import ShopeNftcard from "../components/homeComponents/card/ShopeNftcard";
-import { ShopNFTDetails } from "../utils/Types";
+import { NFTDetails, ShopNFTDetails } from "../utils/Types";
 import { Box, Tab, Tabs } from "@mui/material";
 
 interface NFT {
@@ -91,7 +91,8 @@ const Shop = () => {
       // Define collection URLs
       const collectionUrls = [
         "https://api.opensea.io/api/v2/collection/gully-buddy-international-passport-polygon/nfts",
-        "https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts",
+        "https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts?limit=200",
+        // "https://api.opensea.io/api/v2/collection/gullybuddypolygon/nfts",
         "https://api.opensea.io/api/v2/collection/gully-buddy-international-socketed-nfts-bonus-comm/nfts",
       ];
 
@@ -153,6 +154,8 @@ const Shop = () => {
 
     fetchNFTsCollection();
   }, []);
+
+  
 
   // Fetch traits for Team NFTs after teamNFTdata is set
   useEffect(() => {
