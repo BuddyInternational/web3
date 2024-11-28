@@ -72,8 +72,8 @@ const ShopeNftcard: React.FC<{
 const uniqueMedianTokenNumbers: number[] = Array.from(
   new Set(
     NFTDetails.flatMap((nft) =>
-      nft.traits
-        ? nft.traits
+      nft?.traits
+        ? nft?.traits
             .filter((trait: any) => trait.trait_type === "weighted median tokens" && trait.value)
             .map((trait: any) => {
               // Extract the number part before '_CDE' using regex

@@ -13,6 +13,7 @@ import { saveAs } from "file-saver";
 import axios from "axios";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
+import { motion } from "framer-motion";
 
 // Define mood options
 const moodOptions = [
@@ -191,9 +192,23 @@ const ContributeContent: React.FC = () => {
         {isLoading && <Loader />}
         {/* StoryLines Button */}
         <Link to={`/storylinescontent/${address}`}>
-        <button className="absolute top-4 right-4 p-3 bg-blue-500 text-white rounded-lg border-2 border-white">
-          Create StoryLines
-        </button>
+          {/* Use motion.button for animations */}
+          <motion.button
+            className="absolute top-4 right-4 p-3 text-white rounded-lg border-2 border-white"
+            style={{
+              background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
+            }}
+            whileHover={{
+              scale: 1.1,
+              boxShadow: "0px 0px 15px rgba(72, 209, 204, 0.8)",
+            }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 100, damping: 10 }}
+          >
+            Create StoryLines
+          </motion.button>
         </Link>
 
         {/* Wallet and Vanity Address */}

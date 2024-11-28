@@ -11,10 +11,12 @@ import Shop from "../pages/Shop";
 import ContributeContent from "../pages/ContributeContent";
 import SocketNFTDetails from "../pages/SocketNFTDetails";
 import CreateStoryLines from "../pages/CreateStoryLines";
+import { AnimatePresence } from "framer-motion";
 
 const AllRoutes = () => {
   return (
     <>
+    <AnimatePresence mode="wait">
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -41,6 +43,7 @@ const AllRoutes = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      </AnimatePresence>
     </>
   );
 };

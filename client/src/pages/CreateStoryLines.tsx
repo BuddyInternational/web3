@@ -15,6 +15,7 @@ import { Slider } from "@mui/material";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
 import StoryLineContributions from "../components/contributeComponents/StoryLineContributions";
+import { motion } from "framer-motion"; 
 
 // Define mood options
 const moodOptions = [
@@ -186,6 +187,13 @@ const CreateStoryLines: React.FC = () => {
 
   return (
     <>
+     <motion.div
+      initial={{ opacity: 0, scale: 0.9 }} // Start faded and slightly smaller
+      animate={{ opacity: 1, scale: 1 }}   // Fully visible and normal size
+      exit={{ opacity: 0, scale: 1.1 }}    // Fade out while zooming slightly
+      transition={{ duration: 0.5 }}       // Animation duration
+      className="page-container"
+    >
       <Link
         to="/"
         className="container m-auto text-blue-500 hover:underline flex items-center mb-4"
@@ -405,6 +413,7 @@ const CreateStoryLines: React.FC = () => {
           </button>
         </div>
       </div>
+      </motion.div>
     </>
   );
 };
