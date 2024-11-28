@@ -44,7 +44,8 @@ const Shop = () => {
     setValue(newValue);
   };
 
-  const fetchNFTTraitsWithRetry = async (nft: any, retries: number = 3, delay: number = 1000) => {
+  // fetch nft Traits Details
+  const fetchNFTTraitsWithRetry = async (nft: any, retries: number = 3, delay: number = 60000) => {
     const options = {
       method: "GET",
       headers: {
