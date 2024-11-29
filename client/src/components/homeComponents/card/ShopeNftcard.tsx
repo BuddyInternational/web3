@@ -330,7 +330,7 @@ const uniqueMedianTokenNumbers: number[] = Array.from(
                 <div className="mb-2 text-sm flex flex-column justify-between">
                   <p className="text-sm">Price </p>
                   <span className="flex gap-2">
-                    {nft?.floorPrice === null ? (
+                    {nft?.floorPrice === 0 ? (
                       "Price Not Found"
                     ) : (
                       <>
@@ -339,9 +339,9 @@ const uniqueMedianTokenNumbers: number[] = Array.from(
                             {Number(nft?.floorPrice).toFixed(4)}{" "}
                             {nft?.priceCurrency}
                           </p>
-                          <p className="">
+                          {/* <p className="">
                             {Number(nft?.floorPriceUsd).toFixed(2)} USD
-                          </p>
+                          </p> */}
                         </span>
                       </>
                     )}
