@@ -296,11 +296,12 @@ const Home = () => {
         symbol:
           tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
+        address: Object.keys(tokenAddresses)[idx],
       }));
 
       // ************************** vanity address balance  ********************************
       const vanitybalances = await Promise.all(
-        tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
+        tokenContracts.map((contract) => contract.balanceOf(address))
       );
 
       const formattedVanityBalances = vanitybalances.map((balance, idx) => ({
@@ -309,7 +310,13 @@ const Home = () => {
         symbol:
           tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
+        address: Object.keys(tokenAddresses)[idx],
       }));
+
+      // console.log(
+      //   "formattedVanityBalances=================",
+      //   formattedVanityBalances
+      // );
 
       // ************************ Test CDE address balance  ************************************
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
@@ -492,7 +499,7 @@ const Home = () => {
         targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
       );
 
-      console.log("gullyBuddyNFTsData=============",gullyBuddyNFTsData);
+      console.log("gullyBuddyNFTsData=============", gullyBuddyNFTsData);
 
       // Filter for other NFTs (not matching any of the target addresses)
       const otherNFTsData = combinedNFTs.filter(
@@ -854,7 +861,7 @@ const Home = () => {
             {/* Loop through tokenDetails to display the balances */}
             {Object.keys(tokenDetails).map((tokenAddress, idx) => {
               const walletToken = balances.wallet.find(
-                (token: any) => tokenAddress === token.address
+                (token: any) => tokenDetails[tokenAddress]?.name === token.name
               );
               const walletBalance = walletToken ? walletToken.balance : "0";
 
@@ -1047,8 +1054,10 @@ const Home = () => {
                   <>
                     {Object.keys(tokenDetails).map((tokenAddress, idx) => {
                       const vanityToken = balances.vanity.find(
-                        (token: any) => tokenAddress === token.address
+                        (token: any) =>
+                          tokenDetails[tokenAddress]?.name === token.name // Match by token name
                       );
+
                       const vanityBalance = vanityToken
                         ? vanityToken.balance
                         : "0";
@@ -1183,7 +1192,7 @@ const Home = () => {
                   <ShopeNftcard
                     NFTDetails={gullyBuddyCollectionNFTs}
                     CardType={"BuyNft"}
-                    tabValue = "null"
+                    tabValue="null"
                   />
                 </div>
               ) : (
