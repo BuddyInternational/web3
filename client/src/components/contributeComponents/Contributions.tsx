@@ -29,13 +29,13 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   // submit user content onchain
   const handleSubmit = async (ipfsHash: string) => {
     try {
-      // const sender = address!;
-      // const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-      // const feesAmount = 10;
-      // // Send notification
-      // const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
-      // if (notificationResult && notificationResult.hash) {
-        // toast.success("Notification sent to Buddyinternational.eth");
+      const sender = address!;
+      const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
+      const feesAmount = 10;
+      // Send notification
+      const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+      if (notificationResult && notificationResult.hash) {
+        toast.success("Notification sent to Buddyinternational.eth");
         // Update the content detail
         const updateResponse = await updateContentDetail(
           address!,
@@ -51,7 +51,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
         } else {
           toast.error("Failed to update content detail.");
         }
-      // }
+      }
     } catch (error: any) {
       toast.error("Error sending notification:", error);
     }
