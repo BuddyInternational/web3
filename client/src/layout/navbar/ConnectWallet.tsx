@@ -167,8 +167,6 @@ export default function App() {
   const [openSendVanityDataModal, setOpenSendVanityDataModal] = useState(false);
   const [openMobileModal, setOpenMobileModal] = useState(false);
   const [openEmailModal, setOpenEmailModal] = useState(false);
-  // const [authMethod, setAuthMethod] = useState("");
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const {
     authMethod,
     loginDetails,
@@ -181,19 +179,15 @@ export default function App() {
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
     setShowModal(false);
-    // console.log(vanityAddress);
 
     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
       toast.error("Please connect your wallet to Download Vanity Data.");
       return;
     }
     try {
-      console.log("vanity address---------", vanityAddress);
       const response = await axios.get(
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
-
-      console.log("response--------------", response);
 
       const responseCountLog = await axios.post(
         `${server_api_base_url}/proxyVanityDataDownload`,
@@ -202,17 +196,10 @@ export default function App() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log("responseCountLog==========", responseCountLog);
 
-      // const responseCount = await axios.get(
-      //   `${server_api_base_url}/api/vanity/vanityCallcount`
-      // );
-
-      // console.log("responseCount",responseCount.data);
 
       // Check if response.data exists and is an array
       if (response.data.data && Array.isArray(response.data.data)) {
-        console.log("Setting data", response.data.data);
 
         // // Filter data to exclude fields like _id and vanityPrivateKey
         // const filteredData = response.data.data.map(
@@ -292,7 +279,6 @@ export default function App() {
 
         // Check if the wallet already has a vanity address
         const existingAddress = await checkExistingVanityAddress(address);
-        console.log("existingAddress", existingAddress);
 
         if (existingAddress != null) {
           // setVanityAddress(existingAddress.vanityAddress);
@@ -303,7 +289,6 @@ export default function App() {
             vanity_suffix!,
             1
           );
-          console.log("generateResponse---------", generateResponse);
           if (generateResponse?.data?.[0]?.address) {
             const generatedAddress = generateResponse.data[0];
             // Store the generated address using the helper function
@@ -399,6 +384,7 @@ export default function App() {
         setLoginDetails({}); 
         setIsLoggedIn(false); 
         setVanityAddress("0x0000000000000000000000000000000000000000");
+        resetBalances();
       }
     } catch (error) {
       console.error("Error during logout", error);
@@ -529,8 +515,6 @@ export default function App() {
         {/* connect/disconnect button */}
         <div className="flex flex-row justify-end px-2 py-6 mx-5">
           {!isLoggedIn && !isConnected ? (
-            // <w3m-button />
-            // <w3m-connect-button />
             <>
               <div className="flex gap-2 flex-col lg:flex-col xl:flex-row items-center">
                 {/* Login with Mobile Button */}
@@ -539,10 +523,8 @@ export default function App() {
                   sx={{
                     backgroundColor: "#5773FF",
                     color: "#fff",
-                    // fontWeight: "semibold",
                     fontWeight: "bold",
                     px: 2,
-                    // py: 1,
                     borderRadius: "22px",
                     "&:hover": {
                       backgroundColor: "#5773FF",
@@ -562,7 +544,6 @@ export default function App() {
                     color: "#fff",
                     fontWeight: "bold",
                     px: 2,
-                    // py: 1,
                     borderRadius: "22px",
                     "&:hover": {
                       backgroundColor: "#5773FF",
@@ -643,7 +624,6 @@ export default function App() {
                       color: "#fff",
                       fontWeight: "bold",
                       px: 2,
-                      // py: 1,
                       borderRadius: "22px",
                       "&:hover": {
                         backgroundColor: "#5773FF",

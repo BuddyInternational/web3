@@ -72,13 +72,13 @@ const RegisterModal: React.FC<{
   const handleAssignVanity = async () => {
     // Check if vanity address exists for the given mobile or email
     try {
+      setIsLoading(true);
       const existingVanity = await checkUserExistingVanityAddress(
         option === "mobile" ? inputValue : undefined,
         option === "email" ? inputValue : undefined
       );
       // If the vanity address exists
       if (existingVanity) {
-        console.log("Existing vanity details found:", existingVanity);
         // setVanityAddress(existingVanity.vanityDetails[0]?.vanityAddress);
         toast.success("You have Already assigned a Vanity Address ! Please login this account to access it.");
       } else {
@@ -105,11 +105,14 @@ const RegisterModal: React.FC<{
           toast.error("Error generating vanity address!");
         }
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error during vanity address assignment:", error);
-      toast.error("Error occurred while assigning vanity address!");
+      toast.error(`Error occurred while assigning vanity address! ${error}`);
     }
-    onClose();
+    finally{
+      setIsLoading(false);
+      onClose();
+    }
   };
   return (
     <>

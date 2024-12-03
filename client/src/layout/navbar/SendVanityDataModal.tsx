@@ -10,7 +10,6 @@ import {
   FormControlLabel,
   FormHelperText,
   IconButton,
-  InputLabel,
   Modal,
   TextField,
 } from "@mui/material";
@@ -63,6 +62,7 @@ const SendVanityDataModal: React.FC<{
     alert(`Wallet Address Submitted: ${walletAddress}`);
     onClose();
   };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>

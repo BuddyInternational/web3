@@ -33,6 +33,7 @@ import Tab from "@mui/material/Tab";
 import { useBalanceUpdate } from "../context/BalanceUpdateContext";
 import axios from "axios";
 import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
+import { useAuthContext } from "../context/AuthContext";
 
 // Constant Token address
 const tokenAddresses: any = {
@@ -169,6 +170,7 @@ const Home = () => {
   const targetDate = new Date("2024-12-31T23:59:59");
   const [vanityAddresses, setVanityAddresses] = useState([]);
   const [isHoldGullyBuddyNFT, setIsHoldGullyBuddyNFT] = useState(false);
+  const { isLoggedIn, loginDetails } = useAuthContext();
 
   // open dropdown menu
   const handleDropdownToggle = (event: React.MouseEvent<HTMLElement>) => {
@@ -213,7 +215,6 @@ const Home = () => {
             })
           );
           setVanityAddresses(vanityAddresses);
-          console.log("Extracted Vanity Addresses:", vanityAddresses);
         } else {
           console.error("Invalid API response structure", response.data);
           setVanityAddresses([]);
@@ -226,8 +227,8 @@ const Home = () => {
     fetchVanityAddresses();
   }, [vanityAddress, setVanityAddress, address, triggerVanityAddressUpdate]);
 
-   // fetch the vanity Address list for mobile and email
-   useEffect(() => {
+  // fetch the vanity Address list for mobile and email
+  useEffect(() => {
     const fetchVanityAddressesForMobileAndEmail = async () => {
       if (vanityAddress === "0x0000000000000000000000000000000000000000") {
         setVanityAddresses([]);
@@ -237,20 +238,28 @@ const Home = () => {
         const response = await axios.get(
           `${server_api_base_url}/api/user-vanity/downloadVanityAddressForUser`
         );
+
         // Extract the vanityAddresses from the response
         if (response.data && response.data.data) {
-          const vanityDetails = response.data.data.find(
-            (vanityData: any) => vanityData.walletAddress === address
-          );
-          // Map each detail to include both vanityAddress and accountType
-          const vanityAddresses = vanityDetails.vanityDetails.map(
-            (detail: any) => ({
+          // Find the user by mobile or email based on loginDetails
+          const user = response.data.data.find((vanityData: any) => {
+            return (
+              vanityData.mobile === loginDetails.mobile ||
+              vanityData.email === loginDetails.email
+            );
+          });
+          if (user) {
+            // Extract the vanityDetails for the user
+            const vanityAddresses = user.vanityDetails.map((detail: any) => ({
               vanityAddress: detail.vanityAddress,
               vanityAccountType: detail.vanityAccountType,
-            })
-          );
-          setVanityAddresses(vanityAddresses);
-          console.log("Extracted Vanity Addresses:", vanityAddresses);
+            }));
+
+            setVanityAddresses(vanityAddresses); 
+          } else {
+            console.error("User not found in response");
+            setVanityAddresses([]); 
+          }
         } else {
           console.error("Invalid API response structure", response.data);
           setVanityAddresses([]);
@@ -261,7 +270,13 @@ const Home = () => {
     };
 
     fetchVanityAddressesForMobileAndEmail();
-  }, [vanityAddress, setVanityAddress]);
+  }, [
+    vanityAddress,
+    setVanityAddress,
+    address,
+    isLoggedIn,
+    triggerVanityAddressUpdate,
+  ]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);
@@ -349,11 +364,6 @@ const Home = () => {
         balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
         address: Object.keys(tokenAddresses)[idx],
       }));
-
-      // console.log(
-      //   "formattedVanityBalances=================",
-      //   formattedVanityBalances
-      // );
 
       // ************************ Test CDE address balance  ************************************
       const testCDETokenBalance = await testCDETokenContract.balanceOf(
@@ -541,7 +551,7 @@ const Home = () => {
           })
         );
 
-        const flattenedGullyBuddyCollections = gullyBuddyCollections.flat(); 
+        const flattenedGullyBuddyCollections = gullyBuddyCollections.flat();
         setGullyBuddyCollectionNFTs(flattenedGullyBuddyCollections); // Update Gullybuddy specific NFTs
       } catch (err) {
         console.error("Error fetching Gullybuddy NFTs:", err);
@@ -630,7 +640,6 @@ const Home = () => {
         targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
       );
 
-      console.log("gullyBuddyNFTsData=============", gullyBuddyNFTsData);
 
       // Filter for other NFTs (not matching any of the target addresses)
       const otherNFTsData = combinedNFTs.filter(
