@@ -1,4 +1,9 @@
-import { Button, Skeleton, Tooltip } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Skeleton,
+  Tooltip,
+} from "@mui/material";
 import {
   createWeb3Modal,
   defaultConfig,
@@ -21,6 +26,12 @@ import { ethers } from "ethers";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useBalanceUpdate } from "../../context/BalanceUpdateContext";
+import RegisterModal from "./RegisterationModal";
+import { IoSend } from "react-icons/io5";
+import SendVanityDataModal from "./SendVanityDataModal";
+import LoginModal from "./LoginModal";
+import { useAuthContext } from "../../context/AuthContext";
+import { logOutUser } from "../../api/userVanityAPI";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -152,6 +163,20 @@ export default function App() {
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
   const [showModal, setShowModal] = useState(false);
+  const [openRegisterModal, setOpenRegisterModal] = useState(false);
+  const [openSendVanityDataModal, setOpenSendVanityDataModal] = useState(false);
+  const [openMobileModal, setOpenMobileModal] = useState(false);
+  const [openEmailModal, setOpenEmailModal] = useState(false);
+  // const [authMethod, setAuthMethod] = useState("");
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const {
+    authMethod,
+    loginDetails,
+    isLoggedIn,
+    setAuthMethod,
+    setLoginDetails,
+    setIsLoggedIn,
+  } = useAuthContext();
 
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
@@ -247,9 +272,9 @@ export default function App() {
     const handleWalletConnect = async () => {
       if (isConnected && address) {
         setIsLoading(true);
+        setAuthMethod("wallet");
         // Create ethers provider using the current wallet provider
         const ethersProvider = new ethers.BrowserProvider(walletProvider!);
-        // console.log("---ethersProvider",);
 
         // Check the current network
         const network = await ethersProvider.getNetwork();
@@ -288,7 +313,11 @@ export default function App() {
             }**.`;
             const feesAmount = 2.5;
             const vanityAccountType = "Main";
-            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+            const notificationResult = await notifyGullyBuddy(
+              sender,
+              message,
+              feesAmount
+            );
             console.log("notificationResult", notificationResult);
             if (notificationResult && notificationResult.hash) {
             await storeVanityWallet(
@@ -299,10 +328,11 @@ export default function App() {
             );
             setVanityAddress(generatedAddress.address);
             toast.success("Notification sent to Buddyinternational.eth");
-            }
-            else {
+            } else {
               setIsLoading(false);
-              toast.error("Error sending notification and Generate vanity Address!");
+              toast.error(
+                "Error sending notification and Generate vanity Address!"
+              );
               return;
             }
           } else {
@@ -350,6 +380,32 @@ export default function App() {
     );
   };
 
+  // Handle Modal
+  const handleOpenModal = (setModalState: any) => () => setModalState(true);
+  const handleCloseModal = (setModalState: any) => () => setModalState(false);
+
+  // Handle mobile and email logout 
+  const handleLogout = async() => {
+    try {
+      // Call the logout API with the appropriate parameter
+      const response = await logOutUser(
+        loginDetails.mobile || undefined,
+        loginDetails.email || undefined
+      );
+
+      if (response) {
+        toast.success("User logged out successfully");
+        setAuthMethod(""); 
+        setLoginDetails({}); 
+        setIsLoggedIn(false); 
+        setVanityAddress("0x0000000000000000000000000000000000000000");
+      }
+    } catch (error) {
+      console.error("Error during logout", error);
+      toast.error(`Error during logout. Please try again. ${error}`);
+    }
+  };
+
   return (
     <>
       <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
@@ -373,11 +429,11 @@ export default function App() {
             />
           ) : (
             <>
-              <div className="text-[#5692D9] font-normal font-sans text-base">
+              <div className="text-[#5692D9] font-normal font-sans text-base m-auto">
                 Vanity Address :
               </div>
               <div className="flex flex-col">
-                <div className="text-white flex gap-3 font-normal font-sans text-sm">
+                <div className="text-white flex gap-3 font-normal font-sans text-sm items-center">
                   <span className="mt-1">
                     {vanityAddress?.slice(0, 6)}... {vanityAddress?.slice(-4)}
                   </span>
@@ -451,6 +507,16 @@ export default function App() {
                       <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
                     </a>
                   </Tooltip>
+                  {isConnected && (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      className="bg-[#5692D9] text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#4578B5] transition-all mt-1"
+                      onClick={handleOpenModal(setOpenRegisterModal)}
+                    >
+                      Assign Vanity
+                    </Button>
+                  )}
                 </div>
                 <div>
                   <hr className="border-t border-gray-600 w-full mt-2" />
@@ -462,33 +528,183 @@ export default function App() {
 
         {/* connect/disconnect button */}
         <div className="flex flex-row justify-end px-2 py-6 mx-5">
-          {!isConnected ? (
+          {!isLoggedIn && !isConnected ? (
             // <w3m-button />
-            <w3m-connect-button />
+            // <w3m-connect-button />
+            <>
+              <div className="flex gap-2 flex-col lg:flex-col xl:flex-row items-center">
+                {/* Login with Mobile Button */}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5773FF",
+                    color: "#fff",
+                    // fontWeight: "semibold",
+                    fontWeight: "bold",
+                    px: 2,
+                    // py: 1,
+                    borderRadius: "22px",
+                    "&:hover": {
+                      backgroundColor: "#5773FF",
+                    },
+                    textTransform: "none",
+                  }}
+                  onClick={handleOpenModal(setOpenMobileModal)}
+                >
+                  Login with Mobile
+                </Button>
+
+                {/* Login with Email Button */}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5773FF",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    px: 2,
+                    // py: 1,
+                    borderRadius: "22px",
+                    "&:hover": {
+                      backgroundColor: "#5773FF",
+                    },
+                    textTransform: "none",
+                  }}
+                  onClick={handleOpenModal(setOpenEmailModal)}
+                >
+                  Login with Email
+                </Button>
+                {/* Connect Wallet Button */}
+                <w3m-connect-button />
+              </div>
+            </>
           ) : (
             <div className="flex gap-3 sm:flex-col md:flex-row items-center ">
-              <w3m-network-button />
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setVanityAddress(
-                    "0x0000000000000000000000000000000000000000"
-                  );
-                  resetBalances();
-                  disconnect();
-                }}
-                sx={{
-                  borderRadius: "22px",
-                  textTransform: "capitalize",
-                  background: "#5773FF",
-                }}
-              >
-                Disconnect Wallet
-              </Button>
+              {/* Icons Section */}
+              <div className="flex flex-row justify-center items-center gap-3 mb-2">
+                {/* CDE Icon */}
+                <Tooltip title="CDE" arrow>
+                  <a
+                    href={`/#`}
+                    // target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#5692D9] cursor-pointer"
+                    data-tip="CDE"
+                  >
+                    <img src="/CDE.svg" className="h-6 w-auto" alt="CDE" />
+                  </a>
+                </Tooltip>
+                <Tooltip title="Send Vanity Data" arrow>
+                  <IconButton
+                    aria-label="more"
+                    aria-haspopup="true"
+                    onClick={handleOpenModal(setOpenSendVanityDataModal)}
+                  >
+                    <IoSend
+                      className="text-[#5692D9] text-2xl mt-1 cursor-pointer"
+                      data-tip="Send Vanity Data"
+                    />
+                  </IconButton>
+                </Tooltip>
+              </div>
+              {/* Conditional Rendering Based on Auth Method */}
+              {authMethod === "wallet" ? (
+                <>
+                  {/* Network Button */}
+                  <w3m-network-button />
+
+                  {/* Disconnect Wallet Button */}
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setVanityAddress(
+                        "0x0000000000000000000000000000000000000000"
+                      );
+                      resetBalances();
+                      setAuthMethod("");
+                      disconnect();
+                    }}
+                    sx={{
+                      borderRadius: "22px",
+                      textTransform: "capitalize",
+                      background: "#5773FF",
+                    }}
+                  >
+                    Disconnect Wallet
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Logout Button for Mobile/Email */}
+                  <Button
+                    variant="contained"
+                    onClick={handleLogout}
+                    sx={{
+                      backgroundColor: "#5773FF",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      px: 2,
+                      // py: 1,
+                      borderRadius: "22px",
+                      "&:hover": {
+                        backgroundColor: "#5773FF",
+                      },
+                      textTransform: "none",
+                    }}
+                  >
+                    Log Out
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Open Registration Modal Assign Vanity Address */}
+      {openRegisterModal && (
+        <>
+          <RegisterModal
+            open={openRegisterModal}
+            onClose={handleCloseModal(setOpenRegisterModal)}
+          />
+        </>
+      )}
+
+      {/* Open Send Vanity Data Modal */}
+      {openSendVanityDataModal && (
+        <>
+          <SendVanityDataModal
+            open={openSendVanityDataModal}
+            onClose={handleCloseModal(setOpenSendVanityDataModal)}
+          />
+        </>
+      )}
+
+      {/* Mobile Login Modal */}
+      {openMobileModal && (
+        <>
+          <LoginModal
+            open={openMobileModal}
+            onClose={handleCloseModal(setOpenMobileModal)}
+            logInType="Mobile"
+            // setAuthMethod={setAuthMethod}
+            // setIsLoggedIn={setIsLoggedIn}
+          />
+        </>
+      )}
+
+      {/* Email Login Modal */}
+      {openEmailModal && (
+        <>
+          <LoginModal
+            open={openEmailModal}
+            onClose={handleCloseModal(setOpenEmailModal)}
+            logInType="Email"
+            // setAuthMethod={setAuthMethod}
+            // setIsLoggedIn={setIsLoggedIn}
+          />
+        </>
+      )}
     </>
   );
 }

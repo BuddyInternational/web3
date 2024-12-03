@@ -7,6 +7,7 @@ import { VanityProvider } from "./context/VanityContext";
 import { BalanceUpdateProvider } from "./context/BalanceUpdateContext";
 import { VanityAddressUpdateProvider } from "./context/VanityAddressesListContext";
 import { LoaderProvider } from "./context/LoaderContext";
+import { AuthProvider } from "./context/AuthContext";
 
 // Disable right-click globally
 document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -17,6 +18,7 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <VanityProvider>
+    <AuthProvider>
     <BalanceUpdateProvider>
       <VanityAddressUpdateProvider>
         <LoaderProvider>
@@ -24,6 +26,7 @@ root.render(
         </LoaderProvider>
       </VanityAddressUpdateProvider>
     </BalanceUpdateProvider>
+    </AuthProvider>
   </VanityProvider>
   // </React.StrictMode>
 );

@@ -189,7 +189,7 @@ const Home = () => {
     setAnchorEl(null);
   };
 
-  // fetch the vanity Address list
+  // fetch the vanity Address list for wallet
   useEffect(() => {
     const fetchVanityAddresses = async () => {
       if (vanityAddress === "0x0000000000000000000000000000000000000000") {
@@ -225,6 +225,43 @@ const Home = () => {
 
     fetchVanityAddresses();
   }, [vanityAddress, setVanityAddress, address, triggerVanityAddressUpdate]);
+
+   // fetch the vanity Address list for mobile and email
+   useEffect(() => {
+    const fetchVanityAddressesForMobileAndEmail = async () => {
+      if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+        setVanityAddresses([]);
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `${server_api_base_url}/api/user-vanity/downloadVanityAddressForUser`
+        );
+        // Extract the vanityAddresses from the response
+        if (response.data && response.data.data) {
+          const vanityDetails = response.data.data.find(
+            (vanityData: any) => vanityData.walletAddress === address
+          );
+          // Map each detail to include both vanityAddress and accountType
+          const vanityAddresses = vanityDetails.vanityDetails.map(
+            (detail: any) => ({
+              vanityAddress: detail.vanityAddress,
+              vanityAccountType: detail.vanityAccountType,
+            })
+          );
+          setVanityAddresses(vanityAddresses);
+          console.log("Extracted Vanity Addresses:", vanityAddresses);
+        } else {
+          console.error("Invalid API response structure", response.data);
+          setVanityAddresses([]);
+        }
+      } catch (err) {
+        console.error("Error fetching vanity addresses:", err);
+      }
+    };
+
+    fetchVanityAddressesForMobileAndEmail();
+  }, [vanityAddress, setVanityAddress]);
 
   // Handle Modal
   const handleOpenModal = (setModalState: any) => () => setModalState(true);

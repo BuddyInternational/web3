@@ -1,6 +1,7 @@
 import express from "express";
 import connection from "./config/config.js";
 import { vanityRoutes } from "./routes/vanityRoutes.js";
+import { userVanityRoutes } from "./routes/UserRoutes.js";
 import { nftRoutes } from "./routes/nftRoutes.js";
 import { socketNFTRoutes } from "./routes/socketNFTRoutes.js";
 import { userContentRoutes } from "./routes/userContentRoutes.js";
@@ -20,6 +21,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/vanity", vanityRoutes);
+app.use("/api/user-vanity", userVanityRoutes);
 app.use("/api/nft/", nftRoutes);
 app.use("/api/socket-nft/", socketNFTRoutes);
 app.use("/api/user-content/", userContentRoutes);

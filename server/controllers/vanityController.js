@@ -90,8 +90,10 @@ export const generateAndStoreVanityAddress = async (req, res) => {
 export const generateVanityWallet = async (req, res) => {
   const { suffix, isChecksum = true, isContract = false, count = 1 } = req.body;
   try {
+    console.log("===========================first")
     // Validate suffix
     if (!VanityEth.isValidHex(suffix)) {
+      console.log("inside if")
       return res
         .status(400)
         .json({ error: `${suffix} is not valid hexadecimal` });
@@ -106,15 +108,18 @@ export const generateVanityWallet = async (req, res) => {
     };
 
     while (walletsFound < count) {
+      console.log("inside while loop")
       const wallet = VanityEth.getVanityWallet(
         suffix,
         isChecksum,
         isContract,
         counter
       );
+      console.log("wallet============",wallet);
       results.push(wallet);
       walletsFound++;
     }
+
 
     console.log("Generated wallets:", results);
     res.status(200).json({
