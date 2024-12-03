@@ -191,13 +191,13 @@ const Home = () => {
     setAnchorEl(null);
   };
 
-  // fetch the vanity Address list for wallet
-  useEffect(() => {
-    const fetchVanityAddresses = async () => {
-      if (vanityAddress === "0x0000000000000000000000000000000000000000") {
-        setVanityAddresses([]);
-        return;
-      }
+   //fetch vanity Address list for wallet
+   const fetchVanityAddresses = async () => {
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      setVanityAddresses([]);
+      return;
+    }
+    if (isConnected) {
       try {
         const response = await axios.get(
           `${server_api_base_url}/api/vanity/downloadVanityAddress`
@@ -222,58 +222,62 @@ const Home = () => {
       } catch (err) {
         console.error("Error fetching vanity addresses:", err);
       }
-    };
+    }
+  };
 
-    fetchVanityAddresses();
-  }, [vanityAddress, setVanityAddress, address, triggerVanityAddressUpdate]);
+  // fetch vanity Address list for mobile and email
+  const fetchVanityAddressesForMobileAndEmail = async () => {
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      setVanityAddresses([]);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${server_api_base_url}/api/user-vanity/downloadVanityAddressForUser`
+      );
 
-  // fetch the vanity Address list for mobile and email
-  useEffect(() => {
-    const fetchVanityAddressesForMobileAndEmail = async () => {
-      if (vanityAddress === "0x0000000000000000000000000000000000000000") {
-        setVanityAddresses([]);
-        return;
-      }
-      try {
-        const response = await axios.get(
-          `${server_api_base_url}/api/user-vanity/downloadVanityAddressForUser`
-        );
+      // Extract the vanityAddresses from the response
+      if (response.data && response.data.data) {
+        // Find the user by mobile or email based on loginDetails
+        const user = response.data.data.find((vanityData: any) => {
+          return (
+            vanityData.mobile === loginDetails.mobile ||
+            vanityData.email === loginDetails.email
+          );
+        });
+        if (user) {
+          // Extract the vanityDetails for the user
+          const vanityAddresses = user.vanityDetails.map((detail: any) => ({
+            vanityAddress: detail.vanityAddress,
+            vanityAccountType: detail.vanityAccountType,
+          }));
 
-        // Extract the vanityAddresses from the response
-        if (response.data && response.data.data) {
-          // Find the user by mobile or email based on loginDetails
-          const user = response.data.data.find((vanityData: any) => {
-            return (
-              vanityData.mobile === loginDetails.mobile ||
-              vanityData.email === loginDetails.email
-            );
-          });
-          if (user) {
-            // Extract the vanityDetails for the user
-            const vanityAddresses = user.vanityDetails.map((detail: any) => ({
-              vanityAddress: detail.vanityAddress,
-              vanityAccountType: detail.vanityAccountType,
-            }));
-
-            setVanityAddresses(vanityAddresses); 
-          } else {
-            console.error("User not found in response");
-            setVanityAddresses([]); 
-          }
+          setVanityAddresses(vanityAddresses);
         } else {
-          console.error("Invalid API response structure", response.data);
+          console.error("User not found in response");
           setVanityAddresses([]);
         }
-      } catch (err) {
-        console.error("Error fetching vanity addresses:", err);
+      } else {
+        console.error("Invalid API response structure", response.data);
+        setVanityAddresses([]);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching vanity addresses:", err);
+    }
+  };
 
-    fetchVanityAddressesForMobileAndEmail();
+  // fetch the vanity Address list for wallet and mobile and email
+  useEffect(() => {
+    if (isConnected) {
+      fetchVanityAddresses();
+    } else {
+      fetchVanityAddressesForMobileAndEmail();
+    }
   }, [
     vanityAddress,
     setVanityAddress,
     address,
+    isConnected,
     isLoggedIn,
     triggerVanityAddressUpdate,
   ]);

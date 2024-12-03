@@ -10,8 +10,11 @@ import {
   FormControlLabel,
   FormHelperText,
   IconButton,
+  MenuItem,
   Modal,
+  Select,
   TextField,
+  Typography,
 } from "@mui/material";
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
@@ -19,7 +22,10 @@ import { IoClose } from "react-icons/io5";
 const SendVanityDataModal: React.FC<{
   open: boolean;
   onClose: () => void;
-}> = ({ open, onClose }) => {
+  vanityAddresses: { vanityAddress: string; vanityAccountType: string }[];
+}> = ({ open, onClose ,vanityAddresses}) => {
+  console.log("vanityAddresses******************************",vanityAddresses);
+  const [selectedVanityAddress, setSelectedVanityAddress] = useState("");
     const [walletAddress, setWalletAddress] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +42,11 @@ const SendVanityDataModal: React.FC<{
     } else {
       setError(''); // Clear error if valid input is present
     }
+  };
+
+  // Handle Dropdown Selection
+  const handleVanityAddressChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedVanityAddress(e.target.value as string);
   };
 
   // Handle Checkbox Validation
@@ -104,9 +115,31 @@ const SendVanityDataModal: React.FC<{
           </IconButton>
 
           <DialogContent dividers>
+             {/* Dropdown for Vanity Address Selection */}
+             <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              <Typography variant="body1" gutterBottom>
+                Select Vanity Address
+              </Typography>
+              <Select
+                value={selectedVanityAddress}
+                onChange={(e:any) => {handleVanityAddressChange(e)}}
+                displayEmpty
+                variant="outlined"
+              >
+                <MenuItem value="" disabled>
+                  Select a Vanity Address
+                </MenuItem>
+                {vanityAddresses.map((vanity, index) => (
+                  <MenuItem key={index} value={vanity.vanityAddress}>
+                    {vanity.vanityAddress} ({vanity.vanityAccountType})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
              {/* Wallet Address Input */}
           <TextField
-            label="Wallet Address"
+            label="Receiver's Wallet Address"
             fullWidth
             value={walletAddress}
             onChange={handleWalletAddressChange}

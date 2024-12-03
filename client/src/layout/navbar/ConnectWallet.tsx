@@ -1,6 +1,10 @@
 import {
   Button,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Skeleton,
   Tooltip,
 } from "@mui/material";
@@ -32,6 +36,9 @@ import SendVanityDataModal from "./SendVanityDataModal";
 import LoginModal from "./LoginModal";
 import { useAuthContext } from "../../context/AuthContext";
 import { logOutUser } from "../../api/userVanityAPI";
+import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
+import { FaMobileScreenButton } from "react-icons/fa6";
+import { MdEmail } from "react-icons/md";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -155,6 +162,7 @@ interface VanityData {
 export default function App() {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useWeb3ModalAccount();
+  const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
   const { resetBalances } = useBalanceUpdate();
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
@@ -175,6 +183,107 @@ export default function App() {
     setLoginDetails,
     setIsLoggedIn,
   } = useAuthContext();
+  const [vanityAddresses, setVanityAddresses] = useState([]);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  //fetch vanity Address list for wallet
+  const fetchVanityAddresses = async () => {
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      setVanityAddresses([]);
+      return;
+    }
+    if (isConnected) {
+      try {
+        const response = await axios.get(
+          `${server_api_base_url}/api/vanity/downloadVanityAddress`
+        );
+        // Extract the vanityAddresses from the response
+        if (response.data && response.data.data) {
+          const vanityDetails = response.data.data.find(
+            (vanityData: any) => vanityData.walletAddress === address
+          );
+          // Map each detail to include both vanityAddress and accountType
+          const vanityAddresses = vanityDetails.vanityDetails.map(
+            (detail: any) => ({
+              vanityAddress: detail.vanityAddress,
+              vanityAccountType: detail.vanityAccountType,
+            })
+          );
+          setVanityAddresses(vanityAddresses);
+        } else {
+          console.error("Invalid API response structure", response.data);
+          setVanityAddresses([]);
+        }
+      } catch (err) {
+        console.error("Error fetching vanity addresses:", err);
+      }
+    }
+  };
+
+  // fetch vanity Address list for mobile and email
+  const fetchVanityAddressesForMobileAndEmail = async () => {
+    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+      setVanityAddresses([]);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${server_api_base_url}/api/user-vanity/downloadVanityAddressForUser`
+      );
+
+      // Extract the vanityAddresses from the response
+      if (response.data && response.data.data) {
+        // Find the user by mobile or email based on loginDetails
+        const user = response.data.data.find((vanityData: any) => {
+          return (
+            vanityData.mobile === loginDetails.mobile ||
+            vanityData.email === loginDetails.email
+          );
+        });
+        if (user) {
+          // Extract the vanityDetails for the user
+          const vanityAddresses = user.vanityDetails.map((detail: any) => ({
+            vanityAddress: detail.vanityAddress,
+            vanityAccountType: detail.vanityAccountType,
+          }));
+
+          setVanityAddresses(vanityAddresses);
+        } else {
+          console.error("User not found in response");
+          setVanityAddresses([]);
+        }
+      } else {
+        console.error("Invalid API response structure", response.data);
+        setVanityAddresses([]);
+      }
+    } catch (err) {
+      console.error("Error fetching vanity addresses:", err);
+    }
+  };
+
+  // fetch the vanity Address list for wallet and mobile and email
+  useEffect(() => {
+    if (isConnected) {
+      fetchVanityAddresses();
+    } else {
+      fetchVanityAddressesForMobileAndEmail();
+    }
+  }, [
+    vanityAddress,
+    setVanityAddress,
+    address,
+    isConnected,
+    isLoggedIn,
+    triggerVanityAddressUpdate,
+  ]);
 
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
@@ -197,10 +306,8 @@ export default function App() {
         }
       );
 
-
       // Check if response.data exists and is an array
       if (response.data.data && Array.isArray(response.data.data)) {
-
         // // Filter data to exclude fields like _id and vanityPrivateKey
         // const filteredData = response.data.data.map(
         //   (item: {
@@ -305,14 +412,14 @@ export default function App() {
             );
             console.log("notificationResult", notificationResult);
             if (notificationResult && notificationResult.hash) {
-            await storeVanityWallet(
-              address,
-              generatedAddress.address,
-              generatedAddress.privKey,
-              vanityAccountType
-            );
-            setVanityAddress(generatedAddress.address);
-            toast.success("Notification sent to Buddyinternational.eth");
+              await storeVanityWallet(
+                address,
+                generatedAddress.address,
+                generatedAddress.privKey,
+                vanityAccountType
+              );
+              setVanityAddress(generatedAddress.address);
+              toast.success("Notification sent to Buddyinternational.eth");
             } else {
               setIsLoading(false);
               toast.error(
@@ -366,11 +473,14 @@ export default function App() {
   };
 
   // Handle Modal
-  const handleOpenModal = (setModalState: any) => () => setModalState(true);
+  const handleOpenModal = (setModalState: any) => () => {
+    setModalState(true);
+    handleCloseMenu();
+  };
   const handleCloseModal = (setModalState: any) => () => setModalState(false);
 
-  // Handle mobile and email logout 
-  const handleLogout = async() => {
+  // Handle mobile and email logout
+  const handleLogout = async () => {
     try {
       // Call the logout API with the appropriate parameter
       const response = await logOutUser(
@@ -380,9 +490,9 @@ export default function App() {
 
       if (response) {
         toast.success("User logged out successfully");
-        setAuthMethod(""); 
-        setLoginDetails({}); 
-        setIsLoggedIn(false); 
+        setAuthMethod("");
+        setLoginDetails({});
+        setIsLoggedIn(false);
         setVanityAddress("0x0000000000000000000000000000000000000000");
         resetBalances();
       }
@@ -517,43 +627,51 @@ export default function App() {
           {!isLoggedIn && !isConnected ? (
             <>
               <div className="flex gap-2 flex-col lg:flex-col xl:flex-row items-center">
-                {/* Login with Mobile Button */}
                 <Button
                   variant="contained"
                   sx={{
                     backgroundColor: "#5773FF",
-                    color: "#fff",
+                    color: "#ffffff",
                     fontWeight: "bold",
-                    px: 2,
                     borderRadius: "22px",
                     "&:hover": {
                       backgroundColor: "#5773FF",
                     },
                     textTransform: "none",
                   }}
-                  onClick={handleOpenModal(setOpenMobileModal)}
+                  onClick={handleOpenMenu}
                 >
-                  Login with Mobile
+                  Login Options
                 </Button>
 
-                {/* Login with Email Button */}
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#5773FF",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    px: 2,
-                    borderRadius: "22px",
-                    "&:hover": {
-                      backgroundColor: "#5773FF",
-                    },
-                    textTransform: "none",
+                {/* Dropdown Menu */}
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleCloseMenu}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
                   }}
-                  onClick={handleOpenModal(setOpenEmailModal)}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
                 >
-                  Login with Email
-                </Button>
+                  <MenuItem onClick={handleOpenModal(setOpenMobileModal)}>
+                    <ListItemIcon>
+                      <FaMobileScreenButton fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Login with Mobile" />
+                  </MenuItem>
+                  <MenuItem onClick={handleOpenModal(setOpenEmailModal)}>
+                    <ListItemIcon>
+                      <MdEmail fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Login with Email" />
+                  </MenuItem>
+                </Menu>
+
                 {/* Connect Wallet Button */}
                 <w3m-connect-button />
               </div>
@@ -574,6 +692,7 @@ export default function App() {
                     <img src="/CDE.svg" className="h-6 w-auto" alt="CDE" />
                   </a>
                 </Tooltip>
+                {/* Send Vanity Icon */}
                 <Tooltip title="Send Vanity Data" arrow>
                   <IconButton
                     aria-label="more"
@@ -656,6 +775,7 @@ export default function App() {
           <SendVanityDataModal
             open={openSendVanityDataModal}
             onClose={handleCloseModal(setOpenSendVanityDataModal)}
+            vanityAddresses={vanityAddresses}
           />
         </>
       )}
