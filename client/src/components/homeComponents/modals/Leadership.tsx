@@ -65,19 +65,19 @@ const Leadership: React.FC<{
         if (generateResponse?.data?.[0]?.address) {
           const generatedAddress = generateResponse.data[0];
           // Store the generated address using the helper function
-          const sender = address!;
-          const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-            generatedAddress.address || "N/A"
-          }**.`;
-          const feesAmount = 10;
+          // const sender = address!;
+          // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+          //   generatedAddress.address || "N/A"
+          // }**.`;
+          // const feesAmount = 10;
           const vanityAccountType = "Prestige";
-          const notificationResult = await notifyGullyBuddy(
-            sender,
-            message,
-            feesAmount
-          );
-          console.log("notificationResult", notificationResult);
-          if (notificationResult && notificationResult.hash) {
+          // const notificationResult = await notifyGullyBuddy(
+          //   sender,
+          //   message,
+          //   feesAmount
+          // );
+          // console.log("notificationResult", notificationResult);
+          // if (notificationResult && notificationResult.hash) {
 
           // Transfer Annotation Token to the new Vanity Address
           const ethersProvider = new ethers.BrowserProvider(
@@ -128,13 +128,13 @@ const Leadership: React.FC<{
 
           
 
-          } else {
-            // setIsLoading(false);
-            toast.error(
-              "Error sending notification and Generate vanity Address!"
-            );
-            return;
-          }
+          // } else {
+          //   // setIsLoading(false);
+          //   toast.error(
+          //     "Error sending notification and Generate vanity Address!"
+          //   );
+          //   return;
+          // }
         } else {
           toast.error("Error Generate vanity Address!");
           return;

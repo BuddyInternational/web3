@@ -85,7 +85,7 @@ const ContributeContent: React.FC = () => {
   // Fetch user Content from Database
   const fetchUserContent = async () => {
     if (address && isConnected) {
-      const userContent = await getUserContent(address!);
+      const userContent = await getUserContent(vanityAddress!);
       if (userContent && userContent.data) {
         setSubmissions(userContent.data.contentDetails || []);
       }
@@ -128,6 +128,9 @@ const ContributeContent: React.FC = () => {
           setContent("");
           setMood("");
           fetchUserContent();
+        }
+        else{
+          toast.error("Network Error! Failed to save content details");
         }
       } catch (error: any) {
         toast.error("Error uploading to IPFS:", error);
@@ -177,7 +180,7 @@ const ContributeContent: React.FC = () => {
   // Initial fetch of user content when component mounts
   useEffect(() => {
     fetchUserContent();
-  }, [address, isConnected]);
+  }, [address, isConnected,fetchUserContent]);
 
   return (
     <>

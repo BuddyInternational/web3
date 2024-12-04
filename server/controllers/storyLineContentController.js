@@ -6,7 +6,7 @@ export const saveStoryLineContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
-      console.log("contentDetails--------",contentDetails)
+    console.log("contentDetails--------", contentDetails);
     let storyLineContent = await StoryLineContentData.findOne({
       walletAddress,
       vanityAddress,
@@ -42,10 +42,12 @@ export const saveStoryLineContent = async (req, res) => {
 // fetch story Line content data by wallet address
 export const getStoryLineContent = async (req, res) => {
   try {
-    const { walletAddress } = req.query;
+    const { vanityAddress } = req.query;
 
     // Fetch content data based on wallet address
-    const storyLineContent = await StoryLineContentData.findOne({ walletAddress });
+    const storyLineContent = await StoryLineContentData.findOne({
+      vanityAddress,
+    });
 
     // if (!storyLineContent) {
     //   return res.status(404).json({
@@ -74,7 +76,9 @@ export const updateStoryLineContentDetail = async (req, res) => {
     const { isSubbmited, submissionDate, submissionHash } = req.body;
 
     // Find the story Line content by wallet address
-    const storyLineContent = await StoryLineContentData.findOne({ walletAddress });
+    const storyLineContent = await StoryLineContentData.findOne({
+      walletAddress,
+    });
 
     if (!storyLineContent) {
       return res.status(404).json({
@@ -120,7 +124,9 @@ export const deleteStoryLineContentDetail = async (req, res) => {
     const { walletAddress, ipfsHash } = req.params;
 
     // Find the story Line content by wallet address
-    const storyLineContent = await StoryLineContentData.findOne({ walletAddress });
+    const storyLineContent = await StoryLineContentData.findOne({
+      walletAddress,
+    });
 
     if (!storyLineContent) {
       return res.status(404).json({
@@ -149,33 +155,64 @@ export const deleteStoryLineContentDetail = async (req, res) => {
   }
 };
 
+// Update the wallet Address of a story line when vanity Details transfer to another wallet.
+export const updateVanityStoryLineContentWalletForVanityTransfer = async (
+  req,
+  res
+) => {
+  try {
+    // const { vanityAddress } = req.params;
+    const {vanityAddress, newWalletAddress } = req.body;
+    const storyLineContent = await StoryLineContentData.findOne({
+      vanityAddress,
+    });
+    if (!storyLineContent) {
+      return res.status(404).json({
+        message: "Content not found for this vanity address",
+      });
+    }
+    storyLineContent.walletAddress = newWalletAddress;
+    const updatedContent = await storyLineContent.save();
+    return res.status(200).json({
+      message: "Wallet address updated successfully!",
+      data: updatedContent,
+    });
+  } catch (error) {
+    console.error("Error updating wallet address:", error);
+    return res.status(500).json({
+      message: "Error updating wallet address",
+      error,
+    });
+  }
+};
+
 // Track dowanload story Line content data
-export const trackDownloadStoryLineContent= async( req, res)=> {
+export const trackDownloadStoryLineContent = async (req, res) => {
   const { vanityAddress } = req.body;
 
   if (!vanityAddress) {
-    return res.status(400).json({ error: 'Vanity address is required' });
+    return res.status(400).json({ error: "Vanity address is required" });
   }
 
   try {
     // Find or create the entry for the vanity address
     let log = await StoryLineContentCallLogData.findOne({ vanityAddress });
-    console.log("log1===========",log);
+    console.log("log1===========", log);
     if (log) {
       log.callCount += 1; // Increment individual call count
     } else {
       log = new StoryLineContentCallLogData({ vanityAddress });
     }
 
-    console.log("log==========",log);
+    console.log("log==========", log);
     await log.save();
 
     res.json({
-      message: 'Story Line Call tracked successfully',
+      message: "Story Line Call tracked successfully",
       log,
     });
   } catch (error) {
-    console.error('Error tracking call:', error);
-    res.status(500).json({ error: 'Failed to track the call' });
+    console.error("Error tracking call:", error);
+    res.status(500).json({ error: "Failed to track the call" });
   }
-}
+};

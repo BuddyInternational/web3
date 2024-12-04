@@ -18,153 +18,275 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import {
+  checkExistingVanityAddress,
+  deleteVanityAddress,
+  storeVanityWallet,
+} from "../../api/vanityAPI";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { updateVanityUserContentWalletForVanityTransfer } from "../../api/userContentAPI";
+import { updateVanityStoryLineContentWalletForVanityTransfer } from "../../api/storyLineContentAPI";
+import { useLoader } from "../../context/LoaderContext";
+import Loader from "../../utils/Loader";
+import { toast } from "react-toastify";
+import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 
 const SendVanityDataModal: React.FC<{
   open: boolean;
   onClose: () => void;
   vanityAddresses: { vanityAddress: string; vanityAccountType: string }[];
-}> = ({ open, onClose ,vanityAddresses}) => {
-  console.log("vanityAddresses******************************",vanityAddresses);
+}> = ({ open, onClose, vanityAddresses }) => {
+  const { address } = useWeb3ModalAccount();
   const [selectedVanityAddress, setSelectedVanityAddress] = useState("");
-    const [walletAddress, setWalletAddress] = useState('');
+  const { setTriggerVanityAddressUpdate } = useVanityAddressUpdate();
+  const [walletAddress, setWalletAddress] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [error, setError] = useState('');
-  const [agreeError, setAgreeError] = useState('');
+  const [walletError, setWalletError] = useState("");
+  const [vanityError, setVanityError] = useState("");
+  const [agreeError, setAgreeError] = useState("");
+  const { isLoading, setIsLoading } = useLoader();
 
   // Handle Wallet Address Validation (as user types)
-  const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWalletAddressChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     setWalletAddress(value);
+    const walletRegex = /^(0x)?[0-9a-fA-F]{40}$/;
 
-    // Simple wallet address validation: Check if it is empty or not
     if (!value) {
-      setError('Wallet address is required');
+      setWalletError("Wallet address is required");
+    } else if (!walletRegex.test(value)) {
+      setWalletError(
+        "Invalid wallet address. Please enter a valid Ethereum address."
+      );
     } else {
-      setError(''); // Clear error if valid input is present
+      setWalletError("");
     }
   };
 
   // Handle Dropdown Selection
-  const handleVanityAddressChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedVanityAddress(e.target.value as string);
+  const handleVanityAddressChange = (
+    e: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const value = e.target.value as string;
+    setSelectedVanityAddress(value);
+    if (!value) {
+      setVanityError("select vanity address");
+    } else {
+      setVanityError("");
+    }
   };
 
   // Handle Checkbox Validation
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAgreed(e.target.checked);
-    if (e.target.checked) {
-      setAgreeError(''); // Clear error if checkbox is checked
+    const value = e.target.checked;
+    setAgreed(value);
+    if (value === false) {
+      setAgreeError("Please Check the Teams and Condition.");
+    } else {
+      setAgreeError("");
     }
   };
 
   // Handle submit Vanity Data
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    if (!selectedVanityAddress) {
+      setVanityError("Select a vanity address");
+    }
     if (!walletAddress) {
-      setError('Wallet address is required');
+      setWalletError("Wallet address is required");
       return;
     }
 
     if (!agreed) {
-        setAgreeError('You must agree to the terms');
+      setAgreeError("You must agree to the terms");
       return;
     }
 
-    // Submit logic
-    alert(`Wallet Address Submitted: ${walletAddress}`);
+    try {
+      // fetch selected vanity Address Details
+      const existingAddress = await checkExistingVanityAddress(address!);
+
+      if (existingAddress != null) {
+        // Find the matching vanity address in the vanityDetails array
+        const selectedVanityDetail = existingAddress.vanityDetails.find(
+          (detail: any) => detail.vanityAddress === selectedVanityAddress
+        );
+        console.log("selectedVanityDetail===========", selectedVanityDetail);
+        if (selectedVanityDetail) {
+          // delete this vanity address from connected user details (vanityData)
+          const deleteResponse = await deleteVanityAddress(
+            address!,
+            selectedVanityAddress
+          );
+          if (deleteResponse) {
+            console.log(deleteResponse.message);
+            // insert this vanity details in this walletAddress
+            const updateVanityDetailsResponse = await storeVanityWallet(
+              walletAddress,
+              selectedVanityDetail.vanityAddress,
+              selectedVanityDetail.vanityPrivateKey,
+              selectedVanityDetail.vanityAccountType
+            );
+            if (updateVanityDetailsResponse) {
+              console.log(updateVanityDetailsResponse.message);
+              // update the user generated content with new wallet address with vanity details
+              const updateVanityUserContentResponse =
+                await updateVanityUserContentWalletForVanityTransfer(
+                  selectedVanityAddress,
+                  walletAddress
+                );
+              // update the story line content with new wallet address with vanity details
+              const updateVanityStoryLineContentResponse =
+                await updateVanityStoryLineContentWalletForVanityTransfer(
+                  selectedVanityAddress,
+                  walletAddress
+                );
+                toast.success("Vanity Details Transfer successfully.");
+                setTriggerVanityAddressUpdate((prev) => !prev);
+            }
+          } else {
+            console.error("Failed to delete vanity detail.");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching existing vanity address:", error);
+    } finally {
+      setIsLoading(false);
+    }
     onClose();
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Fade in={open}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "white",
-            width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
-            maxHeight: "80%",
-            overflowY: "auto",
-            borderRadius: "8px",
-            boxShadow: 3,
-            zIndex: 2000,
-            p: 3,
-          }}
-        >
-          <DialogTitle
-            sx={{ m: 0, p: 2, textAlign: "center" }}
-            id="customized-dialog-title"
-          >
-            Send Vanity Details
-          </DialogTitle>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={(theme) => ({
+    <>
+      {isLoading && <Loader />}
+      <Modal open={open} onClose={onClose}>
+        <Fade in={open}>
+          <Box
+            sx={{
               position: "absolute",
-              right: 12,
-              top: 10,
-              fontSize: "20px",
-              border: "1px solid gray",
-              borderRadius: "10px",
-            })}
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "white",
+              width: { xs: "90%", sm: "70%", md: "60%", lg: "50%", xl: "40%" },
+              maxHeight: "80%",
+              overflowY: "auto",
+              borderRadius: "8px",
+              boxShadow: 3,
+              zIndex: 2000,
+              p: 3,
+            }}
           >
-            <IoClose />
-          </IconButton>
+            <DialogTitle
+              sx={{ m: 0, p: 2, textAlign: "center" }}
+              id="customized-dialog-title"
+            >
+              Send Vanity Details
+            </DialogTitle>
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={(theme) => ({
+                position: "absolute",
+                right: 12,
+                top: 10,
+                fontSize: "20px",
+                border: "1px solid gray",
+                borderRadius: "10px",
+              })}
+            >
+              <IoClose />
+            </IconButton>
 
-          <DialogContent dividers>
-             {/* Dropdown for Vanity Address Selection */}
-             <FormControl fullWidth sx={{ marginBottom: 2 }}>
-              <Typography variant="body1" gutterBottom>
-                Select Vanity Address
-              </Typography>
-              <Select
-                value={selectedVanityAddress}
-                onChange={(e:any) => {handleVanityAddressChange(e)}}
-                displayEmpty
-                variant="outlined"
+            <DialogContent dividers>
+              {/* Dropdown for Vanity Address Selection */}
+              <FormControl
+                fullWidth
+                sx={{ marginBottom: 2 }}
+                error={!!vanityError}
               >
-                <MenuItem value="" disabled>
-                  Select a Vanity Address
-                </MenuItem>
-                {vanityAddresses.map((vanity, index) => (
-                  <MenuItem key={index} value={vanity.vanityAddress}>
-                    {vanity.vanityAddress} ({vanity.vanityAccountType})
+                <Typography variant="body1" gutterBottom>
+                  Select Vanity Address
+                </Typography>
+                <Select
+                  value={selectedVanityAddress}
+                  onChange={(e: any) => {
+                    handleVanityAddressChange(e);
+                  }}
+                  displayEmpty
+                  variant="outlined"
+                  sx={{ marginBottom: 2 }}
+                >
+                  <MenuItem value="" disabled>
+                    Select a Vanity Address
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {vanityAddresses.filter(
+                    (vanity) => vanity.vanityAccountType === "Prestige"
+                  ).length > 0 ? (
+                    vanityAddresses
+                      .filter(
+                        (vanity) => vanity.vanityAccountType === "Prestige"
+                      )
+                      .map((vanity, index) => (
+                        <MenuItem key={index} value={vanity.vanityAddress}>
+                          {vanity.vanityAddress} ({vanity.vanityAccountType})
+                        </MenuItem>
+                      ))
+                  ) : (
+                    <MenuItem disabled>
+                      You Have No Any Prestige Accounts
+                    </MenuItem>
+                  )}
+                </Select>
+                {vanityError && <FormHelperText>{vanityError}</FormHelperText>}
+              </FormControl>
 
-             {/* Wallet Address Input */}
-          <TextField
-            label="Receiver's Wallet Address"
-            fullWidth
-            value={walletAddress}
-            onChange={handleWalletAddressChange}
-            variant="outlined"
-            error={!!error}
-            helperText={error}
-            sx={{ marginBottom: 2 }}
-          />
+              {/* Wallet Address Input */}
+              <TextField
+                label="Receiver's Wallet Address"
+                fullWidth
+                value={walletAddress}
+                onChange={handleWalletAddressChange}
+                variant="outlined"
+                error={!!walletError}
+                helperText={walletError}
+                sx={{ marginBottom: 2 }}
+              />
 
-          {/* Checkbox for agreement */}
-          <FormControl error={!!agreeError} sx={{ marginBottom: 2 }}>
-            <FormControlLabel
-              control={<Checkbox checked={agreed} onChange={handleCheckboxChange} />}
-              label="I agree to the terms and conditions"
-            />
-            {agreeError && <FormHelperText>{agreeError}</FormHelperText>}
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="secondary">Cancel</Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">Submit</Button>
-        </DialogActions>
-        </Box>
-      </Fade>
-    </Modal>
+              {/* Checkbox for agreement */}
+              <FormControl error={!!agreeError} sx={{ marginBottom: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={agreed}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label="I agree to the terms and conditions"
+                />
+                {agreeError && <FormHelperText>{agreeError}</FormHelperText>}
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={onClose} color="secondary">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                color="primary"
+                variant="contained"
+              >
+                Submit
+              </Button>
+            </DialogActions>
+          </Box>
+        </Fade>
+      </Modal>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// Define the schema for UserContent
+// Define the schema for UserContent  
 const UserContentSchema = new mongoose.Schema(
   {
     walletAddress: {

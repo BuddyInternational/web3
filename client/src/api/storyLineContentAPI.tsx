@@ -33,12 +33,12 @@ export const saveStoryLineContentDetails = async (
 };
 
 // Function to fetch the Story Line Content
-export const getStoryLineContent = async (walletAddress: string) => {
+export const getStoryLineContent = async (vanityAddress: string) => {
   try {
     const response: any = await axios.get(
       `${server_api_base_url}/api/storyLine-content/getStoryLineContent`,
       {
-        params: { walletAddress },
+        params: { vanityAddress },
       }
     );
     if(response){
@@ -90,4 +90,22 @@ export const updateStoryLineContentDetail = async (
   }
 };
 
-
+// Function to update a wallet address because vanity Details transfer
+export const updateVanityStoryLineContentWalletForVanityTransfer = async (
+  vanityAddress: string,
+  newWalletAddress: string
+) => {
+  try {
+    const response: any = await axios.put(
+      `${server_api_base_url}/api/storyLine-content/updateVanityStoryLineContentWalletForVanityTransfer`,
+      {
+        vanityAddress,
+        newWalletAddress,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating wallet address:", error);
+    return null;
+  }
+};

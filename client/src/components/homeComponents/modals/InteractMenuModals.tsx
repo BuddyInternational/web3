@@ -72,7 +72,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   const [connectedNetwork, setConnectedNetwork] = useState<string | null>(null);
   const [canClaim, setCanClaim] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
-  const [hasFetched, setHasFetched] = useState(false); // Initialize flag
+  const [hasFetched, setHasFetched] = useState(false); 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isCorrectNetwork =
     connectedNetwork?.toLowerCase() === ChainName?.toLowerCase();
@@ -111,6 +111,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     }
   };
 
+  // Fetch the last claimed time from the contract
   const claimRewards = async () => {
     setIsLoading(true);
     // Check if window.ethereum is available
@@ -118,7 +119,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       console.error(
         "Ethereum provider is not available. Make sure to install a Web3 wallet like MetaMask."
       );
-      setIsLoading(false); // Reset loading on error
+      setIsLoading(false); 
       return;
     }
     const ethersProvider = new ethers.BrowserProvider(

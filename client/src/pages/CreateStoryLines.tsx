@@ -88,7 +88,7 @@ const CreateStoryLines: React.FC = () => {
   // Fetch story Line Content from Database
   const fetchStoryLineContent = async () => {
     if (address && isConnected) {
-      const storyLineContent = await getStoryLineContent(address!);
+      const storyLineContent = await getStoryLineContent(vanityAddress!);
       if (storyLineContent && storyLineContent.data) {
         setSubmissions(storyLineContent.data.contentDetails || []);
       }

@@ -6,7 +6,7 @@ export const saveUserContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
-      console.log("contentDetails--------",contentDetails)
+    console.log("contentDetails--------", contentDetails);
     let userContent = await UserContentData.findOne({
       walletAddress,
       vanityAddress,
@@ -42,10 +42,10 @@ export const saveUserContent = async (req, res) => {
 // fetch user content data by wallet address
 export const getUserContent = async (req, res) => {
   try {
-    const { walletAddress } = req.query;
+    const { vanityAddress } = req.query;
 
     // Fetch content data based on wallet address
-    const userContent = await UserContentData.findOne({ walletAddress });
+    const userContent = await UserContentData.findOne({ vanityAddress });
 
     // if (!userContent) {
     //   return res.status(404).json({
@@ -149,33 +149,59 @@ export const deleteContentDetail = async (req, res) => {
   }
 };
 
+// Update the wallet Address of a user when vanity Details transfer to another wallet.
+export const updateVanityUserContentWalletForVanityTransfer = async (req, res) => {
+  try {
+    // const { vanityAddress } = req.params;
+    const {vanityAddress,newWalletAddress } = req.body;
+    const userContent = await UserContentData.findOne({ vanityAddress });
+    if (!userContent) {
+      return res.status(404).json({
+        message: "Content not found for this vanity address",
+      });
+    }
+    userContent.walletAddress = newWalletAddress;
+    const updatedContent = await userContent.save();
+    return res.status(200).json({
+      message: "Wallet address updated successfully!",
+      data: updatedContent,
+    });
+  } catch (error) {
+    console.error("Error updating wallet address:", error);
+    return res.status(500).json({
+      message: "Error updating wallet address",
+      error,
+    });
+  }
+};
+
 // Track dowanload user content data
-export const trackDownloadUserContent= async( req, res)=> {
+export const trackDownloadUserContent = async (req, res) => {
   const { vanityAddress } = req.body;
 
   if (!vanityAddress) {
-    return res.status(400).json({ error: 'Vanity address is required' });
+    return res.status(400).json({ error: "Vanity address is required" });
   }
 
   try {
     // Find or create the entry for the vanity address
     let log = await UserContentCallLogData.findOne({ vanityAddress });
-    console.log("log1===========",log);
+    console.log("log1===========", log);
     if (log) {
       log.callCount += 1; // Increment individual call count
     } else {
       log = new UserContentCallLogData({ vanityAddress });
     }
 
-    console.log("log==========",log);
+    console.log("log==========", log);
     await log.save();
 
     res.json({
-      message: 'Call tracked successfully',
+      message: "Call tracked successfully",
       log,
     });
   } catch (error) {
-    console.error('Error tracking call:', error);
-    res.status(500).json({ error: 'Failed to track the call' });
+    console.error("Error tracking call:", error);
+    res.status(500).json({ error: "Failed to track the call" });
   }
-}
+};

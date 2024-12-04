@@ -90,10 +90,10 @@ export const generateAndStoreVanityAddress = async (req, res) => {
 export const generateVanityWallet = async (req, res) => {
   const { suffix, isChecksum = true, isContract = false, count = 1 } = req.body;
   try {
-    console.log("===========================first")
+    console.log("===========================first");
     // Validate suffix
     if (!VanityEth.isValidHex(suffix)) {
-      console.log("inside if")
+      console.log("inside if");
       return res
         .status(400)
         .json({ error: `${suffix} is not valid hexadecimal` });
@@ -108,18 +108,17 @@ export const generateVanityWallet = async (req, res) => {
     };
 
     while (walletsFound < count) {
-      console.log("inside while loop")
+      console.log("inside while loop");
       const wallet = VanityEth.getVanityWallet(
         suffix,
         isChecksum,
         isContract,
         counter
       );
-      console.log("wallet============",wallet);
+      console.log("wallet============", wallet);
       results.push(wallet);
       walletsFound++;
     }
-
 
     console.log("Generated wallets:", results);
     res.status(200).json({
@@ -134,7 +133,8 @@ export const generateVanityWallet = async (req, res) => {
 };
 
 export const storeVanityWallet = async (req, res) => {
-  const { walletAddress, vanityAddress, vanityPrivateKey ,vanityAccountType} = req.body;
+  const { walletAddress, vanityAddress, vanityPrivateKey, vanityAccountType } =
+    req.body;
 
   try {
     // // Create and save the new vanity wallet record in the database
@@ -151,7 +151,7 @@ export const storeVanityWallet = async (req, res) => {
     // Find or create the vanity address entry in the database
     let newAddress = await VanityData.findOne({ walletAddress });
 
-    console.log("newAddress------------",newAddress);
+    console.log("newAddress------------", newAddress);
     if (!newAddress) {
       // If wallet address is not found, create a new record
       newAddress = new VanityData({
@@ -233,6 +233,38 @@ export const checkExistingVanityAddress = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error checking vanity address", error: e.message });
+  }
+};
+
+// Delete a vanity address for given wallet address
+export const deleteVanityAddress = async (req, res) => {
+  const { walletAddress ,vanityAddressToDelete} = req.params;
+  try {
+    const existingEntry = await VanityData.findOne({ walletAddress });
+    if (existingEntry) {
+      // Check if the vanityDetails field contains the vanityAddressToDelete
+      const vanityDetailExists = existingEntry.vanityDetails.some(
+        (vanityDetail) => vanityDetail.vanityAddress === vanityAddressToDelete
+      );
+      if (vanityDetailExists) {
+        // Remove the specific vanity detail from the array
+        await VanityData.updateOne(
+          { walletAddress },
+          { $pull: { vanityDetails: { vanityAddress: vanityAddressToDelete } } }
+        );
+
+        return res.status(200).json({
+          message: `Vanity detail for ${vanityAddressToDelete} deleted`,
+        });
+      }
+      else {
+        return res.status(404).json({ message: "Vanity address not found in vanity details" });
+      }
+    } else return res.status(404).json({ message: "No vanity address found" });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: "Error deleting vanity address", error: e.message });
   }
 };
 

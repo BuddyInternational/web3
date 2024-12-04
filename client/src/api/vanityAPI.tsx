@@ -97,3 +97,16 @@ export const storeVanityWallet = async (
     return null;
   }
 };
+
+// Function to Delete specific vanity Details from wallet
+export const deleteVanityAddress = async (walletAddress: string,vanityAddressToDelete:string) => {
+  try {
+    const response:any = await axios.delete(
+      `${server_api_base_url}/api/vanity/deleteVanityAddress/${walletAddress}/${vanityAddressToDelete}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting content detail:", error);
+    return null;
+  }
+}

@@ -4,7 +4,6 @@ import { ContentSubmission } from "../utils/Types";
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
-
 // Define Response interfaces
 interface SaveUserContentResponse {
   message: string;
@@ -34,18 +33,17 @@ export const saveContentDetails = async (
 };
 
 // Function to fetch the User Content
-export const getUserContent = async (walletAddress: string) => {
+export const getUserContent = async (vanityAddress: string) => {
   try {
     const response: any = await axios.get(
       `${server_api_base_url}/api/user-content/getUserContent`,
       {
-        params: { walletAddress },
+        params: { vanityAddress },
       }
     );
-    if(response){
+    if (response) {
       return response.data;
-    }
-    else{
+    } else {
       return null;
     }
   } catch (error) {
@@ -55,9 +53,12 @@ export const getUserContent = async (walletAddress: string) => {
 };
 
 // Function to Delete the User Content
-export const deleteUserContent = async (walletAddress: string,ipfsHash:string) => {
+export const deleteUserContent = async (
+  walletAddress: string,
+  ipfsHash: string
+) => {
   try {
-    const response:any = await axios.delete(
+    const response: any = await axios.delete(
       `${server_api_base_url}/api/user-content/deleteContentDetail/${walletAddress}/${ipfsHash}`
     );
     return response.data;
@@ -65,7 +66,7 @@ export const deleteUserContent = async (walletAddress: string,ipfsHash:string) =
     console.error("Error deleting content detail:", error);
     return null;
   }
-}
+};
 
 // Function to update a specific content detail
 export const updateContentDetail = async (
@@ -81,7 +82,7 @@ export const updateContentDetail = async (
       {
         isSubbmited,
         submissionDate,
-        submissionHash
+        submissionHash,
       }
     );
     return response.data;
@@ -91,4 +92,22 @@ export const updateContentDetail = async (
   }
 };
 
-
+// Function to update a wallet address because vanity Details transfer
+export const updateVanityUserContentWalletForVanityTransfer = async (
+  vanityAddress: string,
+  newWalletAddress: string
+) => {
+  try {
+    const response: any = await axios.put(
+      `${server_api_base_url}/api/user-content/updateVanityUserContentWalletForVanityTransfer`,
+      {
+        vanityAddress,
+        newWalletAddress,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating wallet address:", error);
+    return null;
+  }
+};
