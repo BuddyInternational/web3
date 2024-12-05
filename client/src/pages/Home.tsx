@@ -35,6 +35,36 @@ import axios from "axios";
 import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
 import { useAuthContext } from "../context/AuthContext";
 
+interface NFT {
+  asset_contract: {
+    chain: string;
+    schema_name: string;
+  };
+  contract: string;
+  identifier: string;
+  name: string;
+  permalink: string;
+  display_image_url: string;
+  display_animation_url: string | null;
+  updated_at: string;
+  floor_price: number;
+  floor_price_usd: number;
+  payment_token: {
+    symbol: string;
+  };
+  last_claimed_date: string | null;
+  claim_count: number;
+  claim_hashes: string[];
+}
+
+interface CountdownRendererProps {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+}
+
 // Constant Token address
 const tokenAddresses: any = {
   CDE1: process.env.REACT_APP_TOKEN1_ADDRESS,
@@ -77,6 +107,8 @@ const TestTIMAddress: any =
 const TestANTAddress: any =
   process.env.REACT_APP_TESTANT_TOKEN_CONTRACT_ADDRESS;
 
+  // Server API Base URL
+const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
 const rpc_url: any = process.env.REACT_APP_RPC_URL;
@@ -84,7 +116,6 @@ const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 const ApiKey = process.env.REACT_APP_OPENSEA_API_KEY;
 const gullyBuddyNFTAddress =
   process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!;
-// const gullyBuddyNFTAddress = "0x89bcfa8273c6017b9c5c8d5d272808ee0df3fb11";
 
 const gullyBuddyNFTCollectionAddress = [
   process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!,
@@ -92,45 +123,6 @@ const gullyBuddyNFTCollectionAddress = [
   process.env.REACT_APP_TEAM2_NFT_COLLECTION_ADDRESS!,
   process.env.REACT_APP_MANAGER_NFT_COLLECTION_ADDRESS!,
 ];
-// const gullyBuddyNFTCollectionAddress =[
-//  "0x89bcfa8273c6017b9c5c8d5d272808ee0df3fb11",
-//  "0x7d551e93e8db94a89f94b7fdcbe004a170384eaf"
-
-// ]
-
-// const testWalletAddress: any = process.env.REACT_APP_TEST_WALLET_ADDRESS;
-// Server API Base URL
-const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-
-interface NFT {
-  asset_contract: {
-    chain: string;
-    schema_name: string;
-  };
-  contract: string;
-  identifier: string;
-  name: string;
-  permalink: string;
-  display_image_url: string;
-  display_animation_url: string | null;
-  updated_at: string;
-  floor_price: number;
-  floor_price_usd: number;
-  payment_token: {
-    symbol: string;
-  };
-  last_claimed_date: string | null;
-  claim_count: number;
-  claim_hashes: string[];
-}
-
-interface CountdownRendererProps {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  completed: boolean;
-}
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
@@ -607,7 +599,7 @@ const Home = () => {
               name: nft.name,
               tokenType: nft.contract_type,
               tokenUri: nft.token_uri,
-              imageUrl: nft.media?.original_media_url,
+              imageUrl: nft.normalized_metadata?.image,
               mediaType: nft.media?.mimetype,
               timeLastUpdated: nft.last_metadata_sync,
               floorPrice: nft?.floor_price,
@@ -643,7 +635,6 @@ const Home = () => {
       const gullyBuddyNFTsData = combinedNFTs.filter((nft: any) =>
         targetContractAddresses.includes(nft.contractAddress?.toLowerCase())
       );
-
 
       // Filter for other NFTs (not matching any of the target addresses)
       const otherNFTsData = combinedNFTs.filter(
@@ -687,7 +678,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address, vanityAddress]);
+  }, [address, vanityAddress,isConnected]);
 
   // fetch the Account persona NFT and Token Details
   useEffect(() => {
@@ -752,6 +743,9 @@ const Home = () => {
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
+    if (!imageUrl) {
+      return imageUrl; 
+    }
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
       // const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;

@@ -160,6 +160,11 @@ const SendVanityDataModal: React.FC<{
     onClose();
   };
 
+  // for enable disble button
+  const isSubmitDisabled =
+  !selectedVanityAddress || !!vanityError || !!walletError || !agreed;
+
+
   return (
     <>
       {isLoading && <Loader />}
@@ -279,6 +284,7 @@ const SendVanityDataModal: React.FC<{
                 onClick={handleSubmit}
                 color="primary"
                 variant="contained"
+                disabled={isSubmitDisabled}
               >
                 Submit
               </Button>

@@ -131,6 +131,9 @@ const uniqueMedianTokenNumbers: number[] = Array.from(
 
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
+    if (!imageUrl) {
+      return imageUrl; 
+    }
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
       // const newImageUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
