@@ -157,6 +157,7 @@ const CDEReward: React.FC<{
         console.log("amountInWei-----------", Number(amountInWei));
 
         const tx = await nftMarketContract.transferEthAndGetTestCDEOrTestTIM(
+          // amountInWei,
           amountInEther,
           vanityAddress,
           tokenType,

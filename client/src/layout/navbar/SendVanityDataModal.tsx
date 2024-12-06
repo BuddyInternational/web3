@@ -89,76 +89,195 @@ const SendVanityDataModal: React.FC<{
     }
   };
 
-  // Handle submit Vanity Data
+  // // Handle submit Vanity Data
+  // const handleSubmit = async () => {
+  //   setIsLoading(true);
+  //   if (!selectedVanityAddress) {
+  //     setVanityError("Select a vanity address");
+  //   }
+  //   if (!walletAddress) {
+  //     setWalletError("Wallet address is required");
+  //     return;
+  //   }
+
+  //   if (!agreed) {
+  //     setAgreeError("You must agree to the terms");
+  //     return;
+  //   }
+
+  //   try {
+  //     // fetch selected vanity Address Details
+  //     const existingAddress = await checkExistingVanityAddress(address!);
+
+  //     if (existingAddress != null) {
+  //       // Find the matching vanity address in the vanityDetails array
+  //       const selectedVanityDetail = existingAddress.vanityDetails.find(
+  //         (detail: any) => detail.vanityAddress === selectedVanityAddress
+  //       );
+  //       console.log("selectedVanityDetail===========", selectedVanityDetail);
+  //       if (selectedVanityDetail) {
+  //         // delete this vanity address from connected user details (vanityData)
+  //         const deleteResponse = await deleteVanityAddress(
+  //           address!,
+  //           selectedVanityAddress
+  //         );
+  //         if (deleteResponse) {
+  //           console.log(deleteResponse.message);
+  //           // insert this vanity details in this walletAddress
+  //           const updateVanityDetailsResponse = await storeVanityWallet(
+  //             walletAddress,
+  //             selectedVanityDetail.vanityAddress,
+  //             selectedVanityDetail.vanityPrivateKey,
+  //             selectedVanityDetail.vanityAccountType
+  //           );
+  //           if (updateVanityDetailsResponse) {
+  //             console.log(updateVanityDetailsResponse.message);
+  //             // update the user generated content with new wallet address with vanity details
+  //             const updateVanityUserContentResponse =
+  //               await updateVanityUserContentWalletForVanityTransfer(
+  //                 selectedVanityAddress,
+  //                 walletAddress
+  //               );
+  //             // update the story line content with new wallet address with vanity details
+  //             const updateVanityStoryLineContentResponse =
+  //               await updateVanityStoryLineContentWalletForVanityTransfer(
+  //                 selectedVanityAddress,
+  //                 walletAddress
+  //               );
+  //               toast.success("Vanity Details Transfer successfully.");
+  //               setTriggerVanityAddressUpdate((prev) => !prev);
+  //           }
+  //         } else {
+  //           console.error("Failed to delete vanity detail.");
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching existing vanity address:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  //   onClose();
+  // };
+  
   const handleSubmit = async () => {
     setIsLoading(true);
+  
+    // Validation for required fields
     if (!selectedVanityAddress) {
       setVanityError("Select a vanity address");
+      setIsLoading(false);
+      return;
     }
     if (!walletAddress) {
       setWalletError("Wallet address is required");
+      setIsLoading(false);
       return;
     }
-
     if (!agreed) {
       setAgreeError("You must agree to the terms");
+      setIsLoading(false);
       return;
     }
-
+  
+    // Array to hold rollback functions
+    let rollbackActions = [];
+  
     try {
-      // fetch selected vanity Address Details
+      // Step 1: Fetch existing vanity address details
       const existingAddress = await checkExistingVanityAddress(address!);
-
-      if (existingAddress != null) {
-        // Find the matching vanity address in the vanityDetails array
-        const selectedVanityDetail = existingAddress.vanityDetails.find(
-          (detail: any) => detail.vanityAddress === selectedVanityAddress
-        );
-        console.log("selectedVanityDetail===========", selectedVanityDetail);
-        if (selectedVanityDetail) {
-          // delete this vanity address from connected user details (vanityData)
-          const deleteResponse = await deleteVanityAddress(
-            address!,
-            selectedVanityAddress
-          );
-          if (deleteResponse) {
-            console.log(deleteResponse.message);
-            // insert this vanity details in this walletAddress
-            const updateVanityDetailsResponse = await storeVanityWallet(
-              walletAddress,
-              selectedVanityDetail.vanityAddress,
-              selectedVanityDetail.vanityPrivateKey,
-              selectedVanityDetail.vanityAccountType
-            );
-            if (updateVanityDetailsResponse) {
-              console.log(updateVanityDetailsResponse.message);
-              // update the user generated content with new wallet address with vanity details
-              const updateVanityUserContentResponse =
-                await updateVanityUserContentWalletForVanityTransfer(
-                  selectedVanityAddress,
-                  walletAddress
-                );
-              // update the story line content with new wallet address with vanity details
-              const updateVanityStoryLineContentResponse =
-                await updateVanityStoryLineContentWalletForVanityTransfer(
-                  selectedVanityAddress,
-                  walletAddress
-                );
-                toast.success("Vanity Details Transfer successfully.");
-                setTriggerVanityAddressUpdate((prev) => !prev);
-            }
-          } else {
-            console.error("Failed to delete vanity detail.");
-          }
+      if (!existingAddress) {
+        toast.error("Vanity address does not exist.");
+        return;
+      }
+  
+      const selectedVanityDetail = existingAddress.vanityDetails.find(
+        (detail:any) => detail.vanityAddress === selectedVanityAddress
+      );
+  
+      if (!selectedVanityDetail) {
+        toast.error("Selected vanity address not found.");
+        return;
+      }
+  
+      // Step 2: Delete the existing vanity address
+      const deleteResponse = await deleteVanityAddress(address!, selectedVanityAddress);
+      if (!deleteResponse) {
+        throw new Error("Failed to delete vanity address.");
+      }
+      console.log(deleteResponse.message);
+  
+      // Add rollback for deleting the vanity address
+      rollbackActions.push(async () =>
+        storeVanityWallet(
+          address!,
+          selectedVanityDetail.vanityAddress,
+          selectedVanityDetail.vanityPrivateKey,
+          selectedVanityDetail.vanityAccountType
+        )
+      );
+  
+      // Step 3: Insert vanity details into the new wallet
+      const updateVanityDetailsResponse = await storeVanityWallet(
+        walletAddress,
+        selectedVanityDetail.vanityAddress,
+        selectedVanityDetail.vanityPrivateKey,
+        selectedVanityDetail.vanityAccountType
+      );
+      if (!updateVanityDetailsResponse) {
+        throw new Error("Failed to store vanity wallet details.");
+      }
+      console.log(updateVanityDetailsResponse.message);
+  
+      // Add rollback for storing vanity details
+      rollbackActions.push(async () => deleteVanityAddress(walletAddress, selectedVanityAddress));
+  
+      // Step 4: Update user-generated content
+      await updateVanityUserContentWalletForVanityTransfer(
+        selectedVanityAddress,
+        walletAddress
+      );
+      rollbackActions.push(async () =>
+        updateVanityUserContentWalletForVanityTransfer(
+          selectedVanityAddress,
+          address!
+        )
+      );
+  
+      // Step 5: Update storyline content
+      await updateVanityStoryLineContentWalletForVanityTransfer(
+        selectedVanityAddress,
+        walletAddress
+      );
+      rollbackActions.push(async () =>
+        updateVanityStoryLineContentWalletForVanityTransfer(
+          selectedVanityAddress,
+          address!
+        )
+      );
+  
+      // Success Message
+      toast.success("Vanity Details Transfer successfully.");
+      setTriggerVanityAddressUpdate((prev) => !prev);
+  
+    } catch (error) {
+      console.error("Error during vanity address transfer:", error);
+      toast.error("An error occurred during the transfer process.");
+  
+      // Rollback changes in reverse order
+      for (const rollback of rollbackActions.reverse()) {
+        try {
+          await rollback(); // Execute rollback action
+        } catch (rollbackError) {
+          console.error("Rollback failed:", rollbackError);
         }
       }
-    } catch (error) {
-      console.error("Error fetching existing vanity address:", error);
     } finally {
       setIsLoading(false);
+      onClose();
     }
-    onClose();
   };
+  
 
   // for enable disble button
   const isSubmitDisabled =
