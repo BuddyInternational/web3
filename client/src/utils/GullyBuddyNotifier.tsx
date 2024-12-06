@@ -2,7 +2,8 @@ import { useWeb3ModalProvider } from "@web3modal/ethers/react";
 import axios from "axios";
 import { ethers } from "ethers";
 
-const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
+// const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
+const domain: string | undefined = process.env.REACT_APP_MATIC_DOMAIN;
 
 // const notificationDomains: Record<string, string | undefined> = {
 //   "1": process.env.REACT_APP_ETHEREUM_DOMAIN, // Ethereum Mainnet
