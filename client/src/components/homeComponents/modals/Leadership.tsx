@@ -33,7 +33,7 @@ import Loader from "../../../utils/Loader";
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
 const nftMarketContractAddress: string | undefined =
   process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-const ANTTokenAmount = process.env.REACT_APP_ANNOTATION_TOKEN_TRANSFER_AMOUNT;
+// const ANTTokenAmount = process.env.REACT_APP_ANNOTATION_TOKEN_TRANSFER_AMOUNT;
 
 const Leadership: React.FC<{
   open: boolean;
@@ -93,9 +93,9 @@ const Leadership: React.FC<{
           try {
             // Transfer Annotation Token to prestige Account
             const transferToken =
-              await nftMarketContract.transferANTTokenToPrestige(
+              await nftMarketContract.transferANTokenToPrestige(
                 generatedAddress.address,
-                ANTTokenAmount
+                // ANTTokenAmount
               );
             console.log("Transaction sent:", transferToken);
             // Wait for the transaction to be confirmed

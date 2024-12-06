@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import {
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from "@web3modal/ethers/react";
 import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
@@ -65,53 +68,130 @@ interface CountdownRendererProps {
   completed: boolean;
 }
 
-// Constant Token address
-const tokenAddresses: any = {
-  CDE1: process.env.REACT_APP_TOKEN1_ADDRESS,
-  CDE2: process.env.REACT_APP_TOKEN2_ADDRESS,
-  TIM: process.env.REACT_APP_TOKEN3_ADDRESS,
-};
-
-const tokenDetails = {
-  [process.env.REACT_APP_TOKEN1_ADDRESS!]: {
-    name: "CDE®v1",
-    symbol: "CDE",
+const tokenAddressesByChain: any = {
+  mainnet: {
+    CDE1: process.env.REACT_APP_ETHEREUM_CDE1_TOKEN_ADDRESS,
+    CDE2: process.env.REACT_APP_ETHEREUM_CDE2_TOKEN_ADDRESS,
+    TIM: process.env.REACT_APP_ETHEREUM_TIM_TOKEN_ADDRESS,
+    AN: process.env.REACT_APP_ETHEREUM_AN_TOKEN_ADDRESS,
   },
-  [process.env.REACT_APP_TOKEN2_ADDRESS!]: {
-    name: "CDE®v2",
-    symbol: "CDE",
-  },
-  [process.env.REACT_APP_TOKEN3_ADDRESS!]: {
-    name: (
-      <span style={{ display: "flex", alignItems: "center" }}>
-        TIM
-        <img
-          src="/TIM.svg"
-          alt="TIM Logo"
-          style={{
-            height: "0.8em",
-            marginLeft: "1px",
-            verticalAlign: "middle",
-          }}
-        />
-      </span>
-    ),
-    symbol: "TIM",
+  matic: {
+    CDE1: process.env.REACT_APP_POLYGON_CDE1_TOKEN_ADDRESS,
+    CDE2: process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS,
+    TIM: process.env.REACT_APP_POLYGON_TIM_TOKEN_ADDRESS,
+    AN: process.env.REACT_APP_POLYGON_AN_TOKEN_ADDRESS,
   },
 };
 
-const TestCDEAddress: any =
-  process.env.REACT_APP_TESTCDE_TOKEN_CONTRACT_ADDRESS;
-const TestTIMAddress: any =
-  process.env.REACT_APP_TESTTIM_TOKEN_CONTRACT_ADDRESS;
-const TestANTAddress: any =
-  process.env.REACT_APP_TESTANT_TOKEN_CONTRACT_ADDRESS;
+const tokenDetailsByChain: any = {
+  mainnet: {
+    [process.env.REACT_APP_ETHEREUM_CDE1_TOKEN_ADDRESS!]: {
+      name: "CDE®v1",
+      symbol: "CDE",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_ETHEREUM_CDE2_TOKEN_ADDRESS!]: {
+      name: "CDE®v2",
+      symbol: "CDE",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_ETHEREUM_TIM_TOKEN_ADDRESS!]: {
+      name: (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          TIM
+          <img
+            src="/TIM.svg"
+            alt="TIM Logo"
+            style={{
+              height: "0.8em",
+              marginLeft: "1px",
+              verticalAlign: "middle",
+            }}
+          />
+        </span>
+      ),
+      symbol: "TIM",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_ETHEREUM_AN_TOKEN_ADDRESS!]: {
+      name: (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          AN
+          <img
+            src="/Annotation.svg"
+            alt="AN Logo"
+            style={{
+              height: "1em",
+              marginLeft: "10px",
+              marginRight: "5px",
+              verticalAlign: "middle",
+            }}
+          />
+        </span>
+      ),
+      symbol: "AN",
+      decimals: 4,
+    },
+  },
+  matic: {
+    [process.env.REACT_APP_POLYGON_CDE1_TOKEN_ADDRESS!]: {
+      name: "CDE®v1",
+      symbol: "CDE",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS!]: {
+      name: "CDE®v2",
+      symbol: "CDE",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_POLYGON_TIM_TOKEN_ADDRESS!]: {
+      name: (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          TIM
+          <img
+            src="/TIM.svg"
+            alt="TIM Logo"
+            style={{
+              height: "0.8em",
+              marginLeft: "1px",
+              verticalAlign: "middle",
+            }}
+          />
+        </span>
+      ),
+      symbol: "TIM",
+      decimals: 18,
+    },
+    [process.env.REACT_APP_POLYGON_AN_TOKEN_ADDRESS!]: {
+      name: (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          AN
+          <img
+            src="/Annotation.svg"
+            alt="AN Logo"
+            style={{
+              height: "1em",
+              marginLeft: "10px",
+              marginRight: "5px",
+              verticalAlign: "middle",
+            }}
+          />
+        </span>
+      ),
+      symbol: "AN",
+      decimals: 4,
+    },
+  },
+};
 
-  // Server API Base URL
+// const TestANTAddress: any =
+//   process.env.REACT_APP_TESTANT_TOKEN_CONTRACT_ADDRESS;
+
+// Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
-const rpc_url: any = process.env.REACT_APP_RPC_URL;
+const rpc_url: any = process.env.REACT_APP_RPC_URL_MAINNET;
 const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 const ApiKey = process.env.REACT_APP_OPENSEA_API_KEY;
 const gullyBuddyNFTAddress =
@@ -126,6 +206,7 @@ const gullyBuddyNFTCollectionAddress = [
 
 const Home = () => {
   const { address, isConnected } = useWeb3ModalAccount();
+  const { walletProvider } = useWeb3ModalProvider();
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
   const [balances, setBalances] = useState<any>({
@@ -133,9 +214,9 @@ const Home = () => {
     vanity: [],
   });
 
-  const [testCDEBalance, setTestCDEBalance] = useState(0);
-  const [testTIMBalance, setTestTIMBalance] = useState(0);
-  const [testANTBalance, setTestANTBalance] = useState(0);
+  const [selectedChain, setSelectedChain] = useState("mainnet");
+  const [isNetworkChanging, setIsNetworkChanging] = useState(false);
+  // const [testANTBalance, setTestANTBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [otherNFTs, setOtherNFTs] = useState<NFTDetails[]>([]);
   const [gullyBuddyNFTs, setGullyBuddyNFTs] = useState<NFTDetails[]>([]);
@@ -183,8 +264,8 @@ const Home = () => {
     setAnchorEl(null);
   };
 
-   //fetch vanity Address list for wallet
-   const fetchVanityAddresses = async () => {
+  //fetch vanity Address list for wallet
+  const fetchVanityAddresses = async () => {
     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
       setVanityAddresses([]);
       return;
@@ -305,94 +386,90 @@ const Home = () => {
           wallet: [],
           vanity: [],
         });
-        setTestCDEBalance(0);
-        setTestTIMBalance(0);
-        setTestANTBalance(0);
+        // setTestANTBalance(0);
         return;
       }
 
-      const provider = new ethers.JsonRpcProvider(rpc_url);
+      const rpcUrls = {
+        mainnet: process.env.REACT_APP_RPC_URL_MAINNET,
+        matic: process.env.REACT_APP_RPC_URL_MATIC,
+      };
+      const ethersProvider = new ethers.BrowserProvider(walletProvider!);
+      const network = await ethersProvider.getNetwork();
+      const selectedChain: string | undefined = network.name;
+
+      let provider: any;
+      // const provider = new ethers.JsonRpcProvider(rpcUrls[selectedChain]);
+      if (rpcUrls[selectedChain as keyof typeof rpcUrls]) {
+        provider = new ethers.JsonRpcProvider(
+          rpcUrls[selectedChain as keyof typeof rpcUrls]
+        );
+      } else {
+        console.error(`No RPC URL configured for network: ${network.name}`);
+      }
+      console.log("provider===============", provider);
+      const tokenAddresses = tokenAddressesByChain[selectedChain];
+      console.log("tokenAddresses===========", tokenAddresses);
       const tokenContracts = Object.keys(tokenAddresses).map(
-        (token) => new Contract(tokenAddresses[token], ERC20ABI, provider)
+        (token: any) => new Contract(tokenAddresses[token], ERC20ABI, provider)
       );
 
-      const testTokenProvider = new ethers.JsonRpcProvider(sepolia_rpc_url);
-      const testCDETokenContract = new Contract(
-        TestCDEAddress,
-        testTokenAbi.abi,
-        testTokenProvider
-      );
-      const testTIMTokenContract = new Contract(
-        TestTIMAddress,
-        testTokenAbi.abi,
-        testTokenProvider
-      );
-      const testANTTokenContract = new Contract(
-        TestANTAddress,
-        testTokenAbi.abi,
-        testTokenProvider
-      );
-
-      // ************************  wallet address balance *********************************
-      const walletbalances = await Promise.all(
+      // Fetch wallet balances
+      const walletBalances = await Promise.all(
         tokenContracts.map((contract) => contract.balanceOf(address))
       );
 
-      const formattedWalletBalances = walletbalances.map((balance, idx) => ({
-        name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
-          .name,
-        symbol:
-          tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
-        balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
-        address: Object.keys(tokenAddresses)[idx],
-      }));
+      const formatBalance = (balance: any, decimals: number) => {
+        return Number(balance) / Math.pow(10, decimals);
+      };
 
-      // ************************** vanity address balance  ********************************
-      const vanitybalances = await Promise.all(
-        tokenContracts.map((contract) => contract.balanceOf(address))
+      const formattedWalletBalances = walletBalances.map((balance, idx) => {
+        const tokenAddress = Object.keys(tokenAddresses)[idx];
+        const tokenDetails =
+          tokenDetailsByChain[selectedChain][tokenAddresses[tokenAddress]];
+        const decimals = tokenDetails.decimals || 18;
+
+        return {
+          name: tokenDetails.name,
+          symbol: tokenDetails.symbol,
+          balance: formatBalance(balance, decimals).toFixed(4),
+          address: tokenAddress,
+        };
+      });
+
+      console.log(
+        "formattedWalletBalances=====================",
+        formattedWalletBalances
       );
 
-      const formattedVanityBalances = vanitybalances.map((balance, idx) => ({
-        name: tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]]
-          .name,
-        symbol:
-          tokenDetails[tokenAddresses[Object.keys(tokenAddresses)[idx]]].symbol,
-        balance: Number(Web3.utils.fromWei(balance, "ether")).toFixed(4),
-        address: Object.keys(tokenAddresses)[idx],
-      }));
-
-      // ************************ Test CDE address balance  ************************************
-      const testCDETokenBalance = await testCDETokenContract.balanceOf(
-        vanityAddress
+      // Fetch vanity balances
+      const vanityBalances = await Promise.all(
+        tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
       );
-      const formattedTestCDEBalance = Number(
-        Web3.utils.fromWei(testCDETokenBalance, "ether")
-      ).toFixed(4);
 
-      // ***********************  Test TIM address balance  *********************************
-      const testTIMTokenBalance = await testTIMTokenContract.balanceOf(
-        vanityAddress
+      const formattedVanityBalances = vanityBalances.map((balance, idx) => {
+        const tokenAddress = Object.keys(tokenAddresses)[idx];
+        const tokenDetails =
+          tokenDetailsByChain[selectedChain][tokenAddresses[tokenAddress]];
+        const decimals = tokenDetails.decimals || 18;
+
+        return {
+          name: tokenDetails.name,
+          symbol: tokenDetails.symbol,
+          balance: formatBalance(balance, decimals).toFixed(4),
+          address: tokenAddress,
+        };
+      });
+
+      console.log(
+        "formattedVanityBalances======================",
+        formattedVanityBalances
       );
-      const formattedTestTIMBalance = Number(
-        Web3.utils.fromWei(testTIMTokenBalance, "ether")
-      ).toFixed(4);
 
-      // ***********************  Test ANT address balance  *********************************
-      const testANTTokenBalance = await testANTTokenContract.balanceOf(
-        vanityAddress
-      );
-      const formattedTestANTBalance = Number(
-        Web3.utils.fromWei(testANTTokenBalance, "ether")
-      ).toFixed(4);
-
-      // set all token Balance
       setBalances({
         wallet: formattedWalletBalances,
         vanity: formattedVanityBalances,
       });
-      setTestCDEBalance(Number(formattedTestCDEBalance));
-      setTestTIMBalance(Number(formattedTestTIMBalance));
-      setTestANTBalance(Number(formattedTestANTBalance));
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
@@ -678,7 +755,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching NFTs:", error);
     }
-  }, [address, vanityAddress,isConnected]);
+  }, [address, vanityAddress, isConnected]);
 
   // fetch the Account persona NFT and Token Details
   useEffect(() => {
@@ -735,8 +812,6 @@ const Home = () => {
         wallet: [],
         vanity: [],
       });
-      setTestCDEBalance(0);
-      setTestTIMBalance(0);
     }
     fetchTokenBalance();
   }, [triggerUpdate, fetchTokenBalance]);
@@ -744,7 +819,7 @@ const Home = () => {
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
     if (!imageUrl) {
-      return imageUrl; 
+      return imageUrl;
     }
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
@@ -830,6 +905,26 @@ const Home = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  // Function to fetch network details
+  const getNetworkDetails = async () => {
+    try {
+      if (!walletProvider) return;
+      const ethersProvider = new ethers.BrowserProvider(walletProvider);
+      const network = await ethersProvider.getNetwork();
+      setSelectedChain(network.name);
+    } catch (error) {
+      console.error("Error fetching network:", error);
+    }
+  };
+  // const {chainId} = useWeb3ModalAccount();
+  // console.log("chainId============",chainId);
+  useEffect(() => {
+    if (walletProvider) {
+      getNetworkDetails();
+    }
+  }, [walletProvider]);
+  console.log("selectedChain ============",selectedChain);
 
   return (
     <>
@@ -997,27 +1092,34 @@ const Home = () => {
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
             {/* Loop through tokenDetails to display the balances */}
-            {Object.keys(tokenDetails).map((tokenAddress, idx) => {
-              const walletToken = balances.wallet.find(
-                (token: any) => tokenDetails[tokenAddress]?.name === token.name
-              );
-              const walletBalance = walletToken ? walletToken.balance : "0";
+            {Object.keys(tokenDetailsByChain[selectedChain]).map(
+              (tokenAddress, idx) => {
+                const walletToken = balances.wallet.find(
+                  (token: any) =>
+                    tokenDetailsByChain[selectedChain][tokenAddress]?.name ===
+                    token.name
+                );
+                const walletBalance = walletToken ? walletToken.balance : "0";
 
-              return (
-                <div
-                  key={idx}
-                  className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-                >
-                  <span className="text-[#5692D9] mr-2 flex gap-1">
-                    <p>{tokenDetails[tokenAddress].name}</p>
-                    <p>Token Balance:</p>
-                  </span>{" "}
-                  <span>
-                    {walletBalance} {tokenDetails[tokenAddress].symbol}
-                  </span>
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={idx}
+                    className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                  >
+                    <span className="text-[#5692D9] mr-2 flex gap-1">
+                      <p>
+                        {tokenDetailsByChain[selectedChain][tokenAddress].name}
+                      </p>
+                      <p>Token Balance:</p>
+                    </span>{" "}
+                    <span>
+                      {walletBalance}{" "}
+                      {tokenDetailsByChain[selectedChain][tokenAddress].symbol}
+                    </span>
+                  </div>
+                );
+              }
+            )}
           </div>
           {/* Vanity Balance */}
           <div className="flex flex-col gap-2 mt-2">
@@ -1166,16 +1268,15 @@ const Home = () => {
                 selectedVanity?.vanityAccountType || "unknown";
               if (vanityAccountType === "Prestige") {
                 // Show only ANT Token Balance
+                const antToken = balances.vanity.find(
+                  (token: any) => token.symbol === "AN"
+                );
+
+                const antBalance = antToken ? antToken.balance : "0";
                 return (
-                  // <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-                  //   <span className="text-[#5692D9] mr-2">
-                  //     Test ANT Token Balance:
-                  //   </span>
-                  //   <span>{testANTBalance} TANT</span>
-                  // </div>
                   <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
                     <span className="text-[#5692D9] mr-2 flex items-center">
-                      Test ANT
+                      AN
                       <img
                         src="/Annotation.svg"
                         alt="TANT Symbol"
@@ -1183,50 +1284,51 @@ const Home = () => {
                       />
                       Token Balance:
                     </span>
-                    <span>{testANTBalance} TANT</span>
+                    <span>{antBalance} AN</span>
                   </div>
                 );
               } else {
                 // Show all balances
                 return (
                   <>
-                    {Object.keys(tokenDetails).map((tokenAddress, idx) => {
-                      const vanityToken = balances.vanity.find(
-                        (token: any) =>
-                          tokenDetails[tokenAddress]?.name === token.name // Match by token name
-                      );
+                    {Object.keys(tokenDetailsByChain[selectedChain]).map(
+                      (tokenAddress, idx) => {
+                        const vanityToken = balances.vanity.find(
+                          (token: any) =>
+                            tokenDetailsByChain[selectedChain][tokenAddress]
+                              ?.name === token.name // Match by token name
+                        );
 
-                      const vanityBalance = vanityToken
-                        ? vanityToken.balance
-                        : "0";
+                        const vanityBalance = vanityToken
+                          ? vanityToken.balance
+                          : "0";
 
-                      return (
-                        <div
-                          key={idx}
-                          className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-                        >
-                          <span className="text-[#5692D9] mr-2 flex gap-1">
-                            <p>{tokenDetails[tokenAddress].name}</p>
-                            <p>Token Balance:</p>
-                          </span>
-                          <span>
-                            {vanityBalance} {tokenDetails[tokenAddress].symbol}
-                          </span>
-                        </div>
-                      );
-                    })}
-                    <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-                      <span className="text-[#5692D9] mr-2">
-                        Test CDE Token Balance:
-                      </span>
-                      <span>{testCDEBalance} TCDE</span>
-                    </div>
-                    <div className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1">
-                      <span className="text-[#5692D9] mr-2">
-                        Test TIM Token Balance:
-                      </span>
-                      <span>{testTIMBalance} TTIM</span>
-                    </div>
+                        return (
+                          <div
+                            key={idx}
+                            className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                          >
+                            <span className="text-[#5692D9] mr-2 flex gap-1">
+                              <p>
+                                {
+                                  tokenDetailsByChain[selectedChain][
+                                    tokenAddress
+                                  ].name
+                                }
+                              </p>
+                              <p>Token Balance:</p>
+                            </span>
+                            <span>
+                              {vanityBalance}{" "}
+                              {
+                                tokenDetailsByChain[selectedChain][tokenAddress]
+                                  .symbol
+                              }
+                            </span>
+                          </div>
+                        );
+                      }
+                    )}
                   </>
                 );
               }

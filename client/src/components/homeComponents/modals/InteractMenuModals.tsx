@@ -133,9 +133,9 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
     );
     try {
       // alert("Claim rewards called");
-      const claimTokenAmount = ethers.parseUnits("10", 18);
+      // const claimTokenAmount = ethers.parseUnits("10", 18);
       const tx = await nftMarketContract.claimTimTokenReward(
-        claimTokenAmount,
+        // claimTokenAmount,
         vanityAddress
       );
       console.log("Transaction sent:", tx);

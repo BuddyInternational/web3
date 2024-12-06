@@ -8,119 +8,181 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
-// error purchaseCDETokenError(string);
 contract NFTMarket is Ownable ,Pausable{
-    IERC20 public testCDEToken;
-    IERC20 public testTIMToken;
-    IERC20 public testANTToken;
-    uint256 private testCDERate = 2;
+    IERC20 public CDEToken;
+    IERC20 public TIMToken;
+    IERC20 public ANToken;
     address public tokenowner;
+    uint256 private CDERate = 2000000000000000000; // 2
+    uint256 private TIMRate = 2000000000000000000; // 2
+    uint256 private claimTimRewardAmount = 10000000000000000000; // 10
+    uint256 private ANTokenAmount = 10000000000000000000; // 10
+    uint256 private maxCDETokenAmount = 125000000000000000000000; //125000
+    uint256 private CDEDiscountRate = 400; // 4%
+    uint256 private TIMDiscountRate = 950; // 9.5%
+    uint256 private constant SCALING_FACTOR = 100;
+    // Enum for Token Types
+    enum TokenType { CDE, TIM }
+    // Enum for Address Types
+    enum AddressType { walletAddress, vanityAddress }
+    // Enum for Token Standard
+    enum TokenStandard { ERC721 , ERC1155}
 
     constructor(
-        address _testCDEToken,
-        address _testTIMToken,
-        address _testANTToken,
+        address _CDEToken,
+        address _TIMToken,
+        address _ANToken,
         address _Owner
     ) Ownable(msg.sender){
-        testCDEToken = IERC20(_testCDEToken);
-        testTIMToken = IERC20(_testTIMToken);
-        testANTToken = IERC20(_testANTToken);
+        CDEToken = IERC20(_CDEToken);
+        TIMToken = IERC20(_TIMToken);
+        ANToken = IERC20(_ANToken);
         tokenowner = _Owner;
     }
 
-      // Function to set TestCDE rate (only callable by the owner)
-    function setTestCDERate(uint256 _rate) external onlyOwner {
-        testCDERate = _rate;
-    }
-
-    // Function to get TestCDE rate
-    function getTestCDERate() external view returns (uint256) {
-        return testCDERate;
-    }
-
-     // Function to pause the contract (only callable by the owner)
+     //  Pause and Unpause the contract (only callable by the owner)
     function pause() external onlyOwner {
         _pause();
     }
 
-    // Function to unpause the contract (only callable by the owner)
     function unpause() external onlyOwner {
         _unpause();
     }
 
+// ************************  Setter and  Getter function    ******************************************
+
+      // Setter and Getter for CDERate
+    function setCDERate(uint256 _rate) external onlyOwner {
+        CDERate = _rate * 10**18;
+    }
+
+    function getCDERate() external view returns (uint256) {
+        return CDERate;
+    }
+
+      // Setter and Getter for TIMRate
+    function setTIMRate(uint256 _rate) external onlyOwner {
+        TIMRate = _rate * 10**18;
+    }
+
+    function getTIMRate() external view returns (uint256) {
+        return TIMRate;
+    }
+
+     // Setter and Getter for claimTimRewardAmount
+    function setClaimTimRewardAmount(uint256 _amount) external onlyOwner {
+        claimTimRewardAmount = _amount * 10**18;
+    }
+
+    function getClaimTimRewardAmount() external view returns (uint256) {
+        return claimTimRewardAmount;
+    }
+
+     // Setter and Getter for ANTokenAmount
+    function setANTokenAmount(uint256 _amount) external onlyOwner {
+        ANTokenAmount = _amount * 10**18;
+    }
+
+    function getANTokenAmount() external view returns (uint256) {
+        return ANTokenAmount;
+    }
+
+    // Setter and Getter for maxCDETokenAmount
+    function setMaxCDETokenAmount(uint256 _amount) external onlyOwner {
+        maxCDETokenAmount = _amount * 10**18;
+    }
+
+    function getMaxCDETokenAmount() external view returns (uint256) {
+        return maxCDETokenAmount;
+    }
+
+    // Setter and Getter for CDEDiscountRate
+    function setCDEDiscountRate(uint256 _rate) external onlyOwner {
+        CDEDiscountRate = _rate;
+    }
+
+    function getCDEDiscountRate() external view returns (uint256) {
+        return CDEDiscountRate;
+    }
+
+    // Setter and Getter for TIMDiscountRate
+    function setTIMDiscountRate(uint256 _rate) external onlyOwner {
+        TIMDiscountRate = _rate;
+    }
+
+    function getTIMDiscountRate() external view returns (uint256) {
+        return TIMDiscountRate;
+    }
+
+//  ********************  Main Function    **********************************
+
     // function calculate the tokenAmount
-    function _calculateTokenAmount(uint256 _price)
+    function _calculateTokenAmount(uint256 _price,TokenType _tokenType)
         private
         view
         returns (uint256 tokenAmount)
     {
-        uint256 rateInDecimals = testCDERate * 10**uint256(18);
-        tokenAmount = (_price * rateInDecimals) / 1 ether;
-        return tokenAmount;
+        if(_tokenType == TokenType.CDE){
+            tokenAmount = (_price * CDERate) / 1 ether;
+            return tokenAmount;
+        }
+        if(_tokenType == TokenType.TIM){
+            tokenAmount = (_price * TIMRate) / 1 ether;
+            return tokenAmount;  
+        }
     }
 
-     //Funtion to transfer eth and get the test CDE token
-    function transferEthAndGetTestCDEOrTestTIM(
+     //Funtion to transfer eth and get the  CDE token
+    function transferEthAndGetCDEOrTIM(
         uint256 _ethAmount,
         address _vanityAddress,
-        string memory _tokenType,
-        string memory _addressType
+        TokenType _tokenType,
+        AddressType _addressType
     ) external payable whenNotPaused{
 
-        // require(msg.value == _ethAmount, "Incorrect Ether amount sent");
-        uint256 baseTokenAmount = _calculateTokenAmount(_ethAmount);
-        uint256 tokenAmount = baseTokenAmount * 10**18;
+        // require(msg.value >= _ethAmount, "Incorrect Ether amount sent");
+        uint256 tokenAmount = _calculateTokenAmount(_ethAmount,_tokenType);
 
-        bool isVanityAddress = keccak256(
-            abi.encodePacked(_addressType)
-        ) == keccak256(abi.encodePacked("vanityAddress"));
-
+        bool isVanityAddress = _addressType == AddressType.vanityAddress;
         if (isVanityAddress) {
-            if (
-                keccak256(abi.encodePacked(_tokenType)) ==
-                keccak256(abi.encodePacked("CDE"))
-            ) {
-                tokenAmount = (tokenAmount * 104) / 100; //4% discount
-            } else if (
-                keccak256(abi.encodePacked(_tokenType)) ==
-                keccak256(abi.encodePacked("TIM"))
-            ) {
-                tokenAmount = (tokenAmount * 1095) / 1000; // 9.5% discount
+            if (_tokenType == TokenType.CDE)
+            {
+                uint256 discountMultiplier = SCALING_FACTOR * 100 + CDEDiscountRate;
+                tokenAmount = (tokenAmount * discountMultiplier) / (SCALING_FACTOR * 100);
+            } 
+            else if (_tokenType == TokenType.TIM) 
+            {
+                uint256 discountMultiplier = SCALING_FACTOR * 100 + TIMDiscountRate;
+                tokenAmount = (tokenAmount * discountMultiplier) / (SCALING_FACTOR * 100);
             }
         }
         
-        // if(testCDEToken.balanceOf(_vanityAddress)+tokenAmount >= 125000000000000000000000){
-        //     revert purchaseCDETokenError("User can't purchase more than 125000 CDE Token");
-        // }
         // Check allowances
         uint256 allowance;
-        if (
-            keccak256(abi.encodePacked(_tokenType)) ==
-            keccak256(abi.encodePacked("CDE"))
-        ) {
-            allowance = testCDEToken.allowance(tokenowner, address(this));
+          if (_tokenType == TokenType.CDE)
+         {
+            allowance = CDEToken.allowance(tokenowner, address(this));
             require(
                 allowance >= tokenAmount,
                 "Insufficient allowance for CDE token transfer"
             );
-            uint256 CDEMaximumAmt = testCDEToken.balanceOf(_vanityAddress) + tokenAmount;
-            require(CDEMaximumAmt <= 125000000000000000000000,"User can not purchase more than 125000 CDE Token");
+            uint256 CDEMaximumAmt = CDEToken.balanceOf(_vanityAddress) + tokenAmount;
+            require(CDEMaximumAmt <= maxCDETokenAmount,"User can not purchase more than 125000 CDE Token");
             
             require(
-                testCDEToken.transferFrom(tokenowner, _vanityAddress, tokenAmount),
+                CDEToken.transferFrom(tokenowner, _vanityAddress, tokenAmount),
                 "CDE token transfer failed"
             );
-        } else if (
-            keccak256(abi.encodePacked(_tokenType)) ==
-            keccak256(abi.encodePacked("TIM"))
-        ) {
-            allowance = testTIMToken.allowance(tokenowner, address(this));
+        } 
+        else if (_tokenType == TokenType.TIM) 
+        {
+            allowance = TIMToken.allowance(tokenowner, address(this));
             require(
                 allowance >= tokenAmount,
                 "Insufficient allowance for TIM token transfer"
             );
             require(
-                testTIMToken.transferFrom(tokenowner, _vanityAddress, tokenAmount),
+                TIMToken.transferFrom(tokenowner, _vanityAddress, tokenAmount),
                 "TIM token transfer failed"
             );
         }
@@ -130,19 +192,19 @@ contract NFTMarket is Ownable ,Pausable{
     }
 
     // Function to claim Tim Token Reward
-    function claimTimTokenReward(uint256 _tokenAmount, address _vanityAddress)
+    function claimTimTokenReward(address _vanityAddress)
         external whenNotPaused
     {
         // Check the allowance before transferring
-        uint256 allowance = testTIMToken.allowance(tokenowner, address(this));
+        uint256 allowance = TIMToken.allowance(tokenowner, address(this));
         require(
-            allowance >= _tokenAmount,
+            allowance >= claimTimRewardAmount,
             "Insufficient allowance for token transfer"
         );
 
-        // Transfer testCDEToken to the user
+        // Transfer CDEToken to the user
         require(
-            testTIMToken.transferFrom(tokenowner, _vanityAddress, _tokenAmount),
+            TIMToken.transferFrom(tokenowner, _vanityAddress, claimTimRewardAmount),
             "Token transfer failed"
         );
     }
@@ -152,13 +214,10 @@ contract NFTMarket is Ownable ,Pausable{
         address vanityAddress,
         address nftAddress,
         uint256 tokenId,
-        string memory tokenStandard
+       TokenStandard _tokenStandard
     ) external whenNotPaused {
-        // Transfer ERC721 Token
-        if (
-            keccak256(abi.encodePacked(tokenStandard)) ==
-            keccak256(abi.encodePacked("ERC721"))
-        ) {
+       if (_tokenStandard == TokenStandard.ERC721)
+         {
             // Ensure the contract has been approved to transfer the NFT
             require(
                 IERC721(nftAddress).isApprovedForAll(
@@ -175,11 +234,8 @@ contract NFTMarket is Ownable ,Pausable{
                 tokenId
             );
         }
-        // Transfer ERC1155 Token
-        if (
-            keccak256(abi.encodePacked(tokenStandard)) ==
-            keccak256(abi.encodePacked("ERC1155"))
-        ) {
+        if (_tokenStandard == TokenStandard.ERC1155)
+         {
             // Ensure the contract has been approved to transfer the NFT
             require(
                 IERC1155(nftAddress).isApprovedForAll(
@@ -201,17 +257,17 @@ contract NFTMarket is Ownable ,Pausable{
     }
 
     //Function to Transfer Annotation Token to prestige Account
-    function transferANTTokenToPrestige(address _prestigeAccount,uint256 _tokenAmount) external whenNotPaused{
+    function transferANTokenToPrestige(address _prestigeAccount) external whenNotPaused{
         // Check the allowance before transferring
-        uint256 allowance = testANTToken.allowance(tokenowner, address(this));
+        uint256 allowance = ANToken.allowance(tokenowner, address(this));
         require(
-            allowance >= _tokenAmount,
+            allowance >= ANTokenAmount,
             "Insufficient allowance for token transfer"
         );
 
-        // Transfer testANTToken to the user
+        // Transfer ANToken to the user
         require(
-            testANTToken.transferFrom(tokenowner, _prestigeAccount, _tokenAmount),
+            ANToken.transferFrom(tokenowner, _prestigeAccount, ANTokenAmount),
             "Token transfer failed"
         );
     }

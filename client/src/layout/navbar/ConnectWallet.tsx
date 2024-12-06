@@ -14,6 +14,7 @@ import {
   useDisconnect,
   useWeb3ModalAccount,
   useWeb3ModalProvider,
+  useWeb3ModalState,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaRegCopy, FaEthereum, FaDownload } from "react-icons/fa";
@@ -30,7 +31,7 @@ import { ethers } from "ethers";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useBalanceUpdate } from "../../context/BalanceUpdateContext";
-import RegisterModal from "./RegisterationModal";
+import RegisterModal from "./RegistrationModal";
 import { IoSend } from "react-icons/io5";
 import SendVanityDataModal from "./SendVanityDataModal";
 import LoginModal from "./LoginModal";
@@ -372,6 +373,7 @@ export default function App() {
 
         // Check the current network
         const network = await ethersProvider.getNetwork();
+        console.log("network==============", network);
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
 
         // if (!isMainnet) {

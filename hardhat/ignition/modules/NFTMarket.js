@@ -6,15 +6,15 @@ const config = require("../config");
 
 module.exports = buildModule("NFTMarketModule", (m) => {
   // Define default parameters for the contract
-  const testCDEToken = m.getParameter("testCDEToken",  config.default.testCDEToken);
-  const testTIMToken = m.getParameter("testTIMToken",  config.default.testTIMToken);
-  const testANTToken = m.getParameter("testANTToken",  config.default.testANTToken);
+  const CDEToken = m.getParameter("CDEToken",  config.default.CDEToken);
+  const TIMToken = m.getParameter("TIMToken",  config.default.TIMToken);
+  const ANToken = m.getParameter("ANToken",  config.default.ANToken);
   const owner = m.getParameter("owner",  config.default.tokenOwnerAddress);
 
   // Deploy the NFTMarket contract
-  const nftMarket = m.contract("NFTMarket", [testCDEToken,testTIMToken,testANTToken,owner]);
+  const nftMarket = m.contract("NFTMarket", [CDEToken,TIMToken,ANToken,owner]);
 
   return { nftMarket };
 });
 
-// NFTMarketModule#NFTMarket - 0x4a670ee2Edf9cF26d4A9a96cd8B1BC7216cB5271
+// NFTMarketModule#NFTMarket - 0xFed54E0CAb106DF543eFB2829e6c4a033233F7aF

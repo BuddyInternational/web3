@@ -144,12 +144,13 @@ const ModalNFTCard: React.FC<{
         return;
       }
 
+      const tokenTypeInNumber: any = nftData.tokenType === "ERC721" ? 0 : 1;
       // Call the transferNFTtoVanityAddress function
       const tx = await nftMarketContract.transferNFTtoVanityAddress(
         vanityAddress,
         nftData.contractAddress,
         nftData.tokenId,
-        nftData.tokenType
+        tokenTypeInNumber
       );
       console.log("Transaction sent:", tx);
       // Wait for the transaction to be confirmed

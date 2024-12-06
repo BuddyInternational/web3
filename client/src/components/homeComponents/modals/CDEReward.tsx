@@ -43,8 +43,8 @@ const CDEReward: React.FC<{
     vanityAddress: vanityAddress,
     amount: "",
     selectedChain: "Ethereum", // Default chain
-    selectedToken: "CDE", // Default token
-    receiver: "walletAddress", // Default receiver
+    selectedToken: 0, // Default token
+    receiver: 0, // Default receiver
   });
 
   // network explorer
@@ -94,8 +94,8 @@ const CDEReward: React.FC<{
   // Updated handleChange function
   const handleChange = (
     e:
-      | React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
-      | SelectChangeEvent<string>
+      | React.ChangeEvent<HTMLInputElement | { name?: string; value: string }>
+      | SelectChangeEvent<number>
   ) => {
     const { name, value } = e.target;
     setInputValues((prevValues) => ({
@@ -107,9 +107,9 @@ const CDEReward: React.FC<{
   // Calculate discount
   const getDiscountText = () => {
     const { receiver, selectedToken } = inputValues;
-    if (receiver === "vanityAddress") {
-      if (selectedToken === "CDE") return "4% discount on CDE token";
-      if (selectedToken === "TIM") return "9.5% discount on TIM token";
+    if (receiver === 1) {
+      if (selectedToken === 0) return "4% discount on CDE token";
+      if (selectedToken === 1) return "9.5% discount on TIM token";
     }
     return "No discount available for Wallet Address";
   };
@@ -117,7 +117,7 @@ const CDEReward: React.FC<{
   // Determine the text color based on the receiver
   const getDiscountColor = () => {
     const { receiver } = inputValues;
-    return receiver === "vanityAddress" ? "green" : "red";
+    return receiver === 1 ? "green" : "red";
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -156,14 +156,14 @@ const CDEReward: React.FC<{
         const amountInWei = ethers.parseEther(amountInEther);
         console.log("amountInWei-----------", Number(amountInWei));
 
-        const tx = await nftMarketContract.transferEthAndGetTestCDEOrTestTIM(
-          // amountInWei,
-          amountInEther,
+        const tx = await nftMarketContract.transferEthAndGetCDEOrTIM(
+          amountInWei,
+          // amountInEther,
           vanityAddress,
           tokenType,
           receiverType,
           {
-            value: 0, // Pass the Ether amount
+            value: amountInWei, // Pass the Ether amount
             gasLimit: 300000,
           }
         );
@@ -320,7 +320,7 @@ const CDEReward: React.FC<{
                     <Select
                       name="selectedChain"
                       value={inputValues.selectedChain}
-                      onChange={handleChange}
+                      // onChange={handleChange}
                       label="Chain"
                       inputProps={{ readOnly: true }}
                       disabled
@@ -341,8 +341,8 @@ const CDEReward: React.FC<{
                       onChange={handleChange}
                       label="Token"
                     >
-                      <MenuItem value="CDE">CDE</MenuItem>
-                      <MenuItem value="TIM">TIM</MenuItem>
+                      <MenuItem value={0}>CDE</MenuItem>
+                      <MenuItem value={1}>TIM</MenuItem>
                     </Select>
                   </FormControl>
 

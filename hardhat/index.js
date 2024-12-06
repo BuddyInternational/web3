@@ -2,15 +2,19 @@ const express = require("express");
 const { ethers, parseEther } = require("ethers");
 require("dotenv").config();
 // const nftAbi = require('./artifacts/contracts/Simple721NFT.sol/Simple721NFT.json')
-const cdeTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/CDETokenModule#Token.json");
-const timTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/TIMTokenModule#Token.json");
-const antTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/ANTTokenModule#Token.json");
-const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
+// const cdeTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/CDETokenModule#Token.json");
+// const timTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/TIMTokenModule#Token.json");
+// const antTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/ANTTokenModule#Token.json");
+// const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
+const tokenAbi = require("../hardhat/ABI/ERC20.json");
+const nftMarketAbi = require("./ignition/deployments/chain-137/artifacts/NFTMarketModule#NFTMarket.json");
+
+// console.log("tokenAbi============",tokenAbi);
 
 const app = express();
 const port = process.env.PORT || 4000;
 console.log("port----------", port);
-const provider = new ethers.JsonRpcProvider(process.env.INFURA_URL);
+const provider = new ethers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
 const wallet = new ethers.Wallet(process.env.TOKEN_OWNER_PRIVATE_KEY, provider);
 
 // Middleware to parse JSON requests
@@ -20,21 +24,21 @@ app.use(express.json());
 const cdeTokenContractAddress = process.env.CDE_TOKEN_CONTRACT_ADDRESS;
 const cdeTokenContract = new ethers.Contract(
   cdeTokenContractAddress,
-  cdeTokenAbi.abi,
+  tokenAbi.abi,
   wallet
 );
 
 const timTokenContractAddress = process.env.TIM_TOKEN_CONTRACT_ADDRESS;
 const timTokenContract = new ethers.Contract(
   timTokenContractAddress,
-  timTokenAbi.abi,
+  tokenAbi.abi,
   wallet
 );
 
 const antTokenContractAddress = process.env.ANT_TOKEN_CONTRACT_ADDRESS;
 const antTokenContract = new ethers.Contract(
   antTokenContractAddress,
-  antTokenAbi.abi,
+  tokenAbi.abi,
   wallet
 );
 

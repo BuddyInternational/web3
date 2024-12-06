@@ -167,7 +167,7 @@ const RegisterModal: React.FC<{
                     fullWidth
                     value={option}
                     onChange={handleOptionChange}
-                    label="Select Registeration Option"
+                    label="Select Registration Option"
                     className="mb-4 bg-white text-black rounded-lg"
                     variant="outlined"
                   >

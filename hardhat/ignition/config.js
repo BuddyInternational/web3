@@ -3,10 +3,10 @@ module.exports = {
     default: {
       name: "Test ANT Token",
       symbol: "TANT",
-      tokenOwnerAddress: "0x3f88C36C69199FAa7298815a4e8aa7119d089448",
-      testCDEToken:"0xE4f65aa51311e03bEA21477b348044AcaD5E5eDE",
-      testTIMToken:"0x78F46490e5a47378cB971Bfa6bC752F421F0b921",
-      testANTToken:"0x97BCC8096779D9A3754ff61A7CcD6E97cfAC7c5c",
+      tokenOwnerAddress: "0xc90E5499259Eaa8bb5FD55f6070d43a2e5a78CDE",
+      CDEToken:"0xEF6AF63243C648A3c6478aA9A72f1684D019919E",
+      TIMToken:"0x2552E92e16D98D85051Dd4E80BD033Ee81b89a73",
+      ANToken:"0xe11FA55eaf1f6D16a63536E1058A7ec5CDe03ea9",
     },
   };
   

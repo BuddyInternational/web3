@@ -21,6 +21,10 @@ module.exports = {
     polygon:{
       url:process.env.POLYGON_RPC_URL,
       accounts:[process.env.NFT_MARKET_PRIVATE_KEY_POLYGON]
+    },
+    polygon_amoy:{
+      url:process.env.POLYGON_AMOY_RPC_URL,
+      accounts:[process.env.NFT_MARKET_PRIVATE_KEY_POLYGON_AMOY]
     }
   },
   paths:{
