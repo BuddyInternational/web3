@@ -55,7 +55,7 @@ const chains = [
   {
     chainId: 137,
     name: "Polygon",
-    currency: "Matic",
+    currency: "POL",
     explorerUrl: "https://polygonscan.com/",
     rpcUrl: "https://polygon-rpc.com/",
   },
@@ -372,7 +372,7 @@ export default function App() {
 
         // Check the current network
         const network = await ethersProvider.getNetwork();
-        const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
+        // const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
 
         // if (!isMainnet) {
         //   // User is not on Mainnet, show a warning
@@ -385,10 +385,22 @@ export default function App() {
         // }
 
         // Check if the wallet already has a vanity address
-        const existingAddress = await checkExistingVanityAddress(address);
+        let existingAddress = await checkExistingVanityAddress(address);
 
-        if (existingAddress != null) {
-          // setVanityAddress(existingAddress.vanityAddress);
+        if (existingAddress && existingAddress.AxiosError) {
+          const error = existingAddress.AxiosError;
+          // Show toast based on the error type
+          if (error.code === "ERR_NETWORK") {
+            toast.error(error.message); 
+            disconnect();
+          } else if (error.code === "ERR_NO_RESPONSE") {
+            toast.error("No response from the server. Please try again later.");
+            disconnect();
+          } else {
+            toast.error(`Error: ${error.message}`);
+            disconnect();
+          }
+        } else if (existingAddress) {
           setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
         } else {
           // Generate a new vanity address

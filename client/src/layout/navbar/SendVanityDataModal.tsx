@@ -118,7 +118,7 @@ const SendVanityDataModal: React.FC<{
     try {
       // Step 1: Fetch existing vanity address details
       const existingAddress = await checkExistingVanityAddress(address!);
-      if (!existingAddress) {
+      if (!existingAddress && existingAddress.AxiosError) {
         // toast.error("Vanity address does not exist.");
         return;
       }

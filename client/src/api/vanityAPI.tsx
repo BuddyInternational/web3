@@ -49,9 +49,46 @@ export const checkExistingVanityAddress = async (walletAddress: string) => {
     } else {
       return null;
     }
-  } catch (error) {
-    console.error("Error checking existing vanity address:", error);
-    return null;
+  } catch (error:any) {
+    // console.error("Error checking existing vanity address:", error);
+    // return error;
+    if (error.code === "ERR_NETWORK") {
+      // Handle network errors specifically
+      return {
+        AxiosError: {
+          code: error.code,
+          name: error.name,
+          message: "Network error: Please check your internet connection and try again.",
+        },
+      };
+    } else if (error.response) {
+      // Handle server-related errors (response status code outside 2xx range)
+      return {
+        AxiosError: {
+          code: error.response.status,
+          name: "Server Error",
+          message: `Server returned an error: ${error.response.data.message || "Unknown error"}`,
+        },
+      };
+    } else if (error.request) {
+      // Handle no response received (server didn't respond)
+      return {
+        AxiosError: {
+          code: "ERR_NO_RESPONSE",
+          name: "No Response",
+          message: "No response from server. Please try again later.",
+        },
+      };
+    } else {
+      // Handle other errors
+      return {
+        AxiosError: {
+          code: "ERR_UNKNOWN",
+          name: "Unknown Error",
+          message: "An unexpected error occurred. Please try again later.",
+        },
+      };
+    }
   }
 };
 

@@ -40,7 +40,7 @@ const Leadership: React.FC<{
   onClose: () => void;
 }> = ({ open, onClose }) => {
   const [isChecked, setIsChecked] = useState(false);
-  const { isLoading,setIsLoading } = useLoader();
+  const { isLoading, setIsLoading } = useLoader();
   const { isConnected, address } = useWeb3ModalAccount();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
@@ -55,86 +55,88 @@ const Leadership: React.FC<{
       setIsLoading(true);
       // Check if the wallet already has a vanity address
       const existingAddress = await checkExistingVanityAddress(address);
-      console.log("existingAddress", existingAddress);
-
-      if (existingAddress != null) {
-        console.log("inside the Existing Address");
+      if (existingAddress && existingAddress.AxiosError) {
+        const error = existingAddress.AxiosError;
+        // Show toast based on the error type
+        if (error.code === "ERR_NETWORK") {
+          toast.error(error.message);
+        } else if (error.code === "ERR_NO_RESPONSE") {
+          toast.error("No response from the server. Please try again later.");
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
+      } else {
         // setVanityAddress(existingAddress.vanityAddress);
         // Generate a new vanity address
         const generateResponse = await generateVanityWallet(vanity_suffix!, 1);
         if (generateResponse?.data?.[0]?.address) {
           const generatedAddress = generateResponse.data[0];
           // Store the generated address using the helper function
-          // const sender = address!;
-          // const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-          //   generatedAddress.address || "N/A"
-          // }**.`;
-          // const feesAmount = 10;
+          const sender = address!;
+          const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+            generatedAddress.address || "N/A"
+          }**.`;
+          const feesAmount = 10;
           const vanityAccountType = "Prestige";
-          // const notificationResult = await notifyGullyBuddy(
-          //   sender,
-          //   message,
-          //   feesAmount
-          // );
-          // console.log("notificationResult", notificationResult);
-          // if (notificationResult && notificationResult.hash) {
-
-          // Transfer Annotation Token to the new Vanity Address
-          const ethersProvider = new ethers.BrowserProvider(
-            walletProvider as ethers.Eip1193Provider
+          const notificationResult = await notifyGullyBuddy(
+            sender,
+            message,
+            feesAmount
           );
-          const signer = await ethersProvider.getSigner();
-          const nftMarketContract = new ethers.Contract(
-            nftMarketContractAddress!,
-            nftMarketAbi.abi,
-            signer
-          );
+          console.log("notificationResult", notificationResult);
+          if (notificationResult && notificationResult.hash) {
+            // Transfer Annotation Token to the new Vanity Address
+            const ethersProvider = new ethers.BrowserProvider(
+              walletProvider as ethers.Eip1193Provider
+            );
+            const signer = await ethersProvider.getSigner();
+            const nftMarketContract = new ethers.Contract(
+              nftMarketContractAddress!,
+              nftMarketAbi.abi,
+              signer
+            );
 
-          try {
-            // Transfer Annotation Token to prestige Account
-            const transferToken =
-              await nftMarketContract.transferANTokenToPrestige(
-                generatedAddress.address,
-                // ANTTokenAmount
+            try {
+              // Transfer Annotation Token to prestige Account
+              const transferToken =
+                await nftMarketContract.transferANTokenToPrestige(
+                  generatedAddress.address
+                  // ANTTokenAmount
+                );
+              console.log("Transaction sent:", transferToken);
+              // Wait for the transaction to be confirmed
+              await transferToken.wait();
+              console.log("Transaction confirmed:", transferToken.hash);
+              toast.success(
+                "Transfer Annotation Token to Prestige Account Successfully!"
               );
-            console.log("Transaction sent:", transferToken);
-            // Wait for the transaction to be confirmed
-            await transferToken.wait();
-            console.log("Transaction confirmed:", transferToken.hash);
-            toast.success(
-              "Transfer Annotation Token to Prestige Account Successfully!"
-            );
 
-            await storeVanityWallet(
-              address,
-              generatedAddress.address,
-              generatedAddress.privKey,
-              vanityAccountType
-            );
-            // setVanityAddress(generatedAddress.address);
-            toast.success("Generate Prestige Account Successfully!");
-            console.log("Generate Prestige Account Successfully!");
+              await storeVanityWallet(
+                address,
+                generatedAddress.address,
+                generatedAddress.privKey,
+                vanityAccountType
+              );
+              // setVanityAddress(generatedAddress.address);
+              toast.success("Generate Prestige Account Successfully!");
               // Trigger the VanityAddressUpdate
               setTriggerVanityAddressUpdate((prev) => !prev);
-          } catch (error: any) {
-            console.error(
-              "Error in Transfering Annotation Token to Prestige Account:",
-              error
-            );
+            } catch (error: any) {
+              console.error(
+                "Error in Transfering Annotation Token to Prestige Account:",
+                error
+              );
+              toast.error(
+                "Error in Transfering Annotation Token to Prestige Account"
+              );
+            }
+          } else {
+            // setIsLoading(false);
             toast.error(
-              "Error in Transfering Annotation Token to Prestige Account"
+              "Error sending notification and Generate vanity Address!"
             );
+            return;
           }
-
-          
-
-          // } else {
-          //   // setIsLoading(false);
-          //   toast.error(
-          //     "Error sending notification and Generate vanity Address!"
-          //   );
-          //   return;
-          // }
         } else {
           toast.error("Error Generate vanity Address!");
           return;
@@ -147,9 +149,7 @@ const Leadership: React.FC<{
 
   return (
     <>
-      {isLoading &&(
-        <Loader />
-      )}
+      {isLoading && <Loader />}
 
       <Modal open={open} onClose={onClose}>
         <Fade in={open}>

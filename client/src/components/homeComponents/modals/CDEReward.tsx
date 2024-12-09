@@ -120,6 +120,7 @@ const CDEReward: React.FC<{
     return receiver === 1 ? "green" : "red";
   };
 
+  // Handle submit the wrap cde or tim token purchase
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -262,6 +263,7 @@ const CDEReward: React.FC<{
       onClose();
     }
   };
+  
   // Helper function to slice the address
   const formatAddress = (address: any) => {
     if (!address) return "";

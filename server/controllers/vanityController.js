@@ -215,9 +215,7 @@ export const checkExistingVanityAddress = async (req, res) => {
   const { walletAddress } = req.query;
   try {
     const existingEntry = await VanityData.findOne({ walletAddress });
-
     if (existingEntry) {
-      console.log("address found----------", existingEntry);
       return res.status(200).json({
         message: "Vanity address found",
         // vanityAddress: existingEntry.vanityAddress,
@@ -230,6 +228,15 @@ export const checkExistingVanityAddress = async (req, res) => {
         .json({ message: "No vanity address found for this wallet" });
     }
   } catch (e) {
+    console.error("error=================",e)
+    // Handle general server or network errors (e.g., network down, other server issues)
+    if (e.message.includes("ECONNREFUSED") || e.message.includes("timeout")) {
+      console.error("Network error:", e);
+      return res.status(503).json({
+        error: true,
+        message: "Service Unavailable: Network issue. Please try again later.",
+      });
+    }
     return res
       .status(500)
       .json({ message: "Error checking vanity address", error: e.message });
