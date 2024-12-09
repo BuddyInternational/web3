@@ -90,7 +90,7 @@ export const storeVanityWallet = async (
         vanityAccountType,
       }
     );
-    console.log(" store VanityWallet response:", response);
+    // console.log(" store VanityWallet response:", response);
     return response.data;
   } catch (error) {
     console.error("Error storing vanity wallet:", error);

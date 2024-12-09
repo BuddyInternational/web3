@@ -407,9 +407,7 @@ const Home = () => {
       } else {
         console.error(`No RPC URL configured for network: ${network.name}`);
       }
-      console.log("provider===============", provider);
       const tokenAddresses = tokenAddressesByChain[selectedChain];
-      console.log("tokenAddresses===========", tokenAddresses);
       const tokenContracts = Object.keys(tokenAddresses).map(
         (token: any) => new Contract(tokenAddresses[token], ERC20ABI, provider)
       );
@@ -437,10 +435,10 @@ const Home = () => {
         };
       });
 
-      console.log(
-        "formattedWalletBalances=====================",
-        formattedWalletBalances
-      );
+      // console.log(
+      //   "formattedWalletBalances=====================",
+      //   formattedWalletBalances
+      // );
 
       // Fetch vanity balances
       const vanityBalances = await Promise.all(
@@ -461,10 +459,10 @@ const Home = () => {
         };
       });
 
-      console.log(
-        "formattedVanityBalances======================",
-        formattedVanityBalances
-      );
+      // console.log(
+      //   "formattedVanityBalances======================",
+      //   formattedVanityBalances
+      // );
 
       setBalances({
         wallet: formattedWalletBalances,
@@ -917,14 +915,11 @@ const Home = () => {
       console.error("Error fetching network:", error);
     }
   };
-  // const {chainId} = useWeb3ModalAccount();
-  // console.log("chainId============",chainId);
   useEffect(() => {
     if (walletProvider) {
       getNetworkDetails();
     }
   }, [walletProvider]);
-  console.log("selectedChain ============",selectedChain);
 
   return (
     <>

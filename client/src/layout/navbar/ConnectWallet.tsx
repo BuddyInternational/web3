@@ -373,7 +373,6 @@ export default function App() {
 
         // Check the current network
         const network = await ethersProvider.getNetwork();
-        console.log("network==============", network);
         const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
 
         // if (!isMainnet) {
