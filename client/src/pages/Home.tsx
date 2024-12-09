@@ -6,7 +6,6 @@ import {
 import Moralis from "moralis";
 import { Link } from "react-router-dom";
 import { ethers, Contract } from "ethers";
-import Web3 from "web3";
 import { NFTDetails, ShopNFTDetails } from "../utils/Types";
 import { ERC20ABI } from "../utils/ABI";
 import NftCard from "../components/homeComponents/card/NftCard";
@@ -16,7 +15,6 @@ import CDEReward from "../components/homeComponents/modals/CDEReward";
 import { useVanityContext } from "../context/VanityContext";
 import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import MeetingRoom from "../components/homeComponents/modals/MeetingRoom";
-import testTokenAbi from "./../artifacts/contracts/Token.sol/Token.json";
 import Leadership from "../components/homeComponents/modals/Leadership";
 import { Menu, MenuItem, Tooltip, IconButton } from "@mui/material";
 import Withdraw from "../components/homeComponents/modals/Withdraw";
@@ -191,8 +189,8 @@ const tokenDetailsByChain: any = {
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
-const rpc_url: any = process.env.REACT_APP_RPC_URL_MAINNET;
-const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
+// const rpc_url: any = process.env.REACT_APP_RPC_URL_MAINNET;
+// const sepolia_rpc_url: any = process.env.REACT_APP_RPC_URL_SEPOLIA;
 const ApiKey = process.env.REACT_APP_OPENSEA_API_KEY;
 const gullyBuddyNFTAddress =
   process.env.REACT_APP_PASSPORT_NFT_COLLECTION_ADDRESS!;
@@ -215,8 +213,6 @@ const Home = () => {
   });
 
   const [selectedChain, setSelectedChain] = useState("mainnet");
-  const [isNetworkChanging, setIsNetworkChanging] = useState(false);
-  // const [testANTBalance, setTestANTBalance] = useState(0);
   const [NFTdata, setNFTdata] = useState<NFTDetails[]>([]);
   const [otherNFTs, setOtherNFTs] = useState<NFTDetails[]>([]);
   const [gullyBuddyNFTs, setGullyBuddyNFTs] = useState<NFTDetails[]>([]);
@@ -915,6 +911,8 @@ const Home = () => {
       console.error("Error fetching network:", error);
     }
   };
+  
+  // Function to get the Network Details
   useEffect(() => {
     if (walletProvider) {
       getNetworkDetails();

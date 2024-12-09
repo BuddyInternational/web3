@@ -14,7 +14,6 @@ import {
   useDisconnect,
   useWeb3ModalAccount,
   useWeb3ModalProvider,
-  useWeb3ModalState,
 } from "@web3modal/ethers/react";
 import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaRegCopy, FaEthereum, FaDownload } from "react-icons/fa";
@@ -426,6 +425,7 @@ export default function App() {
               toast.error(
                 "Error sending notification and Generate vanity Address!"
               );
+              disconnect();
               return;
             }
           } else {
