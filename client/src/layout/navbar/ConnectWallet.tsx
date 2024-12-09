@@ -386,6 +386,7 @@ export default function App() {
 
         // Check if the wallet already has a vanity address
         let existingAddress = await checkExistingVanityAddress(address);
+        console.log("existingAddress================",existingAddress);
 
         if (existingAddress && existingAddress.AxiosError) {
           const error = existingAddress.AxiosError;

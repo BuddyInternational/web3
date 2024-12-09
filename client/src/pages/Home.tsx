@@ -638,7 +638,6 @@ const Home = () => {
         !address ||
         vanityAddress === "0x0000000000000000000000000000000000000000"
       ) {
-        console.warn("Invalid address or vanity address.");
         return;
       }
       // Define blockchain networks

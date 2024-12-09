@@ -263,7 +263,7 @@ const CDEReward: React.FC<{
       onClose();
     }
   };
-  
+
   // Helper function to slice the address
   const formatAddress = (address: any) => {
     if (!address) return "";
@@ -357,13 +357,13 @@ const CDEReward: React.FC<{
                       onChange={handleChange}
                       label="Receiver Address"
                     >
-                      <MenuItem value="walletAddress">
+                      <MenuItem value={0}>
                         Your Wallet Address
                         <span className="ml-2">
                           ({formatAddress(inputValues.walletAddress)})
                         </span>
                       </MenuItem>
-                      <MenuItem value="vanityAddress">
+                      <MenuItem value={1}>
                         Your Vanity Address
                         <span className="ml-2">
                           ({formatAddress(inputValues.vanityAddress)})
