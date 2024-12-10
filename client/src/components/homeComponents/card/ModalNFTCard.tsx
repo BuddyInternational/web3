@@ -34,6 +34,9 @@ const ModalNFTCard: React.FC<{
     mainnet: {
       contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
     },
+    matic: {
+      contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
+    },
     sepolia: {
       contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
     },
@@ -101,6 +104,7 @@ const ModalNFTCard: React.FC<{
       toast.error(
         `No contracts available for the connected network: ${networkName}`
       );
+      setIsLoading(false);
       return;
     }
     const nftMarketContract = new ethers.Contract(
@@ -141,6 +145,7 @@ const ModalNFTCard: React.FC<{
         console.log("Approval transaction confirmed:", approvalTx.hash);
       } else {
         console.error("Invalid token standard:", nftData.tokenType);
+        setIsLoading(false);
         return;
       }
 
@@ -174,6 +179,7 @@ const ModalNFTCard: React.FC<{
             "Saved latest transfer to database:",
             savedLatestTransfer
           );
+          toast.success("Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth");
           // Send notification to Buddyinternational.eth
           try {
             const sender = address!;
@@ -181,7 +187,7 @@ const ModalNFTCard: React.FC<{
             const feesAmount = 10;
             const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
             if (notificationResult && notificationResult.hash) {
-              toast.success("Notification sent to Buddyinternational.eth");
+              toast.success("Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth");
               onClose();
             }
           } catch (error: any) {
