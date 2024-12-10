@@ -110,6 +110,7 @@ const CDEReward: React.FC<{
     if (receiver === 1) {
       if (selectedToken === 0) return "4% discount on CDE token";
       if (selectedToken === 1) return "9.5% discount on TIM token";
+      if (selectedToken === 2) return "No discount available on AN token";
     }
     return "No discount available for Wallet Address";
   };
@@ -153,14 +154,27 @@ const CDEReward: React.FC<{
       const receiverType = inputValues?.receiver;
       console.log("receiverType-----------", receiverType);
 
+      const targetAddress =
+        receiverType === 0
+          ? inputValues.walletAddress
+          : inputValues.vanityAddress;
+
+      // Ensure parameters are valid
+      if (!targetAddress || !amountInEther) {
+        toast.error("Please fill in all required fields.");
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("targetAddress============",targetAddress);
+
       if (typeof amountInEther === "string") {
         const amountInWei = ethers.parseEther(amountInEther);
         console.log("amountInWei-----------", Number(amountInWei));
 
-        const tx = await nftMarketContract.transferEthAndGetCDEOrTIM(
+        const tx = await nftMarketContract.purchaseToken(
           amountInWei,
-          // amountInEther,
-          vanityAddress,
+          targetAddress,
           tokenType,
           receiverType,
           {
@@ -345,6 +359,7 @@ const CDEReward: React.FC<{
                     >
                       <MenuItem value={0}>CDE</MenuItem>
                       <MenuItem value={1}>TIM</MenuItem>
+                      <MenuItem value={2}>AN</MenuItem>
                     </Select>
                   </FormControl>
 

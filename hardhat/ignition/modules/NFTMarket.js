@@ -10,11 +10,12 @@ module.exports = buildModule("NFTMarketModule", (m) => {
   const TIMToken = m.getParameter("TIMToken",  config.default.TIMToken);
   const ANToken = m.getParameter("ANToken",  config.default.ANToken);
   const owner = m.getParameter("owner",  config.default.tokenOwnerAddress);
+  const amountReceiverAddress = m.getParameter("amountReceiverAddress",  config.default.amountReceiverAddress);
 
   // Deploy the NFTMarket contract
-  const nftMarket = m.contract("NFTMarket", [CDEToken,TIMToken,ANToken,owner]);
+  const nftMarket = m.contract("NFTMarket", [CDEToken,TIMToken,ANToken,owner,amountReceiverAddress]);
 
   return { nftMarket };
 });
 
-// NFTMarketModule#NFTMarket - 0xFed54E0CAb106DF543eFB2829e6c4a033233F7aF
+// NFTMarketModule#NFTMarket - 0x817c5b580CC6569221fD54E5C3d6215DAe924FA4

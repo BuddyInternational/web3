@@ -1084,7 +1084,8 @@ const Home = () => {
               <hr className="sm:border-dotted sm:border-t sm:border-gray-600 sm:w-full sm:my-1 sm:m-auto md:w-full md:my-2" />
             </div>
             {/* Loop through tokenDetails to display the balances */}
-            {Object.keys(tokenDetailsByChain[selectedChain]).map(
+            {tokenDetailsByChain[selectedChain] &&
+            Object.keys(tokenDetailsByChain[selectedChain]).map(
               (tokenAddress, idx) => {
                 const walletToken = balances.wallet.find(
                   (token: any) =>
@@ -1283,7 +1284,8 @@ const Home = () => {
                 // Show all balances
                 return (
                   <>
-                    {Object.keys(tokenDetailsByChain[selectedChain]).map(
+                   {tokenDetailsByChain[selectedChain] &&
+                    Object.keys(tokenDetailsByChain[selectedChain]).map(
                       (tokenAddress, idx) => {
                         const vanityToken = balances.vanity.find(
                           (token: any) =>
