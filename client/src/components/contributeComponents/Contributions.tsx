@@ -16,6 +16,8 @@ import {
 } from "../../api/userContentAPI";
 import { ContentSubmission } from "../../utils/Types";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
+import { useLoader } from "../../context/LoaderContext";
+import Loader from "../../utils/Loader";
 
 interface ContributionsProps {
   submissions: ContentSubmission[];
@@ -25,9 +27,11 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   const { address } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
+  const { isLoading, setIsLoading } = useLoader();
 
   // submit user content onchain
   const handleSubmit = async (ipfsHash: string) => {
+    setIsLoading(true);
     try {
       const sender = address!;
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
@@ -42,8 +46,8 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
           ipfsHash,
           true,
           new Date().toISOString(),
-          "0x0000000000000000000000000"
-          // notificationResult.hash
+          // "0x0000000000000000000000000"
+          notificationResult.hash
         );
 
         if (updateResponse) {
@@ -54,6 +58,16 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
       }
     } catch (error: any) {
       toast.error("Error sending notification:", error);
+    //  // Check if the error has a reason and display it
+    // const errorMessage =  error?.info?.error?.message || error?.reason || error?.message || error?.data?.message || "An unknown error occurred.";
+    // console.log("errorMessage==============************",error?.info?.error?.message);
+    // console.log("errorMessage==============************1",error?.reason);
+    // console.log("errorMessage==============",errorMessage);
+    // toast.error(`Error: ${errorMessage}`);
+
+    }
+    finally{
+      setIsLoading(false);
     }
   };
 
@@ -73,6 +87,8 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   };
 
   return (
+    <>
+    {isLoading && <Loader />}
     <div className="border-2 border-blue-400 rounded-md shadow-lg">
       {submissions.map((submission, index) => (
         <Accordion
@@ -169,7 +185,12 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
                 style={{ marginTop: "8px" }}
               >
                 <a
-                  href={`https://etherscan.io/tx/${submission.submissionHash}`}
+                 href={
+                  submission.chainId === 137
+                    ? `https://polygonscan.com/tx/${submission.submissionHash}`  // Polygon URL
+                    : `https://etherscan.io/tx/${submission.submissionHash}`  // Ethereum URL
+                }
+                  // href={`https://etherscan.io/tx/${submission.submissionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "#1976d2", textDecoration: "underline" }}
@@ -182,6 +203,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
         </Accordion>
       ))}
     </div>
+    </>
   );
 };
 

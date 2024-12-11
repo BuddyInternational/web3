@@ -39,8 +39,7 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({ submiss
           ipfsHash,
           true,
           new Date().toISOString(),
-          "0x0000000000000000000000000"
-          // notificationResult.hash
+          notificationResult.hash
         );
 
         if (updateResponse) {
@@ -166,7 +165,12 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({ submiss
                 style={{ marginTop: "8px" }}
               >
                 <a
-                  href={`https://etherscan.io/tx/${submission.submissionHash}`}
+                href={
+                  submission.chainId === 137
+                    ? `https://polygonscan.com/tx/${submission.submissionHash}`  // Polygon URL
+                    : `https://etherscan.io/tx/${submission.submissionHash}`  // Ethereum URL
+                }
+                  // href={`https://etherscan.io/tx/${submission.submissionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "#1976d2", textDecoration: "underline" }}

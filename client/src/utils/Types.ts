@@ -83,6 +83,7 @@ export interface ContentSubmission {
   submissionHash: string;
   isSubbmited: boolean;
   submissionDate: string;
+  chainId: number;
 }
 
 export interface StoryLineContentSubmission {
@@ -96,6 +97,7 @@ export interface StoryLineContentSubmission {
   submissionHash: string;
   isSubbmited: boolean;
   submissionDate: string;
+  chainId: number;
 }
 
 export interface City {

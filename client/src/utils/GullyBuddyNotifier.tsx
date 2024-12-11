@@ -92,6 +92,7 @@ export const useGullyBuddyNotifier = () => {
     try {
       // Get the connected chain ID
       const network = await ethersProvider.getNetwork();
+    console.log("Network in use:", network);
       const chainId = network.chainId.toString();
       console.log("Connected chain ID:", chainId);
 
@@ -99,17 +100,33 @@ export const useGullyBuddyNotifier = () => {
       const domainOrAddress = notificationDomains[chainId];
 
       if (!domainOrAddress) {
+        const errorMessage = `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`;
         console.error(
           `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`
         );
-        return false;
+        throw new Error(errorMessage);
+        // return false;
       }
 
       console.log("Selected domain or ENS address:", domainOrAddress);
 
+      let gullyBuddyAddress: string | null = "";
       // Resolve the ENS name to an address
-      const gullyBuddyAddress = await resolveENSName(domainOrAddress);
-      console.log("Resolved ENS Address:", gullyBuddyAddress);
+      if(chainId === "1"){
+        gullyBuddyAddress = await resolveENSName(domainOrAddress);
+        console.log("Resolved ENS Address:", gullyBuddyAddress);
+      }
+      else if(chainId === "137"){
+        gullyBuddyAddress = "0x82FAA8FAc390247A3FBde349BD37068567505cbD";
+        console.log("gullyBuddyAddress==========",gullyBuddyAddress);
+      }
+      else{
+        const errorMessage = `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`;
+        console.error(
+          `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`
+        );
+        throw new Error(errorMessage);
+      }
 
       if (gullyBuddyAddress) {
         console.log(`Resolved address for domain: ${gullyBuddyAddress}`);
@@ -118,37 +135,47 @@ export const useGullyBuddyNotifier = () => {
         const notificationTx = await sendNotificationTransaction(gullyBuddyAddress, content);
         if (!notificationTx) {
           console.error("Failed to send notification message.");
-          return false;
+          throw new Error("Failed to send notification message.");
+          // return false;
         }
 
         // Send payment
         const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount);
         if (!paymentTx) {
           console.error("Failed to send payment.");
-          return false;
+          throw new Error("Failed to send payment.");
+          // return false;
         }
 
         console.log("Notification and payment completed successfully.");
         return notificationTx;
       } else {
         console.error("Failed to resolve ENS name.");
-        return false;
+        throw new Error("Failed to resolve ENS name.");
+        // return false;
       }
     } catch (error) {
       console.error("Error in notifyGullyBuddy:", error);
-      return false;
+      throw error;
+      // return false;
     }
   };
 
   // Resolve Domain name
   const resolveENSName = async (ensName: string) => {
     try {
-      const ensAddress = await ethersProvider.resolveName(ensName);
+      const provider = new ethers.JsonRpcProvider("https://polygon-rpc.com");
+      console.log("normal provider=============",provider);
+      console.log("main provider=============",ethersProvider);
+
+      const ensAddress = await provider.resolveName(ensName);
       console.log("ENS Domain address----------", ensAddress);
       return ensAddress;
-    } catch (error) {
+    } catch (error:any) {
       console.error(`Error resolving ENS name ${ensName}:`, error);
-      return null;
+      console.log(`Error resolving ENS name ${ensName}:`, error);
+      throw new Error(`Error resolving ENS name ${ensName}: ${error.message}`);
+      // return null;
     }
   };
 
@@ -173,9 +200,10 @@ export const useGullyBuddyNotifier = () => {
         tx
       );
       return tx;
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error sending notification transaction:", error);
-      return false;
+      throw new Error("Error sending notification transaction: " + error.message);
+      // return false;
     }
   };
 
@@ -227,9 +255,10 @@ export const useGullyBuddyNotifier = () => {
       );
 
       return paymentTx;
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error sending payment transaction:", error);
-      return false;
+      throw new Error("Error sending payment transaction: " + error.message);
+      // return false;
     }
   };
 

@@ -116,6 +116,7 @@ const CreateStoryLines: React.FC = () => {
           submissionHash: "",
           isSubbmited: false,
           submissionDate: "",
+          chainId: 0,
         };
 
         // Call the API to save content details

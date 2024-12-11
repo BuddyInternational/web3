@@ -135,10 +135,14 @@ const Leadership: React.FC<{
             toast.error(
               "Error sending notification and Generate vanity Address!"
             );
+            setIsLoading(false);
+            onClose();
             return;
           }
         } else {
           toast.error("Error Generate vanity Address!");
+          setIsLoading(false);
+          onClose();
           return;
         }
       }

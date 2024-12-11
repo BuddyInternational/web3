@@ -20,7 +20,8 @@ const UserContentSchema = new mongoose.Schema(
       eligibleStatus: {type: Boolean},
       isSubbmited : {type: Boolean},
       submissionHash : {type: String},
-      submissionDate : {type: Date}
+      submissionDate : {type: Date},
+      chainId : {type:Number,default: null},
     }],
   },
 );
