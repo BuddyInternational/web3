@@ -150,7 +150,7 @@ app.post("/approveanttoken", async (req, res) => {
 
     const totalSupply = await antTokenContract.totalSupply();
     console.log("totalSupply------------",totalSupply);
-    const tx = await antTokenContract.approve(spenderAddress, totalSupply);
+    const tx = await antTokenContract.approve(spenderAddress,BigInt(49000 * 10 **18));
     res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
   } catch (error) {
     console.error("Error approving token:", error);

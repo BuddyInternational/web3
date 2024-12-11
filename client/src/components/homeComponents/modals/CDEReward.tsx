@@ -26,6 +26,7 @@ import { toast } from "react-toastify";
 import { useBalanceUpdate } from "../../../context/BalanceUpdateContext";
 import { useLoader } from "../../../context/LoaderContext";
 import Loader from "../../../utils/Loader";
+import { checkExistingVanityAddress } from "../../../api/vanityAPI";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -38,14 +39,48 @@ const CDEReward: React.FC<{
   const nftMarketContractAddress: string | undefined =
     process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
   const { isLoading, setIsLoading } = useLoader();
+  const [mainVanityAccount, setMainVanityAccount] = useState<string | null>(null);
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
-    vanityAddress: vanityAddress,
+    vanityAddress: null,
     amount: "",
     selectedChain: "Ethereum", // Default chain
     selectedToken: 0, // Default token
     receiver: 0, // Default receiver
   });
+
+  // Fetch Main Vanity Account when modal opens
+  useEffect(() => {
+    const fetchMainVanityAccount = async () => {
+      try {
+        const existingAddress = await checkExistingVanityAddress(address!); // Fetch vanity data
+        console.log("existingAddress: ", existingAddress);
+
+        // Find the Main Vanity Account
+        const mainAccount = existingAddress?.vanityDetails?.find(
+          (detail:any) => detail.vanityAccountType === "Main"
+        );
+
+        if (mainAccount) {
+          setMainVanityAccount(mainAccount.vanityAddress);
+          setInputValues((prev) => ({
+            ...prev,
+            vanityAddress: mainAccount.vanityAddress,
+          }));
+        } else {
+          console.warn("No Main Vanity Account found for the address.");
+          setMainVanityAccount(null);
+        }
+      } catch (error) {
+        console.error("Error fetching Main Vanity Account: ", error);
+        setMainVanityAccount(null);
+      }
+    };
+
+    if (open) {
+      fetchMainVanityAccount();
+    }
+  }, [open, address]);
 
   // network explorer
   const networkExplorers: any = {
@@ -378,12 +413,20 @@ const CDEReward: React.FC<{
                           ({formatAddress(inputValues.walletAddress)})
                         </span>
                       </MenuItem>
-                      <MenuItem value={1}>
+                      {/* <MenuItem value={1}>
                         Your Vanity Address
                         <span className="ml-2">
                           ({formatAddress(inputValues.vanityAddress)})
                         </span>
-                      </MenuItem>
+                      </MenuItem> */}
+                      {mainVanityAccount && (
+                        <MenuItem value={1}>
+                          Your Main Vanity Address
+                          <span className="ml-2">
+                            ({formatAddress(mainVanityAccount)})
+                          </span>
+                        </MenuItem>
+                      )}
                     </Select>
                     {/* Display Discount */}
                     <Box mt={1} textAlign="left" color={getDiscountColor()}>

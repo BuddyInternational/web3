@@ -55,6 +55,7 @@ const Leadership: React.FC<{
       setIsLoading(true);
       // Check if the wallet already has a vanity address
       const existingAddress = await checkExistingVanityAddress(address);
+      console.log("existingAddress==============",existingAddress);
       if (existingAddress && existingAddress.AxiosError) {
         const error = existingAddress.AxiosError;
         // Show toast based on the error type

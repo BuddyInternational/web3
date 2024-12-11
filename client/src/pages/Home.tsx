@@ -831,7 +831,9 @@ const Home = () => {
     if (!isConnected || !address || !vanityAddress) {
       e.preventDefault();
       toast.warning(message);
+      return false;
     }
+    return true;
   };
 
   // Render count Down
@@ -910,7 +912,7 @@ const Home = () => {
       console.error("Error fetching network:", error);
     }
   };
-  
+
   // Function to get the Network Details
   useEffect(() => {
     if (walletProvider) {
@@ -1025,7 +1027,23 @@ const Home = () => {
             <Link
               to="/#"
               className="hover:text-[#5692D9] cursor-pointer underline"
-              onClick={handleOpenModal(setOpenCDERewardModal)}
+              // onClick={handleOpenModal(setOpenCDERewardModal)}
+              onClick={(e: any) => {
+                // Check for network connection before opening the modal
+                const isNetworkConnected = handleClickCheckConnectNetwork(
+                  e,
+                  "Please connect your wallet to continue."
+                );
+                console.log(
+                  "isNetworkConnected============",
+                  isNetworkConnected
+                );
+                if (isNetworkConnected == true) {
+                  setOpenCDERewardModal(true); // Open the modal if network is connected
+                } else {
+                  e.preventDefault(); // Prevent any further actions if network is not connected
+                }
+              }}
             >
               Purchase and/or Wrap your CDE for % off Market Price!
             </Link>
@@ -1085,34 +1103,40 @@ const Home = () => {
             </div>
             {/* Loop through tokenDetails to display the balances */}
             {tokenDetailsByChain[selectedChain] &&
-            Object.keys(tokenDetailsByChain[selectedChain]).map(
-              (tokenAddress, idx) => {
-                const walletToken = balances.wallet.find(
-                  (token: any) =>
-                    tokenDetailsByChain[selectedChain][tokenAddress]?.name ===
-                    token.name
-                );
-                const walletBalance = walletToken ? walletToken.balance : "0";
+              Object.keys(tokenDetailsByChain[selectedChain]).map(
+                (tokenAddress, idx) => {
+                  const walletToken = balances.wallet.find(
+                    (token: any) =>
+                      tokenDetailsByChain[selectedChain][tokenAddress]?.name ===
+                      token.name
+                  );
+                  const walletBalance = walletToken ? walletToken.balance : "0";
 
-                return (
-                  <div
-                    key={idx}
-                    className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-                  >
-                    <span className="text-[#5692D9] mr-2 flex gap-1">
-                      <p>
-                        {tokenDetailsByChain[selectedChain][tokenAddress].name}
-                      </p>
-                      <p>Token Balance:</p>
-                    </span>{" "}
-                    <span>
-                      {walletBalance}{" "}
-                      {tokenDetailsByChain[selectedChain][tokenAddress].symbol}
-                    </span>
-                  </div>
-                );
-              }
-            )}
+                  return (
+                    <div
+                      key={idx}
+                      className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                    >
+                      <span className="text-[#5692D9] mr-2 flex gap-1">
+                        <p>
+                          {
+                            tokenDetailsByChain[selectedChain][tokenAddress]
+                              .name
+                          }
+                        </p>
+                        <p>Token Balance:</p>
+                      </span>{" "}
+                      <span>
+                        {walletBalance}{" "}
+                        {
+                          tokenDetailsByChain[selectedChain][tokenAddress]
+                            .symbol
+                        }
+                      </span>
+                    </div>
+                  );
+                }
+              )}
           </div>
           {/* Vanity Balance */}
           <div className="flex flex-col gap-2 mt-2">
@@ -1284,45 +1308,46 @@ const Home = () => {
                 // Show all balances
                 return (
                   <>
-                   {tokenDetailsByChain[selectedChain] &&
-                    Object.keys(tokenDetailsByChain[selectedChain]).map(
-                      (tokenAddress, idx) => {
-                        const vanityToken = balances.vanity.find(
-                          (token: any) =>
-                            tokenDetailsByChain[selectedChain][tokenAddress]
-                              ?.name === token.name // Match by token name
-                        );
+                    {tokenDetailsByChain[selectedChain] &&
+                      Object.keys(tokenDetailsByChain[selectedChain]).map(
+                        (tokenAddress, idx) => {
+                          const vanityToken = balances.vanity.find(
+                            (token: any) =>
+                              tokenDetailsByChain[selectedChain][tokenAddress]
+                                ?.name === token.name // Match by token name
+                          );
 
-                        const vanityBalance = vanityToken
-                          ? vanityToken.balance
-                          : "0";
+                          const vanityBalance = vanityToken
+                            ? vanityToken.balance
+                            : "0";
 
-                        return (
-                          <div
-                            key={idx}
-                            className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
-                          >
-                            <span className="text-[#5692D9] mr-2 flex gap-1">
-                              <p>
+                          return (
+                            <div
+                              key={idx}
+                              className="md:text-sm lg:text-md text-white flex sm:m-auto md:m-0 sm:flex-col 2xl:flex-row gap-1"
+                            >
+                              <span className="text-[#5692D9] mr-2 flex gap-1">
+                                <p>
+                                  {
+                                    tokenDetailsByChain[selectedChain][
+                                      tokenAddress
+                                    ].name
+                                  }
+                                </p>
+                                <p>Token Balance:</p>
+                              </span>
+                              <span>
+                                {vanityBalance}{" "}
                                 {
                                   tokenDetailsByChain[selectedChain][
                                     tokenAddress
-                                  ].name
+                                  ].symbol
                                 }
-                              </p>
-                              <p>Token Balance:</p>
-                            </span>
-                            <span>
-                              {vanityBalance}{" "}
-                              {
-                                tokenDetailsByChain[selectedChain][tokenAddress]
-                                  .symbol
-                              }
-                            </span>
-                          </div>
-                        );
-                      }
-                    )}
+                              </span>
+                            </div>
+                          );
+                        }
+                      )}
                   </>
                 );
               }
