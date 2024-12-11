@@ -951,7 +951,7 @@ const Home = () => {
                 src={
                   socketNFTImageURL
                     ? convertIpfsUrl(socketNFTImageURL!)
-                    : "/accountPersona.png"
+                    : "/accountPersona1.jpeg"
                 }
                 alt="Account Persona not found"
                 className="md:w-30 sm:w-48 h-auto rounded-xl"
