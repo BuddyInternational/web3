@@ -418,7 +418,6 @@ const Home = () => {
       };
 
       const formattedWalletBalances = walletBalances.map((balance, idx) => {
-        console.log("wallet balance============",balance);
         const tokenAddress = Object.keys(tokenAddresses)[idx];
         const tokenDetails =
           tokenDetailsByChain[selectedChain][tokenAddresses[tokenAddress]];

@@ -164,11 +164,7 @@ export const useGullyBuddyNotifier = () => {
   // Resolve Domain name
   const resolveENSName = async (ensName: string) => {
     try {
-      const provider = new ethers.JsonRpcProvider("https://polygon-rpc.com");
-      console.log("normal provider=============",provider);
-      console.log("main provider=============",ethersProvider);
-
-      const ensAddress = await provider.resolveName(ensName);
+      const ensAddress = await ethersProvider.resolveName(ensName);
       console.log("ENS Domain address----------", ensAddress);
       return ensAddress;
     } catch (error:any) {
