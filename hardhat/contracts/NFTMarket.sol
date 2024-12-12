@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract NFTMarket is Ownable, Pausable, ReentrancyGuard {
     IERC20 public CDEToken;
@@ -50,7 +50,7 @@ contract NFTMarket is Ownable, Pausable, ReentrancyGuard {
         address _ANToken,
         address _Owner,
         address _AmountReceiverAddress
-    ) Ownable(msg.sender) {
+    ) Ownable() {
         CDEToken = IERC20(_CDEToken);
         TIMToken = IERC20(_TIMToken);
         ANToken = IERC20(_ANToken);
@@ -132,7 +132,6 @@ contract NFTMarket is Ownable, Pausable, ReentrancyGuard {
     function getANRate() external view returns (uint256) {
         return ANRate;
     }
-
     // Setter and Getter for claimTimRewardAmount
     function setClaimTimRewardAmount(uint256 _amount) external onlyOwner {
         claimTimRewardAmount = _amount;
@@ -160,6 +159,7 @@ contract NFTMarket is Ownable, Pausable, ReentrancyGuard {
         return maxCDETokenAmount;
     }
 
+    // Setter and getter function for Discount Rate
     function setDiscountRate(address tokenAddress, uint256 rate)
         external
         onlyOwner
@@ -208,7 +208,7 @@ contract NFTMarket is Ownable, Pausable, ReentrancyGuard {
             return tokenAmount;
         }
         if (_tokenType == TokenType.AN) {
-            tokenAmount = (_price * 1 ether) / ANRate;
+            tokenAmount = (_price * 10 ** 4) / ANRate;
             return tokenAmount;
         }
     }

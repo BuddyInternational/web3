@@ -418,6 +418,7 @@ const Home = () => {
       };
 
       const formattedWalletBalances = walletBalances.map((balance, idx) => {
+        console.log("wallet balance============",balance);
         const tokenAddress = Object.keys(tokenAddresses)[idx];
         const tokenDetails =
           tokenDetailsByChain[selectedChain][tokenAddresses[tokenAddress]];
@@ -953,7 +954,7 @@ const Home = () => {
                 src={
                   socketNFTImageURL
                     ? convertIpfsUrl(socketNFTImageURL!)
-                    : "/accountPersona1.jpeg"
+                    : "/CDE.svg"
                 }
                 alt="Account Persona not found"
                 className="md:w-30 sm:w-48 h-auto rounded-xl"

@@ -18,4 +18,4 @@ module.exports = buildModule("NFTMarketModule", (m) => {
   return { nftMarket };
 });
 
-// NFTMarketModule#NFTMarket - 0x817c5b580CC6569221fD54E5C3d6215DAe924FA4
+// NFTMarketModule#NFTMarket - 0x6bB73bA91DcBd1fd28bf586418203E160d57a9cD

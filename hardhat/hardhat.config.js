@@ -1,22 +1,18 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
-console.log(
-  "process.env.SEPOLIA_RPC_URL----------------",
-  process.env.SEPOLIA_RPC_URL
-);
-console.log(
-  "TOKEN_CONTRACT_PRIVATE_KEY_SEPOLIA---------------",
-  process.env.TOKEN_CONTRACT_PRIVATE_KEY_SEPOLIA
-);
-console.log(
-  "NFT_MARKET_CONTRACT_PRIVATE_KEY_SEPOLIA---------------",
-  process.env.NFT_MARKET_CONTRACT_PRIVATE_KEY_SEPOLIA
-);
-
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.25",
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    },
+  },
+  sourcify: {
+    enabled: false,
+  },
   networks: {
     hardhat: {
       chainId: 1337,
@@ -39,7 +35,7 @@ module.exports = {
   etherscan: {
     apiKey: {
       polygon: process.env.POLYGON_API_KEY,
-    },
+    }
   },
 
   paths: {

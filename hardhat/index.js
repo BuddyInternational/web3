@@ -6,8 +6,8 @@ require("dotenv").config();
 // const timTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/TIMTokenModule#Token.json");
 // const antTokenAbi = require("./ignition/deployments/chain-11155111/artifacts/ANTTokenModule#Token.json");
 // const nftMarketAbi = require("./ignition/deployments/chain-11155111/artifacts/NFTMarketModule#NFTMarket.json");
-const tokenAbi = require("../hardhat/ABI/ERC20.json");
-const nftMarketAbi = require("./ignition/deployments/chain-137/artifacts/NFTMarketModule#NFTMarket.json");
+const tokenAbi = require("./ABI/ERC20.json");
+const nftMarketAbi = require("../hardhat/ignition/deployments/chain-137/artifacts/NFTMarketModule#NFTMarket.json");
 
 // console.log("tokenAbi============",tokenAbi);
 
@@ -15,7 +15,10 @@ const app = express();
 const port = process.env.PORT || 4000;
 console.log("port----------", port);
 const provider = new ethers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
+// Token owner cde wallet
 const wallet = new ethers.Wallet(process.env.TOKEN_OWNER_PRIVATE_KEY, provider);
+// plen wallet
+// const wallet = new ethers.Wallet(process.env.PLEN_PRIVATE_KEY, provider);
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -150,7 +153,7 @@ app.post("/approveanttoken", async (req, res) => {
 
     const totalSupply = await antTokenContract.totalSupply();
     console.log("totalSupply------------",totalSupply);
-    const tx = await antTokenContract.approve(spenderAddress,BigInt(49000 * 10 **18));
+    const tx = await antTokenContract.approve(spenderAddress,totalSupply);
     res.json({ success: true, transactionHash: tx.hash , balance: totalSupply.toString(),});
   } catch (error) {
     console.error("Error approving token:", error);
@@ -228,16 +231,16 @@ app.post("/anttokenallowance", async (req, res) => {
 const contractAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
 const nftContract = new ethers.Contract(contractAddress, nftMarketAbi.abi, wallet);
 
-// Get NFT Market contract owner
-app.get('/getOwner',async(req,res)=>{
-    try {
-        const owner = await nftContract.owner();
-        console.log("owner-----------",owner);
-        res.status(200).json({ owner });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-})
+// // Get NFT Market contract owner
+// app.get('/getOwner',async(req,res)=>{
+//     try {
+//         const owner = await nftContract.owner();
+//         console.log("owner-----------",owner);
+//         res.status(200).json({ owner });
+//     } catch (error) {
+//         res.status(500).send(error.message);
+//     }
+// })
 
 // API to transfer NFT and pay
 app.post('/transferEthAndGetTestCDEOrTestTIM', async (req, res) => {
@@ -245,11 +248,15 @@ app.post('/transferEthAndGetTestCDEOrTestTIM', async (req, res) => {
     const amountInWei = ethers.parseEther(ethAmount);
         console.log("amountInWei-----------", Number(amountInWei));
     try {
-        const tx = await nftContract.transferEthAndGetTestCDEOrTestTIM(
+        const tx = await nftContract.purchaseToken(
           amountInWei,
           receiverAddress,
           tokenType,
           receiverType,
+          {
+            value: amountInWei, // Pass the Ether amount
+            gasLimit: 300000,
+          }
         );
         console.log("tx===============",tx);
         await tx.wait(); // Wait for the transaction to be mined

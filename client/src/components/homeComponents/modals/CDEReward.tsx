@@ -214,7 +214,7 @@ const CDEReward: React.FC<{
           receiverType,
           {
             value: amountInWei, // Pass the Ether amount
-            gasLimit: 300000,
+            // gasLimit: 300000,
           }
         );
         console.log("Transaction sent:", tx);
