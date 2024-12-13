@@ -28,6 +28,7 @@ import { ethers } from "ethers";
 import { useVanityAddressUpdate } from "../../../context/VanityAddressesListContext";
 import { useLoader } from "../../../context/LoaderContext";
 import Loader from "../../../utils/Loader";
+import useContract from "../../../utils/useContract";
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
@@ -41,10 +42,11 @@ const Leadership: React.FC<{
 }> = ({ open, onClose }) => {
   const [isChecked, setIsChecked] = useState(false);
   const { isLoading, setIsLoading } = useLoader();
-  const { isConnected, address } = useWeb3ModalAccount();
+  const { isConnected, address, chainId } = useWeb3ModalAccount();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
   const { setTriggerVanityAddressUpdate } = useVanityAddressUpdate();
+  const { getContract } = useContract();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
@@ -53,103 +55,114 @@ const Leadership: React.FC<{
   const handleGenerateVanityAddress = async () => {
     if (isConnected && address) {
       setIsLoading(true);
-      // Check if the wallet already has a vanity address
-      const existingAddress = await checkExistingVanityAddress(address);
-      console.log("existingAddress==============",existingAddress);
-      if (existingAddress && existingAddress.AxiosError) {
-        const error = existingAddress.AxiosError;
-        // Show toast based on the error type
-        if (error.code === "ERR_NETWORK") {
-          toast.error(error.message);
-        } else if (error.code === "ERR_NO_RESPONSE") {
-          toast.error("No response from the server. Please try again later.");
-        } else {
-          toast.error(`Error: ${error.message}`);
-        }
-      } else {
-        // setVanityAddress(existingAddress.vanityAddress);
-        // Generate a new vanity address
-        const generateResponse = await generateVanityWallet(vanity_suffix!, 1);
-        if (generateResponse?.data?.[0]?.address) {
-          const generatedAddress = generateResponse.data[0];
-          // Store the generated address using the helper function
-          const sender = address!;
-          const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-            generatedAddress.address || "N/A"
-          }**.`;
-          const feesAmount = 10;
-          const vanityAccountType = "Prestige";
-          const notificationResult = await notifyGullyBuddy(
-            sender,
-            message,
-            feesAmount
+      try {
+        // Ensure the user is on the correct network
+        if (chainId !== 137 && chainId !== 1) {
+          toast.error(
+            "Unsupported network. Please switch to Ethereum or Polygon."
           );
-          console.log("notificationResult", notificationResult);
-          if (notificationResult && notificationResult.hash) {
-            // Transfer Annotation Token to the new Vanity Address
-            const ethersProvider = new ethers.BrowserProvider(
-              walletProvider as ethers.Eip1193Provider
-            );
-            const signer = await ethersProvider.getSigner();
-            const nftMarketContract = new ethers.Contract(
-              nftMarketContractAddress!,
-              nftMarketAbi.abi,
-              signer
-            );
+          setIsLoading(false);
+          return;
+        }
 
-            try {
-              // Transfer Annotation Token to prestige Account
-              const transferToken =
-                await nftMarketContract.transferANTokenToPrestige(
-                  generatedAddress.address
-                  // ANTTokenAmount
+        // Check if the wallet already has a vanity address
+        const existingAddress = await checkExistingVanityAddress(address);
+        console.log("existingAddress==============", existingAddress);
+        if (existingAddress && existingAddress.AxiosError) {
+          const error = existingAddress.AxiosError;
+          // Show toast based on the error type
+          if (error.code === "ERR_NETWORK") {
+            toast.error(error.message);
+          } else if (error.code === "ERR_NO_RESPONSE") {
+            toast.error("No response from the server. Please try again later.");
+          } else {
+            toast.error(`Error: ${error.message}`);
+          }
+        } else {
+          // setVanityAddress(existingAddress.vanityAddress);
+          // Generate a new vanity address
+          const generateResponse = await generateVanityWallet(
+            vanity_suffix!,
+            1
+          );
+          if (generateResponse?.data?.[0]?.address) {
+            const generatedAddress = generateResponse.data[0];
+            // Store the generated address using the helper function
+            const sender = address!;
+            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+              generatedAddress.address || "N/A"
+            }**.`;
+            const feesAmount = 10;
+            const vanityAccountType = "Prestige";
+            const notificationResult = await notifyGullyBuddy(
+              sender,
+              message,
+              feesAmount
+            );
+            console.log("notificationResult", notificationResult);
+            if (notificationResult && notificationResult.hash) {
+              try {
+                // Transfer Annotation Token to prestige Account
+                // Instantiate the contract
+                const nftMarketContract = await getContract(
+                  walletProvider as ethers.Eip1193Provider,
+                  chainId
                 );
-              console.log("Transaction sent:", transferToken);
-              // Wait for the transaction to be confirmed
-              await transferToken.wait();
-              console.log("Transaction confirmed:", transferToken.hash);
-              toast.success(
-                "Transfer Annotation Token to Prestige Account Successfully!"
-              );
+                const transferToken =
+                  await nftMarketContract.transferANTokenToPrestige(
+                    generatedAddress.address
+                    // ANTTokenAmount
+                  );
+                console.log("Transaction sent:", transferToken);
+                // Wait for the transaction to be confirmed
+                await transferToken.wait();
+                console.log("Transaction confirmed:", transferToken.hash);
+                toast.success(
+                  "Transfer Annotation Token to Prestige Account Successfully!"
+                );
 
-              await storeVanityWallet(
-                address,
-                generatedAddress.address,
-                generatedAddress.privKey,
-                vanityAccountType
-              );
-              // setVanityAddress(generatedAddress.address);
-              toast.success("Generate Prestige Account Successfully!");
-              // Trigger the VanityAddressUpdate
-              setTriggerVanityAddressUpdate((prev) => !prev);
-            } catch (error: any) {
-              console.error(
-                "Error in Transfering Annotation Token to Prestige Account:",
-                error
-              );
+                await storeVanityWallet(
+                  address,
+                  generatedAddress.address,
+                  generatedAddress.privKey,
+                  vanityAccountType
+                );
+                // setVanityAddress(generatedAddress.address);
+                toast.success("Generate Prestige Account Successfully!");
+                // Trigger the VanityAddressUpdate
+                setTriggerVanityAddressUpdate((prev) => !prev);
+              } catch (error: any) {
+                console.error(
+                  "Error in Transfering Annotation Token to Prestige Account:",
+                  error
+                );
+                toast.error(
+                  "Error in Transfering Annotation Token to Prestige Account"
+                );
+              }
+            } else {
+              // setIsLoading(false);
               toast.error(
-                "Error in Transfering Annotation Token to Prestige Account"
+                "Error sending notification and Generate vanity Address!"
               );
+              setIsLoading(false);
+              onClose();
+              return;
             }
           } else {
-            // setIsLoading(false);
-            toast.error(
-              "Error sending notification and Generate vanity Address!"
-            );
+            toast.error("Error Generate vanity Address!");
             setIsLoading(false);
             onClose();
             return;
           }
-        } else {
-          toast.error("Error Generate vanity Address!");
-          setIsLoading(false);
-          onClose();
-          return;
         }
+      } catch (e) {
+        console.error("Error in Generate Prestige Account:", e);
+      } finally {
+        setIsLoading(false);
+        onClose();
       }
     }
-    setIsLoading(false);
-    onClose();
   };
 
   return (

@@ -156,7 +156,7 @@ const CDEReward: React.FC<{
     return receiver === 1 ? "green" : "red";
   };
 
-  // Handle submit the wrap cde or tim token purchase
+  // Handle submit the wrap CDE or TIM or AN token purchase
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
