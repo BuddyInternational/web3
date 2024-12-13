@@ -39,6 +39,7 @@ import { logOutUser } from "../../api/userVanityAPI";
 import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -185,6 +186,7 @@ export default function App() {
   } = useAuthContext();
   const [vanityAddresses, setVanityAddresses] = useState([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -736,6 +738,7 @@ export default function App() {
                       resetBalances();
                       setAuthMethod("");
                       disconnect();
+                      navigate('/');
                     }}
                     sx={{
                       borderRadius: "22px",

@@ -17,7 +17,7 @@ const AllRoutes = () => {
   return (
     <>
     <AnimatePresence mode="wait">
-      <Router>
+      {/* <Router> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/endorsee/quest" element={<EndorseeQuestForm />} />
@@ -42,7 +42,7 @@ const AllRoutes = () => {
           {/* <Route path="*" element={<PageNotFound />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
+      {/* </Router> */}
       </AnimatePresence>
     </>
   );
