@@ -203,7 +203,7 @@ const gullyBuddyNFTCollectionAddress = [
 ];
 
 const Home = () => {
-  const { address, isConnected } = useWeb3ModalAccount();
+  const { address, isConnected ,chainId} = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
@@ -465,7 +465,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [isConnected, address, vanityAddress, resetBalances]);
+  }, [isConnected, address, vanityAddress, resetBalances,selectedChain]);
 
   // Fetch floor price with retries
   const fetchNFTFloorPriceWithRetry = async (
@@ -916,7 +916,7 @@ const Home = () => {
     if (walletProvider) {
       getNetworkDetails();
     }
-  }, [walletProvider]);
+  }, [walletProvider,chainId]);
 
   return (
     <>
