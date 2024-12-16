@@ -182,9 +182,6 @@ const tokenDetailsByChain: any = {
   },
 };
 
-// const TestANTAddress: any =
-//   process.env.REACT_APP_TESTANT_TOKEN_CONTRACT_ADDRESS;
-
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 // API KEY

@@ -106,55 +106,60 @@ const ScreenWrite: React.FC = () => {
   //     }
   //   };
 
-  //   //save the story line content in Databse and also send onChain notification
-  //   const handleSubmit = async () => {
-  //     if (mood && content && age) {
-  //       setIsLoading(true);
-  //       try {
-  //         const timestamp = new Date().toISOString();
-  //         const submissionData = { mood, content, age, timestamp };
-  //         const buffer = Buffer.from(JSON.stringify(submissionData));
-  //         const result = await ipfs.add(buffer);
-  //         console.log("IPFS Hash:", result.path);
-  //         const contentDetails = {
-  //           mood,
-  //           content,
-  //           age,
-  //           ipfsHash: result.path,
-  //           generateContentDate: timestamp,
-  //           contentWordCount: wordCount,
-  //           eligibleStatus: false,
-  //           submissionHash: "",
-  //           isSubbmited: false,
-  //           submissionDate: "",
-  //           chainId: 0,
-  //         };
+    //Submit the Screen Write token 
+    const handleSubmit = async () => {
+      if (mood && content && tag) {
+        setIsLoading(true);
 
-  //         // Call the API to save content details
-  //         const response = await saveStoryLineContentDetails(
-  //           address!,
-  //           vanityAddress,
-  //           contentDetails
-  //         );
+        console.log("values ============",mood);
+        console.log("values ============",content);
+        console.log("values ============",tag);
+        // try {
+        //   const timestamp = new Date().toISOString();
+        //   const submissionData = { mood, content, tag, timestamp };
+        //   const buffer = Buffer.from(JSON.stringify(submissionData));
+        //   const result = await ipfs.add(buffer);
+        //   console.log("IPFS Hash:", result.path);
+        //   const contentDetails = {
+        //     mood,
+        //     content,
+        //     tag,
+        //     ipfsHash: result.path,
+        //     generateContentDate: timestamp,
+        //     contentWordCount: wordCount,
+        //     eligibleStatus: false,
+        //     submissionHash: "",
+        //     isSubbmited: false,
+        //     submissionDate: "",
+        //     chainId: 0,
+        //   };
 
-  //         console.log("response-------------", response);
+        //   // Call the API to save content details
+        //   const response = await saveStoryLineContentDetails(
+        //     address!,
+        //     vanityAddress,
+        //     contentDetails
+        //   );
 
-  //         if (response) {
-  //           toast.success(response.message);
-  //           setContent("");
-  //           setMood("");
-  //           setAge(25);
-  //           fetchStoryLineContent();
-  //         }
-  //       } catch (error: any) {
-  //         toast.error("Error uploading to IPFS:", error);
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     } else {
-  //       toast.error("Please select a Mood & Enter content.");
-  //     }
-  //   };
+        //   console.log("response-------------", response);
+
+        //   if (response) {
+        //     toast.success(response.message);
+        //     setContent("");
+        //     setMood("");
+        //     setAge(25);
+        //     fetchStoryLineContent();
+        //   }
+        // } catch (error: any) {
+        //   toast.error("Error uploading to IPFS:", error);
+        // } finally {
+        //   setIsLoading(false);
+        // }
+      } else {
+        toast.error("Please select a Mood & Enter content.");
+      }
+      setIsLoading(false);
+    };
 
   //   const convertToCSV = (data: any[]) => {
   //     if (!data || data.length === 0) return "";
@@ -197,15 +202,13 @@ const ScreenWrite: React.FC = () => {
   //     fetchStoryLineContent();
   //   }, [address, isConnected]);
 
-  console.log("tag===========",tag);
-
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }} // Start faded and slightly smaller
-        animate={{ opacity: 1, scale: 1 }} // Fully visible and normal size
-        exit={{ opacity: 0, scale: 1.1 }} // Fade out while zooming slightly
-        transition={{ duration: 0.5 }} // Animation duration
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        exit={{ opacity: 0, scale: 1.1 }} 
+        transition={{ duration: 0.5 }} 
         className="page-container"
       >
         <Link
@@ -372,7 +375,7 @@ const ScreenWrite: React.FC = () => {
 
           {/* Submit Button */}
           <button
-            //   onClick={handleSubmit}
+              onClick={handleSubmit}
             className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
           >
             Submit
