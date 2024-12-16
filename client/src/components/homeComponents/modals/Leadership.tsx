@@ -23,7 +23,6 @@ import {
 } from "../../../api/vanityAPI";
 import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
-import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { ethers } from "ethers";
 import { useVanityAddressUpdate } from "../../../context/VanityAddressesListContext";
 import { useLoader } from "../../../context/LoaderContext";
@@ -32,9 +31,6 @@ import useContract from "../../../utils/useContract";
 
 // vanity address suffix
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
-const nftMarketContractAddress: string | undefined =
-  process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-// const ANTTokenAmount = process.env.REACT_APP_ANNOTATION_TOKEN_TRANSFER_AMOUNT;
 
 const Leadership: React.FC<{
   open: boolean;
@@ -111,7 +107,6 @@ const Leadership: React.FC<{
                 const transferToken =
                   await nftMarketContract.transferANTokenToPrestige(
                     generatedAddress.address
-                    // ANTTokenAmount
                   );
                 console.log("Transaction sent:", transferToken);
                 // Wait for the transaction to be confirmed

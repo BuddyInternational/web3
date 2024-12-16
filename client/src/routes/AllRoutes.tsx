@@ -12,6 +12,7 @@ import ContributeContent from "../pages/ContributeContent";
 import SocketNFTDetails from "../pages/SocketNFTDetails";
 import CreateStoryLines from "../pages/CreateStoryLines";
 import { AnimatePresence } from "framer-motion";
+import ScreenWrite from "../pages/ScreenWrite";
 
 const AllRoutes = () => {
   return (
@@ -34,6 +35,10 @@ const AllRoutes = () => {
           <Route
             path="/storylinescontent/:walletAddress"
             element={<CreateStoryLines />}
+          />
+          <Route
+            path="/screenwrite/:walletAddress"
+            element={<ScreenWrite />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           <Route path="/nft/socketNFT/:vanityAddress" element={<SocketNFTDetails />} />

@@ -121,16 +121,12 @@ const ContributeContent: React.FC = () => {
           vanityAddress,
           contentDetails
         );
-
-        console.log("response-------------", response);
-
         if (response) {
           toast.success(response.message);
           setContent("");
           setMood("");
           fetchUserContent();
-        }
-        else{
+        } else {
           toast.error("Network Error! Failed to save content details");
         }
       } catch (error: any) {
@@ -181,7 +177,7 @@ const ContributeContent: React.FC = () => {
   // Initial fetch of user content when component mounts
   useEffect(() => {
     fetchUserContent();
-  }, [address, isConnected,fetchUserContent]);
+  }, [address, isConnected, fetchUserContent]);
 
   return (
     <>
@@ -196,22 +192,51 @@ const ContributeContent: React.FC = () => {
         {isLoading && <Loader />}
         {/* StoryLines Button */}
         <Link to={`/storylinescontent/${address}`}>
-          {/* Use motion.button for animations */}
           <motion.button
-            className="absolute top-4 right-4 p-3 text-white rounded-lg border-2 border-white"
+            className="absolute top-4 right-4 px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
             style={{
               background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
             }}
             whileHover={{
               scale: 1.1,
-              boxShadow: "0px 0px 15px rgba(72, 209, 204, 0.8)",
+              boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
             }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 100, damping: 10 }}
+            transition={{
+              type: "spring",
+              stiffness: 120,
+              damping: 12,
+              delay: 0.1, 
+            }}
           >
             Create StoryLines
+          </motion.button>
+        </Link>
+
+        {/* Write Screen Button */}
+        <Link to={`/screenwrite/${address}`}>
+          <motion.button
+            className="absolute top-20 right-4 px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
+            style={{
+              background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
+            }}
+            whileHover={{
+              scale: 1.1,
+              boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
+            }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 120,
+              damping: 12,
+              delay: 0.2, 
+            }}
+          >
+            Screen Write
           </motion.button>
         </Link>
 

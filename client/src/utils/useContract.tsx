@@ -3,16 +3,14 @@ import { ethers } from "ethers";
 import nftMarketAbi from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json"; 
 
 // Contract Address
-const NFTEthereumContractAddress = process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS!;
-const NFTPolygonContractAddress = process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS!;
+const NFTEthereumContractAddress = process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_ETHEREUM!;
+const NFTPolygonContractAddress = process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_POLYGON!;
 
 const useContract = () => {
   const getContract = async (
     walletProvider: ethers.Eip1193Provider,
     chainId: number
   ) => {
-
-    console.log("chainId=============",chainId);
     try {
       const provider = new ethers.BrowserProvider(walletProvider);
       const signer = await provider.getSigner();

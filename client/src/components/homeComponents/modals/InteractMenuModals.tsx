@@ -23,6 +23,8 @@ import { NFTDetails } from "../../../utils/Types";
 import axios from "axios";
 import { useLoader } from "../../../context/LoaderContext";
 import Loader from "../../../utils/Loader";
+import useContract from "../../../utils/useContract";
+import { toast } from "react-toastify";
 
 interface ModalContents {
   title: string;
@@ -59,11 +61,10 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
   modalContents,
   ChainName,
 }) => {
-  const { address } = useWeb3ModalAccount();
+  const { address,chainId } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
-  const nftMarketContractAddress: string | undefined =
-    process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
+  const { getContract } = useContract();
   const { isLoading, setIsLoading } = useLoader();
   const [timeLeft, setTimeLeft] = useState(30);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,7 +88,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
           walletProvider as ethers.Eip1193Provider
         );
         const network = await ethersProvider.getNetwork();
-        setConnectedNetwork(network.name.toLowerCase()); // e.g., "mainnet", "rinkeby"
+        setConnectedNetwork(network.name.toLowerCase()); 
       } else {
         console.error("Ethereum provider is not available.");
       }
@@ -122,20 +123,18 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
       setIsLoading(false); 
       return;
     }
-    const ethersProvider = new ethers.BrowserProvider(
-      walletProvider as ethers.Eip1193Provider
-    );
-    const signer = await ethersProvider.getSigner();
-    const nftMarketContract = new ethers.Contract(
-      nftMarketContractAddress!,
-      nftMarketAbi.abi,
-      signer
+    // Ensure the user is on the correct network
+    if (chainId !== 137 && chainId !== 1) {
+      toast.error("Unsupported network. Please switch to Ethereum or Polygon.");
+      setIsLoading(false);
+      return;
+    }
+    const nftMarketContract = await getContract(
+      walletProvider as ethers.Eip1193Provider,
+      chainId
     );
     try {
-      // alert("Claim rewards called");
-      // const claimTokenAmount = ethers.parseUnits("10", 18);
       const tx = await nftMarketContract.claimTimTokenReward(
-        // claimTokenAmount,
         vanityAddress
       );
       console.log("Transaction sent:", tx);
@@ -157,6 +156,7 @@ const InteractMenuModals: React.FC<CustomModalProps> = ({
         setTimeLeft(30);
         onClose();
       }
+      toast.success("Claim successful!");
     } catch (error) {
       console.log("Error Claiming Rewards", error);
     } finally {

@@ -3,7 +3,9 @@ import axios from "axios";
 import { ethers } from "ethers";
 
 // const domain: string | undefined = process.env.REACT_APP_ETHEREUM_DOMAIN;
-const domain: string | undefined = process.env.REACT_APP_MATIC_DOMAIN;
+// const domain: string | undefined = process.env.REACT_APP_MATIC_DOMAIN;
+
+const Polygon_domain_address = process.env.REACT_APP_POLYGON_DOMAIN_ADDRESS!;
 
 const notificationDomains: Record<string, string | undefined> = {
   "1": process.env.REACT_APP_ETHEREUM_DOMAIN, // Ethereum Mainnet
@@ -27,64 +29,7 @@ export const useGullyBuddyNotifier = () => {
     walletProvider as ethers.Eip1193Provider
   );
 
-  // // Notify GullyBuddy
-  // const notifyGullyBuddy = async (sender: string, content: string,feesAmount: number) => {
-  //   console.log(
-  //     `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
-  //   );
-
-  //   console.log("fees Amount-----------",feesAmount);
-
-  //   // const network = await ethersProvider.getNetwork();
-  //   // const chainId = network.chainId.toString();
-
-  //   // console.log("network=============",network);
-  //   // console.log("chainId=============",chainId);
-
-  //   // const domainOrAddress = notificationDomains[chainId];
-
-  //   // if (!domainOrAddress) {
-  //   //   console.error(
-  //   //     `No domain configured for chainId ${chainId}. Ensure the domain are set correctly.`
-  //   //   );
-  //   //   return false;
-  //   // }
-
-  //   // console.log("domainOrAddress!", domainOrAddress!);
-  //   console.log("domain!", domain!);
-
-  //   const gullyBuddyAddress = await resolveENSName(domain!);
-  //   console.log("ENS Name :", gullyBuddyAddress);
-
-  //   if (gullyBuddyAddress) {
-  //     console.log(
-  //       `Resolved address for Buddyinternational.eth: ${gullyBuddyAddress}`
-  //     );
-
-  //     // Step 1: Send the notification message
-  //     const notificationTx = await sendNotificationTransaction(
-  //       gullyBuddyAddress,
-  //       content,
-  //     );
-  //     if (!notificationTx) {
-  //       console.error("Failed to send notification message.");
-  //       return false;
-  //     }
-
-  //     // Step 2: Send the equivalent of USD in ETH
-  //     const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount);
-  //     if (!paymentTx) {
-  //       console.error("Failed to send payment.");
-  //       return false;
-  //     }
-
-  //     console.log("Notification and payment completed successfully.");
-  //     return notificationTx;
-  //   } else {
-  //     console.error("Failed to resolve Buddyinternational.eth");
-  //     return false;
-  //   }
-  // };
+ // Notify GullyBuddy
   const notifyGullyBuddy = async (sender: string, content: string, feesAmount: number) => {
     console.log(`Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`);
     console.log("Fees Amount:", feesAmount);
@@ -117,7 +62,8 @@ export const useGullyBuddyNotifier = () => {
         console.log("Resolved ENS Address:", gullyBuddyAddress);
       }
       else if(chainId === "137"){
-        gullyBuddyAddress = "0x82FAA8FAc390247A3FBde349BD37068567505cbD";
+        // gullyBuddyAddress = "0x82FAA8FAc390247A3FBde349BD37068567505cbD";
+        gullyBuddyAddress = Polygon_domain_address;
         console.log("gullyBuddyAddress==========",gullyBuddyAddress);
       }
       else{

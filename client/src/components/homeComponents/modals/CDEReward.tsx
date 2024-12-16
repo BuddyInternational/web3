@@ -20,13 +20,13 @@ import {
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../../context/VanityContext";
-import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { useBalanceUpdate } from "../../../context/BalanceUpdateContext";
 import { useLoader } from "../../../context/LoaderContext";
 import Loader from "../../../utils/Loader";
 import { checkExistingVanityAddress } from "../../../api/vanityAPI";
+import useContract from "../../../utils/useContract";
 
 const CDEReward: React.FC<{
   open: boolean;
@@ -36,17 +36,16 @@ const CDEReward: React.FC<{
   const { vanityAddress } = useVanityContext();
   const { walletProvider } = useWeb3ModalProvider();
   const { setTriggerUpdate } = useBalanceUpdate();
-  const nftMarketContractAddress: string | undefined =
-    process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
+  const { getContract } = useContract();
   const { isLoading, setIsLoading } = useLoader();
   const [mainVanityAccount, setMainVanityAccount] = useState<string | null>(null);
   const [inputValues, setInputValues] = useState({
     walletAddress: address,
     vanityAddress: null,
     amount: "",
-    selectedChain: "Ethereum", // Default chain
-    selectedToken: 0, // Default token
-    receiver: 0, // Default receiver
+    selectedChain: "Ethereum", 
+    selectedToken: 0, 
+    receiver: 0, 
   });
 
   // Fetch Main Vanity Account when modal opens
@@ -169,15 +168,15 @@ const CDEReward: React.FC<{
       setIsLoading(false);
       return;
     }
-    const ethersProvider = new ethers.BrowserProvider(
-      walletProvider as ethers.Eip1193Provider
-    );
-    const signer = await ethersProvider.getSigner();
-    console.log("signer===========", signer);
-    const nftMarketContract = new ethers.Contract(
-      nftMarketContractAddress!,
-      nftMarketAbi.abi,
-      signer
+    // Ensure the user is on the correct network
+    if (chainId !== 137 && chainId !== 1) {
+      toast.error("Unsupported network. Please switch to Ethereum or Polygon.");
+      setIsLoading(false);
+      return;
+    }
+    const nftMarketContract = await getContract(
+      walletProvider as ethers.Eip1193Provider,
+      chainId
     );
 
     try {
@@ -200,9 +199,6 @@ const CDEReward: React.FC<{
         setIsLoading(false);
         return;
       }
-
-      console.log("targetAddress============",targetAddress);
-
       if (typeof amountInEther === "string") {
         const amountInWei = ethers.parseEther(amountInEther);
         console.log("amountInWei-----------", Number(amountInWei));
@@ -213,8 +209,8 @@ const CDEReward: React.FC<{
           tokenType,
           receiverType,
           {
-            value: amountInWei, // Pass the Ether amount
-            // gasLimit: 300000,
+            value: amountInWei,
+            gasLimit: 300000,
           }
         );
         console.log("Transaction sent:", tx);
@@ -276,7 +272,6 @@ const CDEReward: React.FC<{
             onClick: () => window.open(explorerLink, "_blank"),
           }
         );
-        // toast.error(`Reason: ${error?.info?.error?.message || "An unknown error occurred"}`);
       } else if (error?.receipt) {
         const transactionHash = error.receipt?.hash;
         const explorerLink = await getExplorerLink(transactionHash);

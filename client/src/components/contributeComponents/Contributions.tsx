@@ -27,12 +27,13 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { isLoading, setIsLoading } = useLoader();
 
+  // handle submit the user content onChain message
   const handleSubmit = async (ipfsHash: string) => {
     setIsLoading(true);
 
     try {
       const sender = address!;
-      const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
+      const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.Gully Buddy International ® All Rights Reserved`;
       const feesAmount = 10;
       // Step 1: Notify GullyBuddy
       let notificationResult: any;
@@ -63,53 +64,12 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
         error?.message ||
         error?.data?.message ||
         "An unknown error occurred.";
-      toast.error(`Unexpected error: ${errorMessage}`);
+      toast.error("Error to send notification");
       console.error("Unhandled Error:", errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
-  // // submit user content onchain
-  // const handleSubmit = async (ipfsHash: string) => {
-  //   setIsLoading(true);
-  //   let notificationResult: { hash: string } | null = null;
-  //   try {
-  //     const sender = address!;
-  //     const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-  //     const feesAmount = 10;
-  //     // Send notification
-  //     const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
-  //     if (notificationResult && notificationResult.hash) {
-  //       toast.success("Notification sent to Buddyinternational.eth");
-  //       // Update the content detail
-  //       const updateResponse = await updateContentDetail(
-  //         address!,
-  //         ipfsHash,
-  //         true,
-  //         new Date().toISOString(),
-  //         // "0x0000000000000000000000000"
-  //         notificationResult.hash
-  //       );
-
-  //       if (updateResponse) {
-  //         toast.success("Content detail updated successfully!");
-  //       } else {
-  //         toast.error("Failed to update content detail.");
-  //       }
-  //     }
-  //   } catch (error: any) {
-  //     toast.error("Error sending notification:", error);
-  //     //  // Check if the error has a reason and display it
-  //     // const errorMessage =  error?.info?.error?.message || error?.reason || error?.message || error?.data?.message || "An unknown error occurred.";
-  //     // console.log("errorMessage==============************",error?.info?.error?.message);
-  //     // console.log("errorMessage==============************1",error?.reason);
-  //     // console.log("errorMessage==============",errorMessage);
-  //     // toast.error(`Error: ${errorMessage}`);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   // handleDeleteContent
   const handleDeleteContent = async (

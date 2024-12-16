@@ -8,45 +8,39 @@ import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
-import nftMarketAbi from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import { useVanityContext } from "../../../context/VanityContext";
 import { ERC1155ABI, ERC721ABI } from "../../../utils/ABI";
 import { saveSocketNFTAndUpdateLastTransfer } from "../../../api/socketnftAPI";
 import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../../utils/GullyBuddyNotifier";
+import useContract from "../../../utils/useContract";
 
 const ModalNFTCard: React.FC<{
   nft: NFTData;
   nftKey: number;
   onClose: () => void;
   setIsLoading: (loading: boolean) => void;
-}> = ({ nft, nftKey, onClose ,setIsLoading}) => {
+}> = ({ nft, nftKey, onClose, setIsLoading }) => {
   const [isContractAddressCopied, setIsContractAddressCopied] =
     useState<number>(-1);
   const [isTokenIdCopied, setIsTokenIdCopied] = useState<number>(-1);
   const { walletProvider } = useWeb3ModalProvider();
-  const { address, isConnected } = useWeb3ModalAccount();
+  const { address, isConnected, chainId } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
-  const nftMarketContractAddress: string | undefined =
-    process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS;
-
-  const contracts: any = {
-    mainnet: {
-      contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
-    },
-    matic: {
-      contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
-    },
-    sepolia: {
-      contract1: { address: nftMarketContractAddress, abi: nftMarketAbi.abi },
-    },
+  const { getContract } = useContract();
+  const contractAddresses: Record<number, string> = {
+    1: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_ETHEREUM!, 
+    137: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_POLYGON!, 
+  };
+  const getContractAddress = (chainId: number): string | undefined => {
+    return contractAddresses[chainId];
   };
 
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   // Convert image url
   const convertIpfsUrl = (imageUrl: string) => {
     if (!imageUrl) {
-      return imageUrl; 
+      return imageUrl;
     }
     if (imageUrl.startsWith("ipfs://")) {
       const ipfsHash = imageUrl.slice(7);
@@ -90,30 +84,20 @@ const ModalNFTCard: React.FC<{
       walletProvider as ethers.Eip1193Provider
     );
     const signer = await ethersProvider.getSigner();
-    const network = await ethersProvider.getNetwork();
-    const networkName = network.name.toLowerCase();
-    console.log(networkName);
-
-    const networkContracts = contracts[networkName];
-    if (
-      !networkContracts ||
-      !networkContracts.contract1 ||
-      !networkContracts.contract1.address
-    ) {
-      console.error(`No contracts available for the network: ${networkName}`);
-      toast.error(
-        `No contracts available for the connected network: ${networkName}`
-      );
+    
+    // Ensure the user is on the correct network
+    if (chainId !== 137 && chainId !== 1) {
+      toast.error("Unsupported network. Please switch to Ethereum or Polygon.");
       setIsLoading(false);
       return;
     }
-    const nftMarketContract = new ethers.Contract(
-      nftMarketContractAddress!,
-      nftMarketAbi.abi,
-      signer
+    const nftMarketContract = await getContract(
+      walletProvider as ethers.Eip1193Provider,
+      chainId
     );
     try {
       const tokenStandard: string | undefined = nftData.tokenType;
+      const selectedContractAddress = getContractAddress(chainId);
       // Approve the NFT to the smart contract
       if (tokenStandard === "ERC721") {
         console.log("Approving ERC721 NFT...");
@@ -123,7 +107,7 @@ const ModalNFTCard: React.FC<{
           signer
         );
         const approvalTx = await nftContract.approve(
-          nftMarketContractAddress,
+          selectedContractAddress,
           nftData.tokenId
         );
         console.log("Approval transaction sent:", approvalTx);
@@ -137,7 +121,7 @@ const ModalNFTCard: React.FC<{
           signer
         );
         const approvalTx = await nftContract.setApprovalForAll(
-          nftMarketContractAddress,
+          selectedContractAddress,
           true
         );
         console.log("Approval transaction sent:", approvalTx);
@@ -179,15 +163,23 @@ const ModalNFTCard: React.FC<{
             "Saved latest transfer to database:",
             savedLatestTransfer
           );
-          toast.success("Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth");
+          toast.success(
+            "Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth"
+          );
           // Send notification to Buddyinternational.eth
           try {
             const sender = address!;
             const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitteda new contribution to Gully Buddy International [All Rights Reserved].`;
             const feesAmount = 10;
-            const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
+            const notificationResult = await notifyGullyBuddy(
+              sender,
+              message,
+              feesAmount
+            );
             if (notificationResult && notificationResult.hash) {
-              toast.success("Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth");
+              toast.success(
+                "Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth"
+              );
               onClose();
             }
           } catch (error: any) {

@@ -1,7 +1,6 @@
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
-import Contributions from "../components/contributeComponents/Contributions";
 import { create as createIPFSClient } from "ipfs-http-client";
 import { getStoryLineContent ,saveStoryLineContentDetails} from "../api/storyLineContentAPI";
 import { toast } from "react-toastify";
@@ -126,8 +125,6 @@ const CreateStoryLines: React.FC = () => {
           contentDetails
         );
 
-        console.log("response-------------", response);
-
         if (response) {
           toast.success(response.message);
           setContent("");
@@ -189,10 +186,10 @@ const CreateStoryLines: React.FC = () => {
   return (
     <>
      <motion.div
-      initial={{ opacity: 0, scale: 0.9 }} // Start faded and slightly smaller
-      animate={{ opacity: 1, scale: 1 }}   // Fully visible and normal size
-      exit={{ opacity: 0, scale: 1.1 }}    // Fade out while zooming slightly
-      transition={{ duration: 0.5 }}       // Animation duration
+      initial={{ opacity: 0, scale: 0.9 }} 
+      animate={{ opacity: 1, scale: 1 }}  
+      exit={{ opacity: 0, scale: 1.1 }}    
+      transition={{ duration: 0.5 }}      
       className="page-container"
     >
       <Link
@@ -256,7 +253,6 @@ const CreateStoryLines: React.FC = () => {
             Select Age :
           </p>
           <div className="flex items-center justify-between">
-            {/* <p className="text-sm text-gray-400">0</p> */}
             <Slider
               value={age}
               onChange={(e, newValue) => setAge(newValue as number)}
@@ -292,7 +288,6 @@ const CreateStoryLines: React.FC = () => {
                 },
               }}
             />
-            {/* <p className="text-sm text-gray-400">100</p> */}
           </div>
         </div>
 

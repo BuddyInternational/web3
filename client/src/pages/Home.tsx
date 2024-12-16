@@ -382,7 +382,6 @@ const Home = () => {
           wallet: [],
           vanity: [],
         });
-        // setTestANTBalance(0);
         return;
       }
 
@@ -395,7 +394,6 @@ const Home = () => {
       const selectedChain: string | undefined = network.name;
 
       let provider: any;
-      // const provider = new ethers.JsonRpcProvider(rpcUrls[selectedChain]);
       if (rpcUrls[selectedChain as keyof typeof rpcUrls]) {
         provider = new ethers.JsonRpcProvider(
           rpcUrls[selectedChain as keyof typeof rpcUrls]
