@@ -2,18 +2,11 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useVanityContext } from "../context/VanityContext";
 import { create as createIPFSClient } from "ipfs-http-client";
-import {
-  getStoryLineContent,
-  saveStoryLineContentDetails,
-} from "../api/storyLineContentAPI";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
 import { StoryLineContentSubmission } from "../utils/Types";
-import { saveAs } from "file-saver";
-import axios from "axios";
-import { Slider } from "@mui/material";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
 import StoryLineContributions from "../components/contributeComponents/StoryLineContributions";
@@ -158,7 +151,7 @@ const ScreenWrite: React.FC = () => {
       } else {
         toast.error("Please select a Mood & Enter content.");
       }
-      setIsLoading(false);
+      setIsLoading(false);  
     };
 
   //   const convertToCSV = (data: any[]) => {
@@ -212,7 +205,7 @@ const ScreenWrite: React.FC = () => {
         className="page-container"
       >
         <Link
-          to="/"
+          to={`/content/${address}`}
           className="container m-auto text-blue-500 hover:underline flex items-center mb-4"
         >
           <MdKeyboardBackspace className="text-3xl text-white mr-2" />

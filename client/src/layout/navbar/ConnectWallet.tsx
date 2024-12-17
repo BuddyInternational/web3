@@ -39,7 +39,9 @@ import { logOutUser } from "../../api/userVanityAPI";
 import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import Loader from "../../utils/Loader";
+import { useLoader } from "../../context/LoaderContext";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -168,7 +170,8 @@ export default function App() {
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const { vanityAddress, setVanityAddress } = useVanityContext();
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoader();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();
   const [showModal, setShowModal] = useState(false);
@@ -364,93 +367,203 @@ export default function App() {
   };
 
   // handle wallet connect
+  // useEffect(() => {
+  //   const handleWalletConnect = async () => {
+  //     if (isConnected && address) {
+  //       setIsLoading(true);
+  //       setAuthMethod("wallet");
+  //       // Create ethers provider using the current wallet provider
+  //       const ethersProvider = new ethers.BrowserProvider(walletProvider!);
+
+  //       // Check the current network
+  //       const network = await ethersProvider.getNetwork();
+  //       // const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
+
+  //       // if (!isMainnet) {
+  //       //   // User is not on Mainnet, show a warning
+  //       //   toast.warning(
+  //       //     "Please switch to the Ethereum Mainnet to generate a vanity address."
+  //       //   );
+  //       //   disconnect(); // Disconnect from the wallet
+  //       //   setIsLoading(false);
+  //       //   return;
+  //       // }
+
+  //       // Check if the wallet already has a vanity address
+  //       let existingAddress = await checkExistingVanityAddress(address);
+  //       console.log(
+  //         "existingAddress==============++++++++++++++++++==",
+  //         existingAddress
+  //       );
+
+  //       if (existingAddress.AxiosError) {
+  //         const error = existingAddress.AxiosError;
+  //         // Show toast based on the error type
+  //         if (error.code === "ERR_NETWORK") {
+  //           toast.error(error.message);
+  //           disconnect();
+  //         } else if (error.code === "ERR_NO_RESPONSE") {
+  //           toast.error("No response from the server. Please try again later.");
+  //           disconnect();
+  //         }
+  //         //  else {
+  //         //   toast.error(`Error: ${error.message}`);
+  //         //   disconnect();
+  //         // }
+  //       }
+
+  //       // else if (existingAddress) {
+  //       //   setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
+  //       // }
+
+  //       // else {
+  //       if (
+  //         existingAddress?.message === "No vanity address found for this wallet"
+  //       ) {
+  //         toast.info("No vanity address found. Generating a new one...");
+
+  //         // Generate a new vanity address
+  //         const generateResponse = await generateVanityWallet(
+  //           vanity_suffix!,
+  //           1
+  //         );
+  //         if (generateResponse?.data?.[0]?.address) {
+  //           const generatedAddress = generateResponse.data[0];
+  //           // Store the generated address using the helper function
+  //           const sender = address!;
+  //           const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
+  //             generatedAddress.address || "N/A"
+  //           }**.`;
+  //           const feesAmount = 2.5;
+  //           const vanityAccountType = "Main";
+  //           const notificationResult = await notifyGullyBuddy(
+  //             sender,
+  //             message,
+  //             feesAmount
+  //           );
+  //           console.log("notificationResult", notificationResult);
+  //           if (notificationResult && notificationResult.hash) {
+  //             await storeVanityWallet(
+  //               address,
+  //               generatedAddress.address,
+  //               generatedAddress.privKey,
+  //               vanityAccountType
+  //             );
+  //             setVanityAddress(generatedAddress.address);
+  //             toast.success("Notification sent to Buddyinternational.eth");
+  //           } else {
+  //             setIsLoading(false);
+  //             toast.error(
+  //               "Error sending notification and Generate vanity Address!"
+  //             );
+  //             disconnect();
+  //             return;
+  //           }
+  //         } else {
+  //           setIsLoading(false);
+  //           toast.error("Error Generate vanity Address!");
+  //           disconnect();
+  //           return;
+  //         }
+  //       }
+  //       // Handle existing vanity address
+  //       else if (existingAddress) {
+  //         setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
+  //         toast.success("Vanity address found!");
+  //       }
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   handleWalletConnect();
+  // }, [isConnected, address]);
+
   useEffect(() => {
     const handleWalletConnect = async () => {
       if (isConnected && address) {
         setIsLoading(true);
         setAuthMethod("wallet");
-        // Create ethers provider using the current wallet provider
-        const ethersProvider = new ethers.BrowserProvider(walletProvider!);
 
-        // Check the current network
-        const network = await ethersProvider.getNetwork();
-        // const isMainnet = network.chainId === BigInt(1); // Ethereum Mainnet
+        try {
+          const ethersProvider = new ethers.BrowserProvider(walletProvider!);
 
-        // if (!isMainnet) {
-        //   // User is not on Mainnet, show a warning
-        //   toast.warning(
-        //     "Please switch to the Ethereum Mainnet to generate a vanity address."
-        //   );
-        //   disconnect(); // Disconnect from the wallet
-        //   setIsLoading(false);
-        //   return;
-        // }
+          // Check the current network
+          const network = await ethersProvider.getNetwork();
 
-        // Check if the wallet already has a vanity address
-        let existingAddress = await checkExistingVanityAddress(address);
-        console.log("existingAddress================",existingAddress);
+          // Uncomment this to enforce Ethereum Mainnet
+          // if (network.chainId !== BigInt(1)) {
+          //   toast.warning("Please switch to Ethereum Mainnet.");
+          //   disconnect();
+          //   setIsLoading(false);
+          //   return;
+          // }
 
-        if (existingAddress && existingAddress.AxiosError) {
-          const error = existingAddress.AxiosError;
-          // Show toast based on the error type
-          if (error.code === "ERR_NETWORK") {
-            toast.error(error.message); 
-            disconnect();
-          } else if (error.code === "ERR_NO_RESPONSE") {
-            toast.error("No response from the server. Please try again later.");
-            disconnect();
-          } else {
-            toast.error(`Error: ${error.message}`);
-            disconnect();
-          }
-        } else if (existingAddress) {
-          setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
-        } else {
-          // Generate a new vanity address
-          const generateResponse = await generateVanityWallet(
-            vanity_suffix!,
-            1
-          );
-          if (generateResponse?.data?.[0]?.address) {
-            const generatedAddress = generateResponse.data[0];
-            // Store the generated address using the helper function
-            const sender = address!;
-            const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
-              generatedAddress.address || "N/A"
-            }**.`;
-            const feesAmount = 2.5;
-            const vanityAccountType = "Main";
-            const notificationResult = await notifyGullyBuddy(
-              sender,
-              message,
-              feesAmount
+          // Check for existing vanity address
+          const existingAddress = await checkExistingVanityAddress(address);
+          console.log("existingAddress:", existingAddress);
+
+          if (
+            existingAddress?.message ===
+            "No vanity address found for this wallet"
+          ) {
+            // toast.info("No vanity address found. Generating a new one...");
+
+            // Generate new vanity address
+            const generateResponse = await generateVanityWallet(
+              vanity_suffix!,
+              1
             );
-            console.log("notificationResult", notificationResult);
-            if (notificationResult && notificationResult.hash) {
-              await storeVanityWallet(
-                address,
-                generatedAddress.address,
-                generatedAddress.privKey,
-                vanityAccountType
+            if (generateResponse?.data?.[0]?.address) {
+              const generatedAddress = generateResponse.data[0];
+              const sender = address!;
+              const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${generatedAddress.address}**.`;
+              // const feesAmount = 2.5;
+              const feesAmount = 0.5;
+              const vanityAccountType = "Main";
+
+              // Notify about new vanity address
+              const notificationResult = await notifyGullyBuddy(
+                sender,
+                message,
+                feesAmount
               );
-              setVanityAddress(generatedAddress.address);
-              toast.success("Notification sent to Buddyinternational.eth");
+              console.log("Notification Result:", notificationResult);
+
+              if (notificationResult && notificationResult.hash) {
+                await storeVanityWallet(
+                  address,
+                  generatedAddress.address,
+                  generatedAddress.privKey,
+                  vanityAccountType
+                );
+                setVanityAddress(generatedAddress.address);
+                toast.success(
+                  "Vanity address successfully generated and stored!"
+                );
+              } else {
+                throw new Error(
+                  "Error sending notification for new vanity address."
+                );
+              }
             } else {
-              setIsLoading(false);
-              toast.error(
-                "Error sending notification and Generate vanity Address!"
-              );
-              disconnect();
-              return;
+              throw new Error("Error generating a new vanity address.");
             }
-          } else {
-            setIsLoading(false);
-            toast.error("Error Generate vanity Address!");
+          } else if (existingAddress?.vanityDetails?.[0]?.vanityAddress) {
+            // Set existing vanity address
+            setVanityAddress(existingAddress.vanityDetails[0].vanityAddress);
+            // toast.success("Vanity address found!");
+          } else if (existingAddress?.AxiosError) {
+            // Handle Axios-specific errors
+            toast.error(existingAddress.AxiosError.message);
             disconnect();
-            return;
           }
+        } catch (error: any) {
+          console.error("Error during wallet connection:", error);
+          toast.error(error.message || "An unexpected error occurred.");
+          disconnect();
+        } finally {
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     };
 
@@ -520,6 +633,8 @@ export default function App() {
 
   return (
     <>
+      {isLoading && <Loader />}
+
       <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
         {/* connected vanity address */}
         {showModal && (
@@ -738,7 +853,7 @@ export default function App() {
                       resetBalances();
                       setAuthMethod("");
                       disconnect();
-                      navigate('/');
+                      navigate("/");
                     }}
                     sx={{
                       borderRadius: "22px",

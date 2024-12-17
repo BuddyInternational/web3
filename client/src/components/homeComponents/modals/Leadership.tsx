@@ -88,7 +88,8 @@ const Leadership: React.FC<{
             const message = `User with Wallet Address **${address}** has generated a new Vanity Address: **${
               generatedAddress.address || "N/A"
             }**.`;
-            const feesAmount = 10;
+            // const feesAmount = 10;
+            const feesAmount = 0.5;
             const vanityAccountType = "Prestige";
             const notificationResult = await notifyGullyBuddy(
               sender,

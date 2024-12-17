@@ -215,6 +215,7 @@ export const checkExistingVanityAddress = async (req, res) => {
   const { walletAddress } = req.query;
   try {
     const existingEntry = await VanityData.findOne({ walletAddress });
+    console.log("existingEntry===========",existingEntry);
     if (existingEntry) {
       return res.status(200).json({
         message: "Vanity address found",
@@ -222,7 +223,8 @@ export const checkExistingVanityAddress = async (req, res) => {
         // vanityPrivateKey: existingEntry.vanityPrivateKey,
         vanityDetails: existingEntry.vanityDetails,
       });
-    } else {
+    }
+     else {
       return res
         .status(404)
         .json({ message: "No vanity address found for this wallet" });

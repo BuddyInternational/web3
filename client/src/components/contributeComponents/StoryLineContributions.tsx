@@ -28,7 +28,8 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({ submiss
     try {
       const sender = address!;
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-      const feesAmount = 10;
+      // const feesAmount = 10;
+      const feesAmount = 0.5;
       // Send notification
       const notificationResult = await notifyGullyBuddy(sender, message,feesAmount);
       if (notificationResult && notificationResult.hash) {

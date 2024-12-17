@@ -193,7 +193,7 @@ const CreateStoryLines: React.FC = () => {
       className="page-container"
     >
       <Link
-        to="/"
+        to={`/content/${address}`}
         className="container m-auto text-blue-500 hover:underline flex items-center mb-4"
       >
         <MdKeyboardBackspace className="text-3xl text-white mr-2" />

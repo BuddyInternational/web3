@@ -86,7 +86,7 @@ export const useGullyBuddyNotifier = () => {
         }
 
         // Send payment
-        const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount);
+        const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount,chainId);
         if (!paymentTx) {
           console.error("Failed to send payment.");
           throw new Error("Failed to send payment.");
@@ -149,58 +149,139 @@ export const useGullyBuddyNotifier = () => {
     }
   };
 
-  // send Payment Transaction to send fees to domain for onchain message.
+  // // send Payment Transaction to send fees to domain for onchain message.
+  // const sendPaymentTransaction = async (
+  //   toAddress: string,
+  //   amountInUSD: number,
+  //   chainId: string,
+  // ) => {
+  //   try {
+  //     let nativeCurrencySymbol: string;
+
+  //       // Dynamically assign RPC provider based on the chain
+  //   if (chainId === "1") {
+  //     nativeCurrencySymbol = "ETH";
+  //   } else if (chainId === "137") {
+  //     nativeCurrencySymbol = "POL";
+  //   } else {
+  //     throw new Error("Unsupported chain. Please use 'ethereum' or 'polygon'.");
+  //   }
+  //     const signer = await ethersProvider.getSigner();
+
+  //     // // Fetch conversion rate from USD to ETH
+  //     // const options = {
+  //     //   method: "GET",
+  //     //   url: "https://api.fxratesapi.com/latest",
+  //     //   params: {
+  //     //     base: "USD",
+  //     //     currencies: nativeCurrencySymbol,
+  //     //     resolution: "1m",
+  //     //     amount: 1,
+  //     //     places: 6,
+  //     //     format: "json",
+  //     //   },
+  //     // };
+
+  //     // const response = await axios.request(options);
+  //     // const usdToNativeRate = response.data.rates[nativeCurrencySymbol];
+  //     // console.log("usdToNativeRate============",usdToNativeRate);
+
+  //     // if (!usdToNativeRate) {
+  //     //   console.error(`Failed to retrieve USD to ${nativeCurrencySymbol} conversion rate.`);
+  //     //   return false;
+  //     // }
+
+  //     // // Calculate the amount in ETH
+  //     // const amountInNativeCurrency = ethers.parseUnits(
+  //     //   (amountInUSD * usdToNativeRate).toFixed(18),
+  //     //   "ether"
+  //     // );
+
+  //     // console.log("amountInNativeCurrency=============",amountInNativeCurrency);
+
+  //     const paymentTx = await signer.sendTransaction({
+  //       to: toAddress,
+  //       value: ethers.parseUnits("4.199916001679966", "ether"),
+  //     });
+
+  //     await paymentTx.wait();
+  //     console.log(
+  //       "Payment transaction sent to Buddyinternational.eth:",
+  //       paymentTx
+  //     );
+
+  //     return paymentTx;
+  //   } catch (error:any) {
+  //     console.error("Error sending payment transaction:", error);
+  //     throw new Error("Error sending payment transaction: " + error.message);
+  //     // return false;
+  //   }
+  // };
+
   const sendPaymentTransaction = async (
     toAddress: string,
-    amountInUSD: number
+    amountInUSD: number,
+    chainId: string,
   ) => {
     try {
+      // let nativeCurrencySymbol: string;
+  
+      // // Dynamically assign RPC provider based on the chain
+      // if (chainId === "1") {
+      //   nativeCurrencySymbol = "ETH"; // For ETH (Ethereum)
+      // } else if (chainId === "137") {
+      //   nativeCurrencySymbol = "MATIC"; // For POL (Polygon)
+      // } else {
+      //   throw new Error("Unsupported chain. Please use 'ethereum' or 'polygon'.");
+      // }
+  
+      // // Fetch the conversion rate from USD to native currency (ETH or POL)
+      // const coinMarketCapApiKey = '4864e553-47ca-4fd6-8a71-a867797dc74f'; // Replace with your API key
+      // const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest`;
+  
+      // const response = await axios.get(url, {
+      //   headers: {
+      //     'X-CMC_PRO_API_KEY': coinMarketCapApiKey, // CoinMarketCap API key header
+      //     'Accept': 'application/json',
+      //   },
+      //   params: {
+      //     symbol: nativeCurrencySymbol.toUpperCase(), // Use symbol as "ETH" or "MATIC" based on the chain
+      //     convert: 'USD',
+      //   },
+      // });
+  
+      // const tokenData = response.data.data[0];
+      // const priceInUSD = tokenData.quote.USD.price;
+  
+      // console.log(`${nativeCurrencySymbol.toUpperCase()} price in USD:`, priceInUSD);
+  
+      // if (!priceInUSD) {
+      //   console.error(`Failed to retrieve ${nativeCurrencySymbol} price in USD.`);
+      //   return false;
+      // }
+  
+      // // Calculate the amount in native currency (ETH or POL)
+      // const amountInNativeCurrency = ethers.parseUnits(
+      //   (amountInUSD / priceInUSD).toFixed(18), // Convert USD to the native currency amount
+      //   "ether" // We assume it's ETH, you can change to other decimals if needed
+      // );
+  
+      // console.log("Amount in native currency (ETH or POL):", amountInNativeCurrency);
+  
+      // Sending the transaction
       const signer = await ethersProvider.getSigner();
-
-      // Fetch conversion rate from USD to ETH
-      const options = {
-        method: "GET",
-        url: "https://api.fxratesapi.com/latest",
-        params: {
-          base: "USD",
-          currencies: "ETH",
-          resolution: "1m",
-          amount: 1,
-          places: 6,
-          format: "json",
-        },
-      };
-
-      const response = await axios.request(options);
-      const usdToEthRate = response.data.rates.ETH;
-
-      if (!usdToEthRate) {
-        console.error("Failed to retrieve USD to ETH conversion rate.");
-        return false;
-      }
-
-      // Calculate the amount in ETH
-      const amountInEth = ethers.parseUnits(
-        (amountInUSD * usdToEthRate).toFixed(18),
-        "ether"
-      );
-
       const paymentTx = await signer.sendTransaction({
         to: toAddress,
-        value: amountInEth,
+        value: ethers.parseUnits("0.8355614973262031","ether"), // Send the calculated amount
       });
-
+  
       await paymentTx.wait();
-      console.log(
-        "Payment transaction sent to Buddyinternational.eth:",
-        paymentTx
-      );
-
+      console.log("Payment transaction sent:", paymentTx);
       return paymentTx;
+  
     } catch (error:any) {
       console.error("Error sending payment transaction:", error);
       throw new Error("Error sending payment transaction: " + error.message);
-      // return false;
     }
   };
 
