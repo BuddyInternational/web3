@@ -1,3 +1,10 @@
+export interface VanityData {
+  walletAddress: string;
+  vanityAddress: string;
+  vanityPrivateKey: string;
+  createdAt: string;
+}
+
 export interface NFTData {
   chainName?: string;
   contractAddress?: string;
@@ -90,6 +97,21 @@ export interface StoryLineContentSubmission {
   mood: string;
   content: string;
   age:number;
+  ipfsHash?: string;
+  generateContentDate: string;
+  contentWordCount: number;
+  eligibleStatus: boolean;
+  submissionHash: string;
+  isSubbmited: boolean;
+  submissionDate: string;
+  chainId: number;
+}
+
+export interface ScreenWriteContentSubmission {
+  mood: string;
+  content: string;
+  place: string;
+  relativeTag:string;
   ipfsHash?: string;
   generateContentDate: string;
   contentWordCount: number;

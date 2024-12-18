@@ -1,7 +1,7 @@
 import express from "express";
 import connection from "./config/config.js";
 import { vanityRoutes } from "./routes/vanityRoutes.js";
-import { userVanityRoutes } from "./routes/UserRoutes.js";
+import { userVanityRoutes } from "./routes/userRoutes.js";
 import { nftRoutes } from "./routes/nftRoutes.js";
 import { socketNFTRoutes } from "./routes/socketNFTRoutes.js";
 import { userContentRoutes } from "./routes/userContentRoutes.js";
@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import axios from "axios";
+import { screenWriteContentRoutes } from "./routes/screenWriteContentRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -26,6 +27,7 @@ app.use("/api/nft/", nftRoutes);
 app.use("/api/socket-nft/", socketNFTRoutes);
 app.use("/api/user-content/", userContentRoutes);
 app.use("/api/storyLine-content/", storyLineContentRoutes);
+app.use("/api/screenWrite-content/", screenWriteContentRoutes);
 
 // track download vanity data CSV using short link
 app.post("/proxyVanityDataDownload", async (req, res) => {
@@ -77,6 +79,25 @@ app.post("/proxyStoryLineContentDownload", async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error("proxyStoryLineContentDownload request failed:", error);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+
+// Track download Screen Write Content CSV using short link
+app.post("/proxyScreenWriteContentDownload", async (req, res) => {
+  try {
+    console.log("Screen Write-----------",process.env.TRACK_DOWNLOAD_SCREENWRITE_CONTENT_DATA);
+    // Make the actual request to downloads.gully.app
+    const response = await axios.post(
+      process.env.TRACK_DOWNLOAD_SCREENWRITE_CONTENT_DATA,
+      req.body
+    );
+
+    console.log("response===========", response);
+    // Forward the response from downloads.gully.app to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error("proxyScreenWriteContentDownload request failed:", error);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 });

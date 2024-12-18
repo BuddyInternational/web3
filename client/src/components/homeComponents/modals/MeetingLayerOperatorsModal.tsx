@@ -9,6 +9,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { IoClose } from "react-icons/io5";
+import ReactPlayer from "react-player";
+
+const videoURL = process.env.REACT_APP_MEETING_ROOM_VIDEO!;
 
 const MeetingLayerOperatorsModal: React.FC<{
   open: boolean;
@@ -19,9 +22,11 @@ const MeetingLayerOperatorsModal: React.FC<{
     coverImage: "/music_cover.jpeg", // Replace with actual image path
     songName: "Shape of You",
     artistName: "Ed Sheeran",
-    gifUrl: "/music-giphy.gif", // Replace with actual GIF path
+    videoUrl: videoURL
   };
 
+
+console.log("vedio url ===============",songData.videoUrl);
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -93,7 +98,7 @@ const MeetingLayerOperatorsModal: React.FC<{
                 marginBottom: "15px",
               }}
             >
-              <img
+              {/* <img
                 src={songData.gifUrl}
                 alt="GIF"
                 style={{
@@ -101,7 +106,32 @@ const MeetingLayerOperatorsModal: React.FC<{
                   height: "auto", // Maintains the aspect ratio
                   display: "block", // Avoid inline element space issues
                 }}
-              />
+              /> */}
+               <ReactPlayer
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      minHeight: "400px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+                    }}
+                    width={"100%"}
+                    controls={true}
+                    // url={songData.videoUrl}
+                    url={`https://youtu.be/dFs40m2jKLg?si=u3ca-IWDsCHtWOK4`}
+                    loop={true}
+                    playing={true}
+                    // onPlay={() => setIsPlaying(true)}
+                    // onPause={() => setIsPlaying(false)}
+                    config={{
+                      file: {
+                        attributes: {
+                          crossOrigin: "anonymous", // Allows cross-origin access if supported by server
+                        },
+                      },
+                    }}
+                  />
             </Box>
 
             {/* Middle Section */}

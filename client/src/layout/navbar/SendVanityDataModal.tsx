@@ -31,6 +31,7 @@ import Loader from "../../utils/Loader";
 import { toast } from "react-toastify";
 import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
+import { updateVanityScreenWriteContentWalletForVanityTransfer } from "../../api/screenWriteContentAPI";
 
 const SendVanityDataModal: React.FC<{
   open: boolean;
@@ -194,7 +195,19 @@ const SendVanityDataModal: React.FC<{
         )
       );
 
-      // Step 6: Send OnChain Message when transfer Vanity Details
+      // Step 6: Update screen write content
+      await updateVanityScreenWriteContentWalletForVanityTransfer(
+        selectedVanityAddress,
+        walletAddress
+      );
+      rollbackActions.push(async () =>
+        updateVanityScreenWriteContentWalletForVanityTransfer(
+          selectedVanityAddress,
+          address!
+        )
+      );
+
+      // Step 7: Send OnChain Message when transfer Vanity Details
       const sender = address!;
       const message = `The vanity Address "${selectedVanityAddress}" transfer Vanity Account to this wallet Address "${walletAddress}"`;
       // const feesAmount = 75;
@@ -206,7 +219,7 @@ const SendVanityDataModal: React.FC<{
         feesAmount
       );
 
-      if (!notificationResult || !notificationResult.hash) {
+      if (!notificationResult || !notificationResult.notificationTxHash) {
         toast.error("Failed to send on-chain message.");
         // Rollback changes in reverse order
         for (const rollback of rollbackActions.reverse()) {

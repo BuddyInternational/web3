@@ -39,14 +39,15 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
       // Step 1: Notify GullyBuddy
       let notificationResult: any;
       notificationResult = await notifyGullyBuddy(sender, message, feesAmount);
-      if (notificationResult && notificationResult.hash) {
+      if (notificationResult && notificationResult.notificationTxHash) {
         try {
           const updateResponse = await updateContentDetail(
             address!,
             ipfsHash,
             true,
             new Date().toISOString(),
-            notificationResult.hash
+            notificationResult.notificationTxHash ,
+            notificationResult.chainId
           );
 
           if (updateResponse) {

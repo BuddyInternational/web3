@@ -97,7 +97,7 @@ const Leadership: React.FC<{
               feesAmount
             );
             console.log("notificationResult", notificationResult);
-            if (notificationResult && notificationResult.hash) {
+            if (notificationResult && notificationResult.notificationTxHash) {
               try {
                 // Transfer Annotation Token to prestige Account
                 // Instantiate the contract

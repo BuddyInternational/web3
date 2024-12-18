@@ -1,4 +1,4 @@
-import { UserContentData } from "../models/userContent.js";
+import { UserContentData } from "../models/UserContent.js";
 import { UserContentCallLogData } from "../models/UserContentCallLog.js";
 
 //  save user content data
@@ -71,7 +71,7 @@ export const getUserContent = async (req, res) => {
 export const updateContentDetail = async (req, res) => {
   try {
     const { walletAddress, ipfsHash } = req.params;
-    const { isSubbmited, submissionDate, submissionHash } = req.body;
+    const { isSubbmited, submissionDate, submissionHash,chainId } = req.body;
 
     // Find the user content by wallet address
     const userContent = await UserContentData.findOne({ walletAddress });
@@ -97,6 +97,7 @@ export const updateContentDetail = async (req, res) => {
     contentDetail.isSubbmited = isSubbmited;
     contentDetail.submissionDate = submissionDate;
     contentDetail.submissionHash = submissionHash;
+    contentDetail.chainId = chainId;
 
     // Save to the database
     const updatedContent = await userContent.save();

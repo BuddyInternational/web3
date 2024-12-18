@@ -8,20 +8,20 @@ import { Box, Chip, Stack, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useVanityContext } from "../../context/VanityContext";
-import {
-  deleteStoryLineContent,
-  updateStoryLineContentDetail,
-} from "../../api/storyLineContentAPI";
-import { StoryLineContentSubmission } from "../../utils/Types";
+import { ScreenWriteContentSubmission } from "../../utils/Types";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
-import Loader from "../../utils/Loader";
+import {
+  deleteScreenWriteContent,
+  updateScreenWriteContentDetail,
+} from "../../api/screenWriteContentAPI";
 import { useLoader } from "../../context/LoaderContext";
+import Loader from "../../utils/Loader";
 
-interface StoryLineContributionsProps {
-  submissions: StoryLineContentSubmission[];
+interface ScreenWriteContributionsProps {
+  submissions: ScreenWriteContentSubmission[];
 }
 
-const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
+const ScreenWriteContribution: React.FC<ScreenWriteContributionsProps> = ({
   submissions,
 }) => {
   const { address } = useWeb3ModalAccount();
@@ -29,13 +29,13 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { isLoading, setIsLoading } = useLoader();
 
-  // submit story Line content onchain message
+  // submit screen write content onchain message
   const handleSubmit = async (ipfsHash: string) => {
     setIsLoading(true);
     try {
       const sender = address!;
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-      // const feesAmount = 10;
+      // const feesAmount = 1;
       const feesAmount = 0.5;
       // Send notification
       const notificationResult = await notifyGullyBuddy(
@@ -46,24 +46,24 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
       if (notificationResult && notificationResult.notificationTxHash) {
         toast.success("Notification sent to Buddyinternational.eth");
         // Update the content detail
-        const updateResponse = await updateStoryLineContentDetail(
+        const updateResponse = await updateScreenWriteContentDetail(
           address!,
           ipfsHash,
           true,
           new Date().toISOString(),
           notificationResult.notificationTxHash,
           notificationResult.chainId
-
         );
 
         if (updateResponse) {
-          toast.success("Story Line Content detail updated successfully!");
+          toast.success("Screen Write Content detail updated successfully!");
         } else {
           toast.error("Failed to update content detail.");
         }
       }
     } catch (error: any) {
       toast.error("Error sending notification:", error);
+      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
     walletAddress: string,
     ipfsHash: string
   ) => {
-    const response = await deleteStoryLineContent(walletAddress, ipfsHash);
+    const response = await deleteScreenWriteContent(walletAddress, ipfsHash);
     if (response) {
       console.log(response.message);
       toast.success("Delete Content Succefully");
@@ -150,13 +150,19 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
               <Typography variant="body2" color="inherit">
                 {submission.content}
               </Typography>
+              <Typography variant="body2" color="inherit">
+                Place: {submission.place}
+              </Typography>
+              <Typography variant="body2" color="inherit">
+                Relative Tag: {submission.relativeTag}
+              </Typography>
               {/* Flex container for word count and chips */}
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                mt={1}
-                mb={1}
+                //   mt={1}
+                //   mb={1}
               >
                 <Typography variant="body2" color="inherit">
                   Total Content Words: {submission.contentWordCount}
@@ -206,4 +212,4 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
   );
 };
 
-export default StoryLineContributions;
+export default ScreenWriteContribution;

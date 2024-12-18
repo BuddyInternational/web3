@@ -6,12 +6,22 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { FaCheck, FaRegCopy } from "react-icons/fa";
-import { StoryLineContentSubmission } from "../utils/Types";
+import { ScreenWriteContentSubmission } from "../utils/Types";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
-import StoryLineContributions from "../components/contributeComponents/StoryLineContributions";
+import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
-import { TagCloud } from 'react-tagcloud';
+import { TagCloud } from "react-tagcloud";
+import {
+  getScreenWriteContent,
+  saveScreenWriteContentDetails,
+} from "../api/screenWriteContentAPI";
+import ScreenWriteContribution from "../components/contributeComponents/ScreenWriteContribution";
+import axios from "axios";
+import { downloadScreenWriteContent } from "../utils/DownloadCSV";
+
+// Server API Base URL
+const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 // Define mood options
 const moodOptions = [
@@ -34,6 +44,15 @@ const moodOptions = [
   { label: "Board/Governance 👥", value: "Board/Governance 👥" },
 ];
 
+const relativeOptions = [
+  { label: "EXE", value: "EXE" },
+  { label: "DAY", value: "DAY" },
+  { label: "FADE IN", value: "FADE IN" },
+  { label: "INT", value: "INT" },
+  { label: "FADE TO BLACK", value: "FADE TO BLACK" },
+  { label: "THE END", value: "THE END" },
+];
+
 const ipfs = createIPFSClient({
   host: "ipfs.infura.io",
   port: 5001,
@@ -52,10 +71,11 @@ const ScreenWrite: React.FC = () => {
   const { vanityAddress } = useVanityContext();
   const [content, setContent] = useState<string>("");
   const [mood, setMood] = useState<string>("");
-  const [tag, setTag] = useState<string>("");
-  const [submissions, setSubmissions] = useState<StoryLineContentSubmission[]>(
-    []
-  );
+  const [relativeTag, setRelativeTag] = useState<string>("");
+  const [place, setPlace] = useState<string>("");
+  const [submissions, setSubmissions] = useState<
+    ScreenWriteContentSubmission[]
+  >([]);
   const { isLoading, setIsLoading } = useLoader();
   const [wordCount, setWordCount] = useState<number>(0);
   const [isWalletAddressCopied, setIsWalletAddressCopied] = useState(false);
@@ -63,19 +83,10 @@ const ScreenWrite: React.FC = () => {
   const copyAddressTimeoutRef: any = useRef(null);
   const copyVanityAddressTimeoutRef: any = useRef(null);
 
-  // Server API Base URL
-  const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-
   // Function to calculate word count
   const calculateWordCount = (text: string) => {
     return text.trim().split(/\s+/).filter(Boolean).length;
   };
-
-  // handle tags cloud
-  const tags = moodOptions.map((option) => ({
-    value: option.label,
-    count: Math.floor(Math.random() * 10) + 1,
-  }));
 
   // Handler for textarea content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -84,124 +95,132 @@ const ScreenWrite: React.FC = () => {
     setWordCount(calculateWordCount(newContent));
   };
 
-  // Handler for mood selection
-  const handleMoodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMood(e.target.value);
+  // Fetch screen Write Content from Database
+  const fetchScreenWriteContent = async () => {
+    if (address && isConnected) {
+      const screenWriteContent = await getScreenWriteContent(vanityAddress!);
+      if (screenWriteContent && screenWriteContent.data) {
+        setSubmissions(screenWriteContent.data.contentDetails || []);
+      }
+    }
   };
 
-  //   // Fetch story Line Content from Database
-  //   const fetchStoryLineContent = async () => {
-  //     if (address && isConnected) {
-  //       const storyLineContent = await getStoryLineContent(vanityAddress!);
-  //       if (storyLineContent && storyLineContent.data) {
-  //         setSubmissions(storyLineContent.data.contentDetails || []);
-  //       }
-  //     }
-  //   };
+  //Submit the Screen Write token
+  const handleSubmit = async () => {
+    if (mood && content && relativeTag && place) {
+      setIsLoading(true);
+      try {
+        const timestamp = new Date().toISOString();
+        const submissionData = { mood, content, place, relativeTag, timestamp };
+        const buffer = Buffer.from(JSON.stringify(submissionData));
+        const result = await ipfs.add(buffer);
+        console.log("IPFS Hash:", result.path);
+        const contentDetails = {
+          mood,
+          content,
+          place,
+          relativeTag,
+          ipfsHash: result.path,
+          generateContentDate: timestamp,
+          contentWordCount: wordCount,
+          eligibleStatus: false,
+          submissionHash: "",
+          isSubbmited: false,
+          submissionDate: "",
+          chainId: 0,
+        };
 
-    //Submit the Screen Write token 
-    const handleSubmit = async () => {
-      if (mood && content && tag) {
-        setIsLoading(true);
+        // Call the API to save content details
+        const response = await saveScreenWriteContentDetails(
+          address!,
+          vanityAddress,
+          contentDetails
+        );
 
-        console.log("values ============",mood);
-        console.log("values ============",content);
-        console.log("values ============",tag);
-        // try {
-        //   const timestamp = new Date().toISOString();
-        //   const submissionData = { mood, content, tag, timestamp };
-        //   const buffer = Buffer.from(JSON.stringify(submissionData));
-        //   const result = await ipfs.add(buffer);
-        //   console.log("IPFS Hash:", result.path);
-        //   const contentDetails = {
-        //     mood,
-        //     content,
-        //     tag,
-        //     ipfsHash: result.path,
-        //     generateContentDate: timestamp,
-        //     contentWordCount: wordCount,
-        //     eligibleStatus: false,
-        //     submissionHash: "",
-        //     isSubbmited: false,
-        //     submissionDate: "",
-        //     chainId: 0,
-        //   };
+        console.log("response-------------", response);
 
-        //   // Call the API to save content details
-        //   const response = await saveStoryLineContentDetails(
-        //     address!,
-        //     vanityAddress,
-        //     contentDetails
-        //   );
-
-        //   console.log("response-------------", response);
-
-        //   if (response) {
-        //     toast.success(response.message);
-        //     setContent("");
-        //     setMood("");
-        //     setAge(25);
-        //     fetchStoryLineContent();
-        //   }
-        // } catch (error: any) {
-        //   toast.error("Error uploading to IPFS:", error);
-        // } finally {
-        //   setIsLoading(false);
-        // }
-      } else {
-        toast.error("Please select a Mood & Enter content.");
+        if (response) {
+          toast.success(response.message);
+          setContent("");
+          setMood("");
+          setPlace("");
+          setRelativeTag("");
+          fetchScreenWriteContent();
+        }
+      } catch (error: any) {
+        toast.error("Error uploading to IPFS:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);  
-    };
+    } else {
+      toast.error(
+        "Please select a Mood & Enter place,content and relativeTag."
+      );
+    }
+    setIsLoading(false);
+  };
 
-  //   const convertToCSV = (data: any[]) => {
-  //     if (!data || data.length === 0) return "";
-  //     const headers = Object.keys(data[0]);
+  // const convertToCSV = (data: any[]) => {
+  //   if (!data || data.length === 0) return "";
+  //   const headers = Object.keys(data[0]);
 
-  //     const rows = data.map((row) =>
-  //       headers
-  //         .map((header) =>
-  //           JSON.stringify(row[header], (key, value) =>
-  //             value === null ? "" : value
-  //           )
+  //   const rows = data.map((row) =>
+  //     headers
+  //       .map((header) =>
+  //         JSON.stringify(row[header], (key, value) =>
+  //           value === null ? "" : value
   //         )
-  //         .join(",")
-  //     );
-  //     return [headers.join(","), ...rows].join("\n");
-  //   };
+  //       )
+  //       .join(",")
+  //   );
+  //   return [headers.join(","), ...rows].join("\n");
+  // };
 
-  //   // Function to download the CSV file
-  //   const downloadStoryLineContent = async (data: any[]) => {
-  //     const responseStoryLineContentCountLog = await axios.post(
-  //       `${server_api_base_url}/proxyStoryLineContentDownload`,
+  // // Function to download the CSV file
+  // const downloadScreenWriteContent = async (data: any[]) => {
+  //   setIsLoading(true);
+  //   try{
+  //     const responseScreenWriteContentCountLog = await axios.post(
+  //       `${server_api_base_url}/proxyScreenWriteContentDownload`,
   //       { vanityAddress },
   //       {
   //         headers: { "Content-Type": "application/json" },
   //       }
   //     );
-  //     console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
+  //     console.log(
+  //       "responseScreenWriteContentCountLog----------",
+  //       responseScreenWriteContentCountLog
+  //     );
   //     const filteredData = data.map(({ _id, ...rest }) => rest);
   //     const csvData = convertToCSV(filteredData);
-
+  
   //     // Create a Blob from the CSV data
   //     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-
-  //     saveAs(blob, "storyLine_submissions.csv");
+  
+  //     saveAs(blob, "screenWrite_submissions.csv");
   //     toast.success("The CSV file has been downloaded successfully.");
-  //   };
+  //   }
+  //   catch(error:any){
+  //     toast.error("Failed to Download Screen Write CSV File!");
+  //     setIsLoading(false);
+  //   }
+  //   finally{
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  //   // Initial fetch of user content when component mounts
-  //   useEffect(() => {
-  //     fetchStoryLineContent();
-  //   }, [address, isConnected]);
+  // Initial fetch of user content when component mounts
+  useEffect(() => {
+    fetchScreenWriteContent();
+  }, [address, isConnected]);
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }} 
-        animate={{ opacity: 1, scale: 1 }} 
-        exit={{ opacity: 0, scale: 1.1 }} 
-        transition={{ duration: 0.5 }} 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 1.1 }}
+        transition={{ duration: 0.5 }}
         className="page-container"
       >
         <Link
@@ -248,7 +267,7 @@ const ScreenWrite: React.FC = () => {
               id="mood"
               className="w-full p-3 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
               value={mood}
-              onChange={handleMoodChange}
+              onChange={(e) => setMood(e.target.value)}
             >
               <option value="">Select a mood...</option>
               {moodOptions.map((option) => (
@@ -257,6 +276,43 @@ const ScreenWrite: React.FC = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Tag Cloud Section */}
+          <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-8">
+            <p className="text-md font-semibold mb-4 text-blue-400">
+              Relative:
+            </p>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <TagCloud
+                minSize={12}
+                maxSize={35}
+                tags={relativeOptions.map((option) => ({
+                  value: option.label,
+                  count: Math.floor(Math.random() * 10) + 1,
+                }))}
+                className="simple-cloud"
+                onClick={(tag: any) => setRelativeTag(tag.value)}
+              />
+            </div>
+          </div>
+
+          {/* Place Input Section */}
+          <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-4">
+            <label
+              htmlFor="place"
+              className="text-md font-semibold mb-2 text-blue-400 block"
+            >
+              Enter Place:
+            </label>
+            <input
+              type="text"
+              id="place"
+              className="w-full p-3 bg-gray-800 rounded-lg text-white border-2 border-blue-400"
+              placeholder="Enter a place..."
+              value={place}
+              onChange={(e) => setPlace(e.target.value)}
+            />
           </div>
 
           {/* Content Section */}
@@ -272,22 +328,6 @@ const ScreenWrite: React.FC = () => {
             ></textarea>
           </div>
 
-          {/* Tag Cloud Section */}
-          <div className="w-full sm:w-full md:w-3/4 lg:w-1/2 mb-8">
-            <p className="text-md font-semibold mb-4 text-blue-400">
-              Trending Moods:
-            </p>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <TagCloud
-                minSize={12}
-                maxSize={35}
-                tags={tags}
-                className="simple-cloud"
-                onClick={(tag:any) => setTag(tag.value)}
-              />
-            </div>
-          </div>
-
           {/* Disclaimers Section */}
           <ol className="w-full sm:w-full md:w-3/4 lg:w-1/2 text-md text-gray-400 list-decimal list-inside my-3">
             <li className="my-3">
@@ -295,9 +335,8 @@ const ScreenWrite: React.FC = () => {
               tokens.
             </li>
             <li className="my-5">
-              $10 USD worth of fees will be deducted when the on-chain message
-              is propagated through the network once you submit your
-              contribution.
+              $1 USD worth of fees will be deducted when the on-chain message is
+              propagated through the network once you submit your contribution.
             </li>
             <li className="my-3">
               <strong>Message:</strong> The user with Wallet Address "
@@ -368,7 +407,7 @@ const ScreenWrite: React.FC = () => {
 
           {/* Submit Button */}
           <button
-              onClick={handleSubmit}
+            onClick={handleSubmit}
             className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
           >
             Submit
@@ -381,7 +420,7 @@ const ScreenWrite: React.FC = () => {
             </p>
             {/* Displaying submissions in accordion */}
             {submissions.length > 0 ? (
-              <StoryLineContributions submissions={submissions} />
+              <ScreenWriteContribution submissions={submissions} />
             ) : (
               <p className="bg-gray-800 p-3 rounded-lg w-full text-center border-2 border-blue-400">
                 No contributions yet.
@@ -393,7 +432,7 @@ const ScreenWrite: React.FC = () => {
           <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
             <button
               className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 mt-5 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
-              // onClick={() => downloadStoryLineContent(submissions)}
+              onClick={() => downloadScreenWriteContent(submissions,vanityAddress)}
             >
               Download Screen Write Data
             </button>

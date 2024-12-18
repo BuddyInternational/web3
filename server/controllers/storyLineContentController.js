@@ -56,7 +56,7 @@ export const getStoryLineContent = async (req, res) => {
     // }
     if (storyLineContent) {
       return res.status(200).json({
-        message: "Story LineContent fetched successfully!",
+        message: "Story Line Content fetched successfully!",
         data: storyLineContent,
       });
     }
@@ -73,7 +73,7 @@ export const getStoryLineContent = async (req, res) => {
 export const updateStoryLineContentDetail = async (req, res) => {
   try {
     const { walletAddress, ipfsHash } = req.params;
-    const { isSubbmited, submissionDate, submissionHash } = req.body;
+    const { isSubbmited, submissionDate, submissionHash,chainId } = req.body;
 
     // Find the story Line content by wallet address
     const storyLineContent = await StoryLineContentData.findOne({
@@ -101,6 +101,7 @@ export const updateStoryLineContentDetail = async (req, res) => {
     contentDetail.isSubbmited = isSubbmited;
     contentDetail.submissionDate = submissionDate;
     contentDetail.submissionHash = submissionHash;
+    contentDetail.chainId = chainId;
 
     // Save to the database
     const updatedContent = await storyLineContent.save();

@@ -177,7 +177,7 @@ const ModalNFTCard: React.FC<{
               message,
               feesAmount
             );
-            if (notificationResult && notificationResult.hash) {
+            if (notificationResult && notificationResult.notificationTxHash) {
               toast.success(
                 "Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth"
               );

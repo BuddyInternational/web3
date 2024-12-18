@@ -13,6 +13,7 @@ import SocketNFTDetails from "../pages/SocketNFTDetails";
 import CreateStoryLines from "../pages/CreateStoryLines";
 import { AnimatePresence } from "framer-motion";
 import ScreenWrite from "../pages/ScreenWrite";
+import DownloadCSV from "../pages/DownloadCSVFiles";
 
 const AllRoutes = () => {
   return (
@@ -43,6 +44,7 @@ const AllRoutes = () => {
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           <Route path="/nft/socketNFT/:vanityAddress" element={<SocketNFTDetails />} />
           <Route path="/nft/shop" element={<Shop />} />
+          <Route path="/downloadCSV" element={<DownloadCSV />} />
           {/* Add 404 page */}
           {/* <Route path="*" element={<PageNotFound />} /> */}
           <Route path="*" element={<NotFound />} />

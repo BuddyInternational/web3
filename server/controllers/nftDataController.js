@@ -1,4 +1,4 @@
-import { NFTData } from "../models/nftData.js";
+import { NFTData } from "../models/NftData.js";
 
 // Save NFT detail in database
 export const saveNFTDetails = async (req, res) => {

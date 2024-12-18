@@ -74,7 +74,8 @@ export const updateContentDetail = async (
   ipfsHash: string,
   isSubbmited: boolean,
   submissionDate: string,
-  submissionHash: string
+  submissionHash: string,
+  chainId: number,
 ) => {
   try {
     const response: any = await axios.put(
@@ -83,6 +84,7 @@ export const updateContentDetail = async (
         isSubbmited,
         submissionDate,
         submissionHash,
+        chainId
       }
     );
     return response.data;

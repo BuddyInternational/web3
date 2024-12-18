@@ -1,4 +1,4 @@
-import { RegisterData } from "../models/register.js";
+import { RegisterData } from "../models/Register.js";
 
 // store User Vanity Details
 export const storeUserVanityWallet = async (req, res) => {

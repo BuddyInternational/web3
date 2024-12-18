@@ -1,4 +1,4 @@
-import { VanityData } from "../models/vanity.js";
+import { VanityData } from "../models/Vanity.js";
 import { VanityCallLogData } from "../models/VanityCallLog.js";
 import { TotalCallCountData } from "../models/TotalCallCount.js";
 import VanityEth from "../libs/VanityEth.js";

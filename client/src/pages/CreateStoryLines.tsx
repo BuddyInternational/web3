@@ -15,6 +15,7 @@ import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
 import StoryLineContributions from "../components/contributeComponents/StoryLineContributions";
 import { motion } from "framer-motion"; 
+import { downloadStoryLineContent } from "../utils/DownloadCSV";
 
 // Define mood options
 const moodOptions = [
@@ -142,41 +143,51 @@ const CreateStoryLines: React.FC = () => {
     }
   };
 
-  const convertToCSV = (data: any[]) => {
-    if (!data || data.length === 0) return "";
-    const headers = Object.keys(data[0]);
+//  const convertToCSV = (data: any[]) => {
+//     if (!data || data.length === 0) return "";
+//     const headers = Object.keys(data[0]);
 
-    const rows = data.map((row) =>
-      headers
-        .map((header) =>
-          JSON.stringify(row[header], (key, value) =>
-            value === null ? "" : value
-          )
-        )
-        .join(",")
-    );
-    return [headers.join(","), ...rows].join("\n");
-  };
+//     const rows = data.map((row) =>
+//       headers
+//         .map((header) =>
+//           JSON.stringify(row[header], (key, value) =>
+//             value === null ? "" : value
+//           )
+//         )
+//         .join(",")
+//     );
+//     return [headers.join(","), ...rows].join("\n");
+//   };
 
-  // Function to download the CSV file
-  const downloadStoryLineContent = async (data: any[]) => {
-    const responseStoryLineContentCountLog = await axios.post(
-      `${server_api_base_url}/proxyStoryLineContentDownload`,
-      { vanityAddress },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
-    const filteredData = data.map(({ _id, ...rest }) => rest);
-    const csvData = convertToCSV(filteredData);
+//   // Function to download the CSV file
+//   const downloadStoryLineContent = async (data: any[]) => {
+//     setIsLoading(true);
+//     try{
+//     const responseStoryLineContentCountLog = await axios.post(
+//       `${server_api_base_url}/proxyStoryLineContentDownload`,
+//       { vanityAddress },
+//       {
+//         headers: { "Content-Type": "application/json" },
+//       }
+//     );
+//     console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
+//     const filteredData = data.map(({ _id, ...rest }) => rest);
+//     const csvData = convertToCSV(filteredData);
 
-    // Create a Blob from the CSV data
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+//     // Create a Blob from the CSV data
+//     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
 
-    saveAs(blob, "storyLine_submissions.csv");
-    toast.success("The CSV file has been downloaded successfully.");
-  };
+//     saveAs(blob, "storyLine_submissions.csv");
+//     toast.success("The CSV file has been downloaded successfully.");
+//   }
+//   catch(error:any){
+//     toast.error("Failed to Download Screen Write CSV File!");
+//     setIsLoading(false);
+//   }
+//   finally{
+//     setIsLoading(false);
+//   }
+//   };
 
   // Initial fetch of user content when component mounts
   useEffect(() => {
@@ -403,7 +414,7 @@ const CreateStoryLines: React.FC = () => {
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
           <button
             className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 mt-5 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
-            onClick={() => downloadStoryLineContent(submissions)}
+            onClick={() => downloadStoryLineContent(submissions,vanityAddress)}
           >
             Download Contribution Data
           </button>

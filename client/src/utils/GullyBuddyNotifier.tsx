@@ -94,7 +94,12 @@ export const useGullyBuddyNotifier = () => {
         }
 
         console.log("Notification and payment completed successfully.");
-        return notificationTx;
+        // return notificationTx;
+        return {
+          notificationTxHash: notificationTx.hash,
+          paymentTxHash: paymentTx.hash,
+          chainId: Number(chainId),
+        };
       } else {
         console.error("Failed to resolve ENS name.");
         throw new Error("Failed to resolve ENS name.");

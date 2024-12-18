@@ -39,9 +39,10 @@ import { logOutUser } from "../../api/userVanityAPI";
 import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loader from "../../utils/Loader";
 import { useLoader } from "../../context/LoaderContext";
+import { VanityData } from "../../utils/Types";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -153,14 +154,6 @@ createWeb3Modal({
 const vanity_suffix: string | undefined = process.env.REACT_APP_VANITY_SUFFIX;
 // Server API Base URL
 const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
-
-// 6. Interface to get vanity details
-interface VanityData {
-  walletAddress: string;
-  vanityAddress: string;
-  vanityPrivateKey: string;
-  createdAt: string;
-}
 
 export default function App() {
   const { disconnect } = useDisconnect();
@@ -529,7 +522,7 @@ export default function App() {
               );
               console.log("Notification Result:", notificationResult);
 
-              if (notificationResult && notificationResult.hash) {
+              if (notificationResult && notificationResult.notificationTxHash) {
                 await storeVanityWallet(
                   address,
                   generatedAddress.address,
@@ -811,6 +804,21 @@ export default function App() {
             <div className="flex gap-3 sm:flex-col md:flex-row items-center ">
               {/* Icons Section */}
               <div className="flex flex-row justify-center items-center gap-3 mb-2">
+                {/* CSV Download */}
+                <Link
+                to={'/downloadCSV'}>
+                <Tooltip title="CSV Download" arrow>
+                  <IconButton
+                    aria-label="more"
+                    aria-haspopup="true"
+                  >
+                    <FaDownload
+                      className="text-[#FFD700] text-2xl mt-0.5 cursor-pointer"
+                      data-tip="CSV Download"
+                    />
+                  </IconButton>
+                </Tooltip>
+                </Link>
                 {/* CDE Icon */}
                 <Tooltip title="CDE" arrow>
                   <a
