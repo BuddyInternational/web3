@@ -163,7 +163,6 @@ export default function App() {
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const copyAddressTimeoutRef: any = useRef(null);
   const { vanityAddress, setVanityAddress } = useVanityContext();
-  // const [isLoading, setIsLoading] = useState(false);
   const { isLoading, setIsLoading } = useLoader();
   const { notifyGullyBuddy } = useGullyBuddyNotifier();
   const { walletProvider } = useWeb3ModalProvider();

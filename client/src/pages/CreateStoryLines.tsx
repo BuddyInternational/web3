@@ -414,7 +414,14 @@ const CreateStoryLines: React.FC = () => {
         <div className="w-full sm:w-full md:w-3/4 lg:w-1/2">
           <button
             className="bg-blue-600 hover:bg-blue-500 text-white hover:text-blue-950 font-bold py-2 px-8 mt-5 sm:px-12 md:px-16 lg:px-24 rounded-lg mb-8"
-            onClick={() => downloadStoryLineContent(submissions,vanityAddress)}
+            onClick={async () => {
+              setIsLoading(true);
+              try {
+                await downloadStoryLineContent(submissions, vanityAddress);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
           >
             Download Contribution Data
           </button>

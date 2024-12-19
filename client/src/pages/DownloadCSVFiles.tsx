@@ -11,7 +11,6 @@ import Link from "@mui/material/Link";
 import { Box, Typography, IconButton } from "@mui/material";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
-import { FaDownload } from "react-icons/fa6";
 import { FaFileDownload } from "react-icons/fa";
 import {
   downloadScreenWriteContent,
@@ -27,6 +26,8 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { VanityData } from "../utils/Types";
+import { useLoader } from "../context/LoaderContext";
+import Loader from "../utils/Loader";
 
 // Custom styled components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -56,10 +57,7 @@ const DownloadCSV = () => {
   const [userContent, setUserContent] = React.useState([]);
   const [storyLineContent, setStoryLineContent] = React.useState([]);
   const [screenWriteContent, setScreenWriteContent] = React.useState([]);
-  const [showModal, setShowModal] = React.useState(false);
-  const [currentDownloadAction, setCurrentDownloadAction] = React.useState<
-    () => void
-  >(() => () => {});
+  const { isLoading, setIsLoading } = useLoader();
 
   // Function to convert data to CSV format
   const convertToCSV = (array: VanityData[]) => {
@@ -70,8 +68,6 @@ const DownloadCSV = () => {
 
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
-    setShowModal(false);
-
     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
       toast.error("Please connect your wallet to Download Vanity Data.");
       return;
@@ -81,7 +77,7 @@ const DownloadCSV = () => {
         `${server_api_base_url}/api/vanity/downloadVanityAddress`
       );
 
-      console.log("response=================",response);
+      console.log("response=================", response);
 
       const responseCountLog = await axios.post(
         `${server_api_base_url}/proxyVanityDataDownload`,
@@ -127,37 +123,6 @@ const DownloadCSV = () => {
     }
   };
 
-  const handleCancel = () => {
-    // Close the modal if user cancels
-    setShowModal(false);
-  };
-
-  // download vanityData confirm modal
-  const Modal = ({ message, onConfirm, onCancel }: any) => {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg w-96 md:w-1/3 text-center shadow-xl">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Confirm</h2>
-          <p className="mb-6 text-gray-600 text-lg">{message}</p>
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={onCancel}
-              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg hover:from-gray-600 hover:to-gray-800 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // Fetch user Content from Database
   const fetchUserContent = async () => {
     if (address && isConnected) {
@@ -188,65 +153,68 @@ const DownloadCSV = () => {
     }
   };
 
-  const handleDownloadClick = (action: () => void) => {
-    setCurrentDownloadAction(() => action);
-    setShowModal(true);
-  };
-
-  const confirmDownload = () => {
-    if (currentDownloadAction) currentDownloadAction();
-    setShowModal(false);
-  };
-
   React.useEffect(() => {
     fetchUserContent();
-  }, [address, isConnected, fetchUserContent]);
-  React.useEffect(() => {
     fetchStoryLineContent();
-  }, [address, isConnected, fetchStoryLineContent]);
-  React.useEffect(() => {
     fetchScreenWriteContent();
-  }, [address, isConnected, fetchScreenWriteContent]);
+  }, [address, isConnected]);
 
   // Table data
   const rows = [
     {
       id: 1,
       name: "Vanity Data",
-      // link: "/downloads/vanity-data.csv",
-      func: () => handleDownloadClick(downloadVanityData),
+      func: async () => {
+        setIsLoading(true);
+        try {
+          await downloadVanityData();
+        } finally {
+          setIsLoading(false);
+        }
+      },
     },
     {
       id: 2,
       name: "User Content",
-      func: () => {
-        downloadUserContent(userContent, vanityAddress);
+      func: async() => {
+        setIsLoading(true);
+        try {
+          await downloadUserContent(userContent, vanityAddress);
+        } finally {
+          setIsLoading(false);
+        }
       },
     },
     {
       id: 3,
       name: "Storyline Content",
-      func: () => {
-        downloadStoryLineContent(storyLineContent, vanityAddress);
+      func: async() => {
+        setIsLoading(true);
+        try{
+          await downloadStoryLineContent(storyLineContent, vanityAddress);
+        }
+        finally{
+          setIsLoading(false);
+        }
       },
     },
     {
       id: 4,
       name: "Screen Write Content",
-      func: () => {
-        downloadScreenWriteContent(screenWriteContent, vanityAddress);
+      func: async() => {
+        setIsLoading(true);
+        try{
+          await downloadScreenWriteContent(screenWriteContent, vanityAddress);
+        }
+        finally{
+          setIsLoading(false);
+        }
       },
     },
   ];
   return (
     <>
-      {showModal && (
-        <Modal
-          message="Do you want to download the CSV file?"
-          onConfirm={confirmDownload}
-          onCancel={handleCancel}
-        />
-      )}
+      {isLoading && <Loader />}
       <Box
         sx={{
           display: "flex",
@@ -313,7 +281,6 @@ const DownloadCSV = () => {
                   <StyledTableCell>{row.name}</StyledTableCell>
                   <StyledTableCell align="center">
                     <Link
-                      // href={row.link}
                       download
                       underline="hover"
                       color="primary"
@@ -324,6 +291,7 @@ const DownloadCSV = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         gap: 0.5,
+                        cursor: "pointer",
                       }}
                     >
                       Download
