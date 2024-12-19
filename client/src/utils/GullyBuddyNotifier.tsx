@@ -9,7 +9,7 @@ const Polygon_domain_address = process.env.REACT_APP_POLYGON_DOMAIN_ADDRESS!;
 
 const notificationDomains: Record<string, string | undefined> = {
   "1": process.env.REACT_APP_ETHEREUM_DOMAIN, // Ethereum Mainnet
-  "137": process.env.REACT_APP_MATIC_DOMAIN ,  // Polygon Mainnet
+  "137": process.env.REACT_APP_MATIC_DOMAIN, // Polygon Mainnet
   // "42161": process.env.REACT_APP_ARBITRUM_DOMAIN, // Arbitrum Mainnet
   // "8453": process.env.REACT_APP_BASE_DOMAIN, // Base Mainnet
 };
@@ -29,15 +29,21 @@ export const useGullyBuddyNotifier = () => {
     walletProvider as ethers.Eip1193Provider
   );
 
- // Notify GullyBuddy
-  const notifyGullyBuddy = async (sender: string, content: string, feesAmount: number) => {
-    console.log(`Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`);
+  // Notify GullyBuddy
+  const notifyGullyBuddy = async (
+    sender: string,
+    content: string,
+    feesAmount: number
+  ) => {
+    console.log(
+      `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
+    );
     console.log("Fees Amount:", feesAmount);
 
     try {
       // Get the connected chain ID
       const network = await ethersProvider.getNetwork();
-    console.log("Network in use:", network);
+      console.log("Network in use:", network);
       const chainId = network.chainId.toString();
       console.log("Connected chain ID:", chainId);
 
@@ -57,16 +63,14 @@ export const useGullyBuddyNotifier = () => {
 
       let gullyBuddyAddress: string | null = "";
       // Resolve the ENS name to an address
-      if(chainId === "1"){
+      if (chainId === "1") {
         gullyBuddyAddress = await resolveENSName(domainOrAddress);
         console.log("Resolved ENS Address:", gullyBuddyAddress);
-      }
-      else if(chainId === "137"){
+      } else if (chainId === "137") {
         // gullyBuddyAddress = "0x82FAA8FAc390247A3FBde349BD37068567505cbD";
         gullyBuddyAddress = Polygon_domain_address;
-        console.log("gullyBuddyAddress==========",gullyBuddyAddress);
-      }
-      else{
+        console.log("gullyBuddyAddress==========", gullyBuddyAddress);
+      } else {
         const errorMessage = `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`;
         console.error(
           `No domain configured for chainId ${chainId}. Ensure domains are set correctly in the environment variables.`
@@ -78,7 +82,10 @@ export const useGullyBuddyNotifier = () => {
         console.log(`Resolved address for domain: ${gullyBuddyAddress}`);
 
         // Send notification
-        const notificationTx = await sendNotificationTransaction(gullyBuddyAddress, content);
+        const notificationTx = await sendNotificationTransaction(
+          gullyBuddyAddress,
+          content
+        );
         if (!notificationTx) {
           console.error("Failed to send notification message.");
           throw new Error("Failed to send notification message.");
@@ -86,7 +93,11 @@ export const useGullyBuddyNotifier = () => {
         }
 
         // Send payment
-        const paymentTx = await sendPaymentTransaction(gullyBuddyAddress, feesAmount,chainId);
+        const paymentTx = await sendPaymentTransaction(
+          gullyBuddyAddress,
+          feesAmount,
+          chainId
+        );
         if (!paymentTx) {
           console.error("Failed to send payment.");
           throw new Error("Failed to send payment.");
@@ -118,7 +129,7 @@ export const useGullyBuddyNotifier = () => {
       const ensAddress = await ethersProvider.resolveName(ensName);
       console.log("ENS Domain address----------", ensAddress);
       return ensAddress;
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(`Error resolving ENS name ${ensName}:`, error);
       console.log(`Error resolving ENS name ${ensName}:`, error);
       throw new Error(`Error resolving ENS name ${ensName}: ${error.message}`);
@@ -147,144 +158,90 @@ export const useGullyBuddyNotifier = () => {
         tx
       );
       return tx;
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error sending notification transaction:", error);
-      throw new Error("Error sending notification transaction: " + error.message);
+      throw new Error(
+        "Error sending notification transaction: " + error.message
+      );
       // return false;
     }
   };
 
   // // send Payment Transaction to send fees to domain for onchain message.
-  // const sendPaymentTransaction = async (
-  //   toAddress: string,
-  //   amountInUSD: number,
-  //   chainId: string,
-  // ) => {
-  //   try {
-  //     let nativeCurrencySymbol: string;
-
-  //       // Dynamically assign RPC provider based on the chain
-  //   if (chainId === "1") {
-  //     nativeCurrencySymbol = "ETH";
-  //   } else if (chainId === "137") {
-  //     nativeCurrencySymbol = "POL";
-  //   } else {
-  //     throw new Error("Unsupported chain. Please use 'ethereum' or 'polygon'.");
-  //   }
-  //     const signer = await ethersProvider.getSigner();
-
-  //     // // Fetch conversion rate from USD to ETH
-  //     // const options = {
-  //     //   method: "GET",
-  //     //   url: "https://api.fxratesapi.com/latest",
-  //     //   params: {
-  //     //     base: "USD",
-  //     //     currencies: nativeCurrencySymbol,
-  //     //     resolution: "1m",
-  //     //     amount: 1,
-  //     //     places: 6,
-  //     //     format: "json",
-  //     //   },
-  //     // };
-
-  //     // const response = await axios.request(options);
-  //     // const usdToNativeRate = response.data.rates[nativeCurrencySymbol];
-  //     // console.log("usdToNativeRate============",usdToNativeRate);
-
-  //     // if (!usdToNativeRate) {
-  //     //   console.error(`Failed to retrieve USD to ${nativeCurrencySymbol} conversion rate.`);
-  //     //   return false;
-  //     // }
-
-  //     // // Calculate the amount in ETH
-  //     // const amountInNativeCurrency = ethers.parseUnits(
-  //     //   (amountInUSD * usdToNativeRate).toFixed(18),
-  //     //   "ether"
-  //     // );
-
-  //     // console.log("amountInNativeCurrency=============",amountInNativeCurrency);
-
-  //     const paymentTx = await signer.sendTransaction({
-  //       to: toAddress,
-  //       value: ethers.parseUnits("4.199916001679966", "ether"),
-  //     });
-
-  //     await paymentTx.wait();
-  //     console.log(
-  //       "Payment transaction sent to Buddyinternational.eth:",
-  //       paymentTx
-  //     );
-
-  //     return paymentTx;
-  //   } catch (error:any) {
-  //     console.error("Error sending payment transaction:", error);
-  //     throw new Error("Error sending payment transaction: " + error.message);
-  //     // return false;
-  //   }
-  // };
-
   const sendPaymentTransaction = async (
     toAddress: string,
     amountInUSD: number,
-    chainId: string,
+    chainId: string
   ) => {
     try {
-      // let nativeCurrencySymbol: string;
-  
-      // // Dynamically assign RPC provider based on the chain
-      // if (chainId === "1") {
-      //   nativeCurrencySymbol = "ETH"; // For ETH (Ethereum)
-      // } else if (chainId === "137") {
-      //   nativeCurrencySymbol = "MATIC"; // For POL (Polygon)
-      // } else {
-      //   throw new Error("Unsupported chain. Please use 'ethereum' or 'polygon'.");
-      // }
-  
-      // // Fetch the conversion rate from USD to native currency (ETH or POL)
-      // const coinMarketCapApiKey = '4864e553-47ca-4fd6-8a71-a867797dc74f'; // Replace with your API key
-      // const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest`;
-  
-      // const response = await axios.get(url, {
-      //   headers: {
-      //     'X-CMC_PRO_API_KEY': coinMarketCapApiKey, // CoinMarketCap API key header
-      //     'Accept': 'application/json',
-      //   },
-      //   params: {
-      //     symbol: nativeCurrencySymbol.toUpperCase(), // Use symbol as "ETH" or "MATIC" based on the chain
-      //     convert: 'USD',
-      //   },
-      // });
-  
-      // const tokenData = response.data.data[0];
-      // const priceInUSD = tokenData.quote.USD.price;
-  
-      // console.log(`${nativeCurrencySymbol.toUpperCase()} price in USD:`, priceInUSD);
-  
-      // if (!priceInUSD) {
-      //   console.error(`Failed to retrieve ${nativeCurrencySymbol} price in USD.`);
-      //   return false;
-      // }
-  
-      // // Calculate the amount in native currency (ETH or POL)
-      // const amountInNativeCurrency = ethers.parseUnits(
-      //   (amountInUSD / priceInUSD).toFixed(18), // Convert USD to the native currency amount
-      //   "ether" // We assume it's ETH, you can change to other decimals if needed
-      // );
-  
-      // console.log("Amount in native currency (ETH or POL):", amountInNativeCurrency);
-  
-      // Sending the transaction
+      let nativeCurrencySymbol: string;
+
+      // Dynamically assign native currency symbol based on chainId
+      if (chainId === "1") {
+        nativeCurrencySymbol = "Ethereum"; // For ETH
+      } else if (chainId === "137") {
+        nativeCurrencySymbol = "Polygon"; // For MATIC
+      } else {
+        throw new Error(
+          "Unsupported chain. Please use 'ethereum' or 'polygon'."
+        );
+      }
+
+      // Fetch the conversion rate from Mobula API
+      // const mobulaApiKey = 'YOUR_MOBULA_API_KEY'; // Replace with your Mobula API key
+      const mobulaUrl = `https://api.mobula.io/api/1/market/data?asset=${nativeCurrencySymbol}`;
+
+      const response = await axios.get(mobulaUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: mobulaApiKey,
+        },
+      });
+
+      console.log("Price response:", response.data.data.price);
+
+      const priceInUSD = response.data.data.price;
+
+      if (!priceInUSD) {
+        console.error(
+          `Failed to retrieve ${nativeCurrencySymbol} price in USD.`
+        );
+        return false;
+      }
+
+      console.log(`${nativeCurrencySymbol} price in USD:`, priceInUSD);
+
+      // Calculate the amount in native currency (ETH or MATIC)
+      const amountInNativeCurrency = ethers.parseUnits(
+        (amountInUSD / priceInUSD).toFixed(18), // Convert USD to the native currency amount
+        "ether" // Assuming 18 decimals
+      );
+
+      console.log(
+        "Amount in native currency:",
+        amountInNativeCurrency.toString()
+      );
+
+      // Fetch signer and balance
       const signer = await ethersProvider.getSigner();
+      const signerBalance = await ethersProvider.getBalance(signer.address);
+      console.log("Signer balance:", signerBalance.toString());
+
+      if (signerBalance < amountInNativeCurrency) {
+        throw new Error("Insufficient balance to send transaction.");
+      }
+      // Sending the transaction
+      // const signer = await ethersProvider.getSigner();
       const paymentTx = await signer.sendTransaction({
         to: toAddress,
-        value: ethers.parseUnits("0.8355614973262031","ether"), // Send the calculated amount
+        // value: ethers.parseUnits("0.8355614973262031","ether"), // Send the calculated amount
+        value: amountInNativeCurrency, // Send the calculated amount
       });
-  
+
       await paymentTx.wait();
       console.log("Payment transaction sent:", paymentTx);
       return paymentTx;
-  
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error sending payment transaction:", error);
       throw new Error("Error sending payment transaction: " + error.message);
     }

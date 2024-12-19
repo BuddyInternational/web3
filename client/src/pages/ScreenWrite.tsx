@@ -243,8 +243,45 @@ const ScreenWrite: React.FC = () => {
                   count: Math.floor(Math.random() * 10) + 1,
                 }))}
                 className="simple-cloud"
-                onClick={(tag: any) => setRelativeTag(tag.value)}
+                renderer={(tag: any, size: number, color: string) => (
+                  <label
+                    key={tag.value}
+                    className="inline-flex items-center space-x-2 cursor-pointer"
+                    style={{
+                      color: color, // Use the color provided by the TagCloud
+                      fontSize: `${size}px`, // Adjust the font size dynamically
+                      margin: "0px 10px",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="relativeTag"
+                      value={tag.value}
+                      checked={relativeTag === tag.value}
+                      onChange={() => setRelativeTag(tag.value)}
+                      className="cursor-pointer"
+                    />
+                    <span>{tag.value}</span>
+                  </label>
+                )}
               />
+
+              {/* {relativeOptions.map((option) => (
+                <div key={option.value} className="flex items-center mb-2">
+                  <input
+                    type="radio"
+                    id={option.value}
+                    name="relativeTag"
+                    value={option.value}
+                    checked={relativeTag === option.value}
+                    onChange={() => setRelativeTag(option.value)}
+                    className="mr-2"
+                  />
+                  <label htmlFor={option.value} className="text-white">
+                    {option.label}
+                  </label>
+                </div>
+              ))} */}
             </div>
           </div>
 

@@ -210,8 +210,8 @@ const SendVanityDataModal: React.FC<{
       // Step 7: Send OnChain Message when transfer Vanity Details
       const sender = address!;
       const message = `The vanity Address "${selectedVanityAddress}" transfer Vanity Account to this wallet Address "${walletAddress}"`;
-      // const feesAmount = 75;
-      const feesAmount = 0.5;
+      const feesAmount = 75;
+      // const feesAmount = 0.5;
 
       const notificationResult = await notifyGullyBuddy(
         sender,

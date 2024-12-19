@@ -35,8 +35,8 @@ const ScreenWriteContribution: React.FC<ScreenWriteContributionsProps> = ({
     try {
       const sender = address!;
       const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
-      // const feesAmount = 1;
-      const feesAmount = 0.5;
+      const feesAmount = 1;
+      // const feesAmount = 0.5;
       // Send notification
       const notificationResult = await notifyGullyBuddy(
         sender,
