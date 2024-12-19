@@ -7,11 +7,14 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
 
 const videoURL = process.env.REACT_APP_MEETING_ROOM_VIDEO!;
+ // Server API Base URL
+ const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 
 const MeetingLayerOperatorsModal: React.FC<{
   open: boolean;
@@ -19,14 +22,46 @@ const MeetingLayerOperatorsModal: React.FC<{
 }> = ({ open, onClose }) => {
   // Static Song Data
   const songData = {
-    coverImage: "/music_cover.jpeg", // Replace with actual image path
+    coverImage: "/music_cover.jpeg", 
     songName: "Shape of You",
     artistName: "Ed Sheeran",
     videoUrl: videoURL
   };
+  const [videoUrl, setVideoUrl] = useState("");
+  const [hasFetched, setHasFetched] = useState(false); 
 
 
 console.log("vedio url ===============",songData.videoUrl);
+
+// Function to resolve the short URL and set the full video URL
+useEffect(() => {
+  const resolveUrl = async () => {
+    if (songData.videoUrl) {
+      try {
+        const response = await axios.get(
+          `${server_api_base_url}/api/resolve-url`,
+          {
+            params: { shortUrl: songData.videoUrl },
+          }
+        );
+        // Set the resolved URL if CORS allows
+        if (response.data.resolvedUrl) {
+          setVideoUrl(response.data.resolvedUrl);
+        } else {
+          console.warn("Could not resolve URL due to CORS.");
+        }
+      } catch (error) {
+        console.error("Error resolving the short URL:", error);
+      }
+    }
+  };
+  if (songData.videoUrl && !hasFetched) {
+    resolveUrl();
+    setHasFetched(true);
+  }
+}, [songData.videoUrl, hasFetched, server_api_base_url]);
+
+
   return (
     <Modal open={open} onClose={onClose}>
       <Fade in={open}>
@@ -82,31 +117,22 @@ console.log("vedio url ===============",songData.videoUrl);
           <DialogContent
             dividers
             sx={{
-              borderColor: "white", // Set divider color to white
-              color: "white", // Optional: Text color
+              borderColor: "white", 
+              color: "white", 
             }}
           >
             {/* Full-Width GIF Section */}
             <Box
               sx={{
-                width: "90%", // Full width of modal
-                height: "70%", // Restrict the height to a reasonable value
-                overflow: "hidden", // Ensure no overflow if the image aspect ratio varies
+                width: "90%", 
+                height: "70%", 
+                overflow: "hidden", 
                 borderRadius: "8px",
                 margin: "auto",
                 marginTop: "25px",
                 marginBottom: "15px",
               }}
             >
-              {/* <img
-                src={songData.gifUrl}
-                alt="GIF"
-                style={{
-                  width: "100%", // Ensures it takes the full width
-                  height: "auto", // Maintains the aspect ratio
-                  display: "block", // Avoid inline element space issues
-                }}
-              /> */}
                <ReactPlayer
                     style={{
                       width: "100%",
@@ -118,16 +144,13 @@ console.log("vedio url ===============",songData.videoUrl);
                     }}
                     width={"100%"}
                     controls={true}
-                    // url={songData.videoUrl}
-                    url={`https://youtu.be/dFs40m2jKLg?si=u3ca-IWDsCHtWOK4`}
+                    url={videoUrl}
                     loop={true}
                     playing={true}
-                    // onPlay={() => setIsPlaying(true)}
-                    // onPause={() => setIsPlaying(false)}
                     config={{
                       file: {
                         attributes: {
-                          crossOrigin: "anonymous", // Allows cross-origin access if supported by server
+                          crossOrigin: "anonymous", 
                         },
                       },
                     }}
@@ -141,7 +164,7 @@ console.log("vedio url ===============",songData.videoUrl);
                 alignItems: "center",
                 justifyContent: "space-between",
                 p: 2,
-                mt: "auto", // Push the bottom content to the end
+                mt: "auto", 
               }}
             >
               {/* Song Cover Image */}
