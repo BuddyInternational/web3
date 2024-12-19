@@ -143,52 +143,6 @@ const CreateStoryLines: React.FC = () => {
     }
   };
 
-//  const convertToCSV = (data: any[]) => {
-//     if (!data || data.length === 0) return "";
-//     const headers = Object.keys(data[0]);
-
-//     const rows = data.map((row) =>
-//       headers
-//         .map((header) =>
-//           JSON.stringify(row[header], (key, value) =>
-//             value === null ? "" : value
-//           )
-//         )
-//         .join(",")
-//     );
-//     return [headers.join(","), ...rows].join("\n");
-//   };
-
-//   // Function to download the CSV file
-//   const downloadStoryLineContent = async (data: any[]) => {
-//     setIsLoading(true);
-//     try{
-//     const responseStoryLineContentCountLog = await axios.post(
-//       `${server_api_base_url}/proxyStoryLineContentDownload`,
-//       { vanityAddress },
-//       {
-//         headers: { "Content-Type": "application/json" },
-//       }
-//     );
-//     console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
-//     const filteredData = data.map(({ _id, ...rest }) => rest);
-//     const csvData = convertToCSV(filteredData);
-
-//     // Create a Blob from the CSV data
-//     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-
-//     saveAs(blob, "storyLine_submissions.csv");
-//     toast.success("The CSV file has been downloaded successfully.");
-//   }
-//   catch(error:any){
-//     toast.error("Failed to Download Screen Write CSV File!");
-//     setIsLoading(false);
-//   }
-//   finally{
-//     setIsLoading(false);
-//   }
-//   };
-
   // Initial fetch of user content when component mounts
   useEffect(() => {
     fetchStoryLineContent();

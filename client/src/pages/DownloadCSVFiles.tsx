@@ -271,7 +271,7 @@ const DownloadCSV = () => {
               <TableRow>
                 <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Content Type</StyledTableCell>
-                <StyledTableCell align="center">Download Link</StyledTableCell>
+                <StyledTableCell align="center">Download CSV FILE</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
