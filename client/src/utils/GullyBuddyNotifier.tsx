@@ -36,7 +36,7 @@ export const useGullyBuddyNotifier = () => {
     feesAmount: number
   ) => {
     console.log(
-      `Notifying Buddyinternational.eth Sender: ${sender}, Content: ${content}`
+      `Notifying Sender: ${sender}, Content: ${content}`
     );
     console.log("Fees Amount:", feesAmount);
 
@@ -154,7 +154,7 @@ export const useGullyBuddyNotifier = () => {
 
       await tx.wait();
       console.log(
-        "Notification transaction sent to Buddyinternational.eth:",
+        "Successfully Sent Notification!:",
         tx
       );
       return tx;

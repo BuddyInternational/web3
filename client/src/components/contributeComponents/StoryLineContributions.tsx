@@ -44,7 +44,7 @@ const StoryLineContributions: React.FC<StoryLineContributionsProps> = ({
         feesAmount
       );
       if (notificationResult && notificationResult.notificationTxHash) {
-        toast.success("Notification sent to Buddyinternational.eth");
+        toast.success("Successfully Sent Notification!");
         // Update the content detail
         const updateResponse = await updateStoryLineContentDetail(
           address!,

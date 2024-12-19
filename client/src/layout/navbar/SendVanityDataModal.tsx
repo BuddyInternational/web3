@@ -231,7 +231,7 @@ const SendVanityDataModal: React.FC<{
         }
         return;
       } else {
-        toast.success("Notification sent to Buddyinternational.eth");
+        toast.success("Successfully Sent Notification!");
         // Success Message
         toast.success("Vanity Details Transfer successfully.");
         setTriggerVanityAddressUpdate((prev) => !prev);

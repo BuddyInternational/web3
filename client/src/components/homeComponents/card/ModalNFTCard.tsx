@@ -163,10 +163,10 @@ const ModalNFTCard: React.FC<{
             "Saved latest transfer to database:",
             savedLatestTransfer
           );
-          toast.success(
-            "Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth"
-          );
-          // Send notification to Buddyinternational.eth
+          // toast.success(
+          //   "Transfer NFT to Vanity Address and also Successfully Sent Notification!"
+          // );
+          // Send notification to Specific Domain
           try {
             const sender = address!;
             const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitteda new contribution to Gully Buddy International [All Rights Reserved].`;
@@ -179,7 +179,7 @@ const ModalNFTCard: React.FC<{
             );
             if (notificationResult && notificationResult.notificationTxHash) {
               toast.success(
-                "Transfer NFT to Vanity Address and also Notification sent to Buddyinternational.eth"
+                "Transfer NFT to Vanity Address and also Successfully Sent Notification!"
               );
               onClose();
             }
