@@ -209,7 +209,7 @@ const SendVanityDataModal: React.FC<{
 
       // Step 7: Send OnChain Message when transfer Vanity Details
       const sender = address!;
-      const message = `The vanity Address "${selectedVanityAddress}" transfer Vanity Account to this wallet Address "${walletAddress}"`;
+      const message = `The vanity address "${selectedVanityAddress}" has been transferred to the wallet address "${walletAddress}" under the ownership of Gully Buddy International ®. All rights reserved.`;
       const feesAmount = 75;
       // const feesAmount = 0.5;
 

@@ -33,7 +33,7 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
 
     try {
       const sender = address!;
-      const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.Gully Buddy International ® All Rights Reserved`;
+      const message = `A new contribution has been submitted to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights reserved.`;
       const feesAmount = 10;
       // const feesAmount = 0.5;
       // Step 1: Notify GullyBuddy

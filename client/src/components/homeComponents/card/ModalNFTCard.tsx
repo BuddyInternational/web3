@@ -169,7 +169,7 @@ const ModalNFTCard: React.FC<{
           // Send notification to Specific Domain
           try {
             const sender = address!;
-            const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitteda new contribution to Gully Buddy International [All Rights Reserved].`;
+            const message = `A new NFT has been added to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights are reserved.`;
             const feesAmount = 10;
             // const feesAmount = 0.5;
             const notificationResult = await notifyGullyBuddy(

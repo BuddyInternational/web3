@@ -34,7 +34,7 @@ const ScreenWriteContribution: React.FC<ScreenWriteContributionsProps> = ({
     setIsLoading(true);
     try {
       const sender = address!;
-      const message = `The user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}" has submitted a new contribution to the network.`;
+      const message = `A new contribution has been submitted to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights reserved.`;
       const feesAmount = 1;
       // const feesAmount = 0.5;
       // Send notification
