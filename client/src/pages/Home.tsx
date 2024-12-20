@@ -76,7 +76,7 @@ const tokenAddressesByChain: any = {
   },
   matic: {
     CDE1: process.env.REACT_APP_POLYGON_CDE1_TOKEN_ADDRESS,
-    CDE2: process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS,
+    // CDE2: process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS,
     TIM: process.env.REACT_APP_POLYGON_TIM_TOKEN_ADDRESS,
     AN: process.env.REACT_APP_POLYGON_AN_TOKEN_ADDRESS,
   },
@@ -138,11 +138,11 @@ const tokenDetailsByChain: any = {
       symbol: "CDE",
       decimals: 18,
     },
-    [process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS!]: {
-      name: "CDE®v2",
-      symbol: "CDE",
-      decimals: 18,
-    },
+    // [process.env.REACT_APP_POLYGON_CDE2_TOKEN_ADDRESS!]: {
+    //   name: "CDE®v2",
+    //   symbol: "CDE2",
+    //   decimals: 18,
+    // },
     [process.env.REACT_APP_POLYGON_TIM_TOKEN_ADDRESS!]: {
       name: (
         <span style={{ display: "flex", alignItems: "center" }}>
@@ -1107,7 +1107,21 @@ const Home = () => {
             </div>
             {/* Loop through tokenDetails to display the balances */}
             {tokenDetailsByChain[selectedChain] &&
-              Object.keys(tokenDetailsByChain[selectedChain]).map(
+              Object.keys(tokenDetailsByChain[selectedChain]).filter((tokenAddress) => {
+                // Filter include/exclude tokens based on the selected chain
+                const tokenSymbol =
+                  tokenDetailsByChain[selectedChain][tokenAddress]?.symbol;
+          
+                if (selectedChain === "mainnet") {
+                  // For Ethereum, include all tokens
+                  return ["CDE", "TIM", "AN"].includes(tokenSymbol);
+                } else if (selectedChain === "matic") {
+                  // For Polygon, exclude CDE2
+                  return ["CDE", "TIM", "AN"].includes(tokenSymbol) && tokenSymbol !== "CDE2";
+                }
+          
+                return false;
+              }).map(
                 (tokenAddress, idx) => {
                   const walletToken = balances.wallet.find(
                     (token: any) =>
@@ -1313,12 +1327,26 @@ const Home = () => {
                 return (
                   <>
                     {tokenDetailsByChain[selectedChain] &&
-                      Object.keys(tokenDetailsByChain[selectedChain]).map(
+                      Object.keys(tokenDetailsByChain[selectedChain]).filter((tokenAddress) => {
+                        // Filter include/exclude tokens based on the selected chain
+                        const tokenSymbol =
+                          tokenDetailsByChain[selectedChain][tokenAddress]?.symbol;
+                  
+                        if (selectedChain === "mainnet") {
+                          // For Ethereum, include all tokens
+                          return ["CDE", "TIM", "AN"].includes(tokenSymbol);
+                        } else if (selectedChain === "matic") {
+                          // For Polygon, exclude CDE2
+                          return ["CDE", "TIM", "AN"].includes(tokenSymbol) && tokenSymbol !== "CDE2";
+                        }
+                  
+                        return false;
+                      }).map(
                         (tokenAddress, idx) => {
                           const vanityToken = balances.vanity.find(
                             (token: any) =>
                               tokenDetailsByChain[selectedChain][tokenAddress]
-                                ?.name === token.name // Match by token name
+                                ?.name === token.name 
                           );
 
                           const vanityBalance = vanityToken
