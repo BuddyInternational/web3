@@ -7,6 +7,7 @@ import { useVanityContext } from "../context/VanityContext";
 import Moralis from "moralis";
 import { NFTDetails } from "../utils/Types";
 import { Box, Tab, Tabs } from "@mui/material";
+import { AiOutlineStock } from "react-icons/ai";
 
 // API KEY
 const api_key: any = process.env.REACT_APP_MORALIS_NFT_API;
@@ -346,17 +347,30 @@ const SocketNFTDetails = () => {
       {/* Total Valuation */}
       <div className="mt-2">
         {/* Other Socketed NFT Total Value */}
-        <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
-          <p className="text-[#5692D9]">Total Value(Other Socketd NFTs):</p>
+        <div className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
+          <p className="text-[#5692D9] flex items-center">
+            Total Value(Other Socketed NFTs)
+            <span className="text-green-600 flex items-center gap-1 ml-0.5">
+              <span className="text-white text-sm">(0.025%)</span>
+              <AiOutlineStock className="text-2xl"/>
+            </span>
+            :
+          </p>
           <p>{calculateTotalOtherSocketedNFTValue()} USD</p>
-        </span>
+        </div>
+
         {/* GullyBuddy's Socketed NFT Total Value */}
-        <span className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
-          <p className="text-[#5692D9]">
-            Total Value(GullyBuddy's Socketd NFTs):
+        <div className="text-white flex gap-2 mx-6 my-2 mb-4 text-xl justify-end">
+          <p className="text-[#5692D9] flex items-center">
+            Total Value(GullyBuddy's Socketed NFTs)
+            <span className="text-green-600 flex items-center gap-1 ml-0.5">
+              <span className="text-white text-sm">(0.031%)</span>
+              <AiOutlineStock className="text-2xl"/>
+            </span>
+            :
           </p>
           <p>{totalCDE} CDE</p>
-        </span>
+        </div>
       </div>
 
       {/* Holding options */}

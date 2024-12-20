@@ -1,4 +1,4 @@
-import * as React from "react";
+import  React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -54,10 +54,13 @@ const server_api_base_url: any = process.env.REACT_APP_SERVER_API_BASE_URL;
 const DownloadCSV = () => {
   const { address, isConnected } = useWeb3ModalAccount();
   const { vanityAddress } = useVanityContext();
-  const [userContent, setUserContent] = React.useState([]);
-  const [storyLineContent, setStoryLineContent] = React.useState([]);
-  const [screenWriteContent, setScreenWriteContent] = React.useState([]);
+  const [userContent, setUserContent] = useState([]);
+  const [storyLineContent, setStoryLineContent] = useState([]);
+  const [screenWriteContent, setScreenWriteContent] = useState([]);
   const { isLoading, setIsLoading } = useLoader();
+  const [showModal, setShowModal] = useState(false);
+  const [downloadAction, setDownloadAction] = useState<Function | null>(null);
+  const [modalMessage, setModalMessage] = useState("");
 
   // Function to convert data to CSV format
   const convertToCSV = (array: VanityData[]) => {
@@ -153,65 +156,155 @@ const DownloadCSV = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchUserContent();
     fetchStoryLineContent();
     fetchScreenWriteContent();
   }, [address, isConnected]);
 
-  // Table data
-  const rows = [
+
+
+  // // Table data
+  // const rows = [
+  //   {
+  //     id: 1,
+  //     name: "Vanity Data",
+  //     func: async () => {
+  //       setIsLoading(true);
+  //       try {
+  //         await downloadVanityData();
+  //       } finally {
+  //         setIsLoading(false);
+  //       }
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "User Data",
+  //     func: async() => {
+  //       setIsLoading(true);
+  //       try {
+  //         await downloadUserContent(userContent, vanityAddress);
+  //       } finally {
+  //         setIsLoading(false);
+  //       }
+  //     },
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Storyline Data",
+  //     func: async() => {
+  //       setIsLoading(true);
+  //       try{
+  //         await downloadStoryLineContent(storyLineContent, vanityAddress);
+  //       }
+  //       finally{
+  //         setIsLoading(false);
+  //       }
+  //     },
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Screen Write Data",
+  //     func: async() => {
+  //       setIsLoading(true);
+  //       try{
+  //         await downloadScreenWriteContent(screenWriteContent, vanityAddress);
+  //       }
+  //       finally{
+  //         setIsLoading(false);
+  //       }
+  //     },
+  //   },
+  // ];
+
+   // Table data
+   const rows = [
     {
       id: 1,
       name: "Vanity Data",
-      func: async () => {
-        setIsLoading(true);
-        try {
-          await downloadVanityData();
-        } finally {
-          setIsLoading(false);
-        }
+      func: () => {
+        setModalMessage("Are you sure you want to download Vanity Data?");
+        setDownloadAction(() => downloadVanityData);
+        setShowModal(true);
       },
     },
     {
       id: 2,
-      name: "User Content",
-      func: async() => {
-        setIsLoading(true);
-        try {
+      name: "User Data",
+      func: () => {
+        setModalMessage("Are you sure you want to download User Data?");
+        setDownloadAction(() => async () => {
           await downloadUserContent(userContent, vanityAddress);
-        } finally {
-          setIsLoading(false);
-        }
+        });
+        setShowModal(true);
       },
     },
     {
       id: 3,
-      name: "Storyline Content",
-      func: async() => {
-        setIsLoading(true);
-        try{
+      name: "Storyline Data",
+      func: () => {
+        setModalMessage("Are you sure you want to download Storyline Data?");
+        setDownloadAction(() => async () => {
           await downloadStoryLineContent(storyLineContent, vanityAddress);
-        }
-        finally{
-          setIsLoading(false);
-        }
+        });
+        setShowModal(true);
       },
     },
     {
       id: 4,
-      name: "Screen Write Content",
-      func: async() => {
-        setIsLoading(true);
-        try{
+      name: "Screen Write Data",
+      func: () => {
+        setModalMessage("Are you sure you want to download Screen Write Data?");
+        setDownloadAction(() => async () => {
           await downloadScreenWriteContent(screenWriteContent, vanityAddress);
-        }
-        finally{
-          setIsLoading(false);
-        }
+        });
+        setShowModal(true);
       },
     },
   ];
+
+  const handleConfirm = async () => {
+    setShowModal(false); 
+    if (downloadAction) {
+      setIsLoading(true);
+      try {
+        await downloadAction();
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+  };
+
+  const Modal = ({ message, onConfirm, onCancel }: any) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg w-96 md:w-1/3 text-center shadow-xl">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Confirm</h2>
+          <p className="mb-6 text-gray-600 text-lg">{message}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={onCancel}
+              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg hover:from-gray-600 hover:to-gray-800 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition duration-200 ease-in-out transform hover:scale-105"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {isLoading && <Loader />}
@@ -258,7 +351,7 @@ const DownloadCSV = () => {
           color="#3b82f6"
           sx={{ fontWeight: "bold", marginTop: 2 }}
         >
-          Download Content CSV Files
+          Data CSV Files
         </Typography>
 
         {/* Table */}
@@ -304,6 +397,11 @@ const DownloadCSV = () => {
           </Table>
         </TableContainer>
       </Box>
+
+       {/* Modal */}
+       {showModal && (
+        <Modal message={modalMessage} onConfirm={handleConfirm} onCancel={handleCancel} />
+      )}
     </>
   );
 };

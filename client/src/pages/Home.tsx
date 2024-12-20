@@ -22,7 +22,7 @@ import { SiPolygon } from "react-icons/si";
 import { FaEthereum } from "react-icons/fa";
 import SocketNFT from "../components/homeComponents/modals/SocketNFT";
 import { HiMiniTv } from "react-icons/hi2";
-import { GiBiceps } from "react-icons/gi";
+import { GiBiceps, GiPartyPopper } from "react-icons/gi";
 import { getSocketNFTLastTransferDetails } from "../api/socketnftAPI";
 import { toast } from "react-toastify";
 import { getNFTDetails, saveNFTDetails } from "../api/nftAPI";
@@ -35,6 +35,7 @@ import { useBalanceUpdate } from "../context/BalanceUpdateContext";
 import axios from "axios";
 import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
 import { useAuthContext } from "../context/AuthContext";
+import { MdNewReleases } from "react-icons/md";
 
 interface NFT {
   asset_contract: {
@@ -200,7 +201,7 @@ const gullyBuddyNFTCollectionAddress = [
 ];
 
 const Home = () => {
-  const { address, isConnected ,chainId} = useWeb3ModalAccount();
+  const { address, isConnected, chainId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
@@ -462,7 +463,7 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching token balances:", error);
     }
-  }, [isConnected, address, vanityAddress, resetBalances,selectedChain]);
+  }, [isConnected, address, vanityAddress, resetBalances, selectedChain]);
 
   // Fetch floor price with retries
   const fetchNFTFloorPriceWithRetry = async (
@@ -913,14 +914,14 @@ const Home = () => {
     if (walletProvider) {
       getNetworkDetails();
     }
-  }, [walletProvider,chainId]);
+  }, [walletProvider, chainId]);
 
   return (
     <>
       {/* second Navbar */}
       <div className="container m-auto flex justify-between mt-2 flex-col md:flex-row gap-3 ">
         {/* Start section  : Account Persona Details */}
-        <div className="flex flex-col gap-8 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
+        <div className="flex flex-col gap-4 justify-start ml-4 w-full md:w-1/4 sm:text-center md:text-left sm:ml-0 md:ml-4">
           {/* Terms of use */}
           <div className="">
             <button
@@ -929,9 +930,13 @@ const Home = () => {
             >
               Gully Buddies Membership Rewards!!!! [Update]
             </button>
+            <p className="mt-2 bg-gradient-to-r from-teal-200 via-purple-500 to-orange-500 bg-clip-text text-transparent text-base animate-blink text-center">
+              Over 10,000 collectibles
+              <MdNewReleases className="ml-2 inline-block text-xl text-yellow-400" />
+            </p>
           </div>
           {/* Account Persona: [Default] */}
-          <div className="flex flex-col mt-2 gap-2 sm:items-center md:items-start">
+          <div className="flex flex-col mt-1 gap-2 sm:items-center md:items-start">
             <p className="text-md font-sans text-[#5692D9]">
               Account Persona:{" "}
               {socketNFTImageURL ? "[NFT Socketed]" : " [Default]"}
@@ -981,6 +986,10 @@ const Home = () => {
             >
               Get List of [Socketed NFTs]
             </Link>
+            <p className="hover:text-[#5692D9] cursor-pointer underline text-white text-xs">
+              Socketed NFTs change profile image provision %ROIs %Surprise for
+              minigames.
+            </p>
           </div>
           {/* divider */}
           <div>

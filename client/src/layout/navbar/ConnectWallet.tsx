@@ -23,7 +23,7 @@ import {
   storeVanityWallet,
 } from "../../api/vanityAPI";
 import { useVanityContext } from "../../context/VanityContext";
-import { SiPolygon } from "react-icons/si";
+import { SiPolygon, SiSimplelogin } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useGullyBuddyNotifier } from "../../utils/GullyBuddyNotifier";
 import { ethers } from "ethers";
@@ -38,11 +38,12 @@ import { useAuthContext } from "../../context/AuthContext";
 import { logOutUser } from "../../api/userVanityAPI";
 import { useVanityAddressUpdate } from "../../context/VanityAddressesListContext";
 import { FaMobileScreenButton } from "react-icons/fa6";
-import { MdEmail } from "react-icons/md";
+import { MdEmail, MdPower, MdPowerOff } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "../../utils/Loader";
 import { useLoader } from "../../context/LoaderContext";
 import { VanityData } from "../../utils/Types";
+import { IoIosLogIn, IoIosLogOut } from "react-icons/io";
 
 // 1. Get projectId
 const projectId: any = process.env.REACT_APP_WALLET_PROJECT_ID;
@@ -654,6 +655,7 @@ export default function App() {
                   onClick={handleOpenMenu}
                 >
                   Login Options
+                  <IoIosLogIn className="ml-2 mt-0.5 color-white text-lg" />
                 </Button>
 
                 {/* Dropdown Menu */}
@@ -685,7 +687,23 @@ export default function App() {
                 </Menu>
 
                 {/* Connect Wallet Button */}
-                <w3m-connect-button />
+                {/* <w3m-connect-button /> */}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5773FF",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    borderRadius: "20px",
+                    textTransform: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  <w3m-connect-button />
+                  <MdPower className="mr-2 text-white text-lg" />
+                </Button>
               </div>
             </>
           ) : (
@@ -693,19 +711,15 @@ export default function App() {
               {/* Icons Section */}
               <div className="flex flex-row justify-center items-center gap-3 mb-2">
                 {/* CSV Download */}
-                <Link
-                to={'/downloadCSV'}>
-                <Tooltip title="CSV Download" arrow>
-                  <IconButton
-                    aria-label="more"
-                    aria-haspopup="true"
-                  >
-                    <FaDownload
-                      className="text-[#FFD700] text-2xl mt-0.5 cursor-pointer"
-                      data-tip="CSV Download"
-                    />
-                  </IconButton>
-                </Tooltip>
+                <Link to={"/downloadCSV"}>
+                  <Tooltip title="CSV Download" arrow>
+                    <IconButton aria-label="more" aria-haspopup="true">
+                      <FaDownload
+                        className="text-[#FFD700] text-2xl mt-0.5 cursor-pointer"
+                        data-tip="CSV Download"
+                      />
+                    </IconButton>
+                  </Tooltip>
                 </Link>
                 {/* CDE Icon */}
                 <Tooltip title="CDE" arrow>
@@ -758,6 +772,7 @@ export default function App() {
                     }}
                   >
                     Disconnect Wallet
+                    <MdPowerOff className="ml-2 text-white text-lg" />
                   </Button>
                 </>
               ) : (
@@ -779,6 +794,7 @@ export default function App() {
                     }}
                   >
                     Log Out
+                    <IoIosLogOut className="ml-2 mt-0.5 text-white text-lg"/>
                   </Button>
                 </>
               )}
