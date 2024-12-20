@@ -29,8 +29,8 @@ const ModalNFTCard: React.FC<{
   const { vanityAddress } = useVanityContext();
   const { getContract } = useContract();
   const contractAddresses: Record<number, string> = {
-    1: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_ETHEREUM!, 
-    137: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_POLYGON!, 
+    1: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_ETHEREUM!,
+    137: process.env.REACT_APP_NFT_MARKET_CONTRACT_ADDRESS_POLYGON!,
   };
   const getContractAddress = (chainId: number): string | undefined => {
     return contractAddresses[chainId];
@@ -84,7 +84,7 @@ const ModalNFTCard: React.FC<{
       walletProvider as ethers.Eip1193Provider
     );
     const signer = await ethersProvider.getSigner();
-    
+
     // Ensure the user is on the correct network
     if (chainId !== 137 && chainId !== 1) {
       toast.error("Unsupported network. Please switch to Ethereum or Polygon.");
@@ -145,7 +145,7 @@ const ModalNFTCard: React.FC<{
       // Wait for the transaction to be confirmed
       await tx.wait();
       console.log("Transaction confirmed:", tx.hash);
-      toast.success("Socket NFT to Vanity Address successful!");
+      // toast.success("Socket NFT to Vanity Address successful!");
 
       // Saved In Database
       if (isConnected && address) {
@@ -184,7 +184,39 @@ const ModalNFTCard: React.FC<{
               onClose();
             }
           } catch (error: any) {
-            toast.error("Error sending notification:", error);
+            console.error("Error sending notification:", error);
+
+            // Distinguish error types for better feedback
+            if (error.message.includes("Provider not initialized")) {
+              toast.error(
+                "Failed to initialize the wallet provider. Please reconnect your wallet."
+              );
+            } else if (error.message.includes("No domain configured")) {
+              toast.error(
+                `Notification domain is not configured for this chain. Please verify your chain ID or environment setup.`
+              );
+            } else if (error.message.includes("Error resolving ENS name")) {
+              toast.error(
+                "Failed to resolve the ENS name. Please check the domain name or network."
+              );
+            } else if (
+              error.message.includes("Failed to send notification message")
+            ) {
+              toast.error(
+                "Failed to send the notification. Please try again later."
+              );
+            } else if (error.message.includes("Failed to send payment")) {
+              toast.error(
+                "Payment transaction failed. Ensure sufficient funds are available."
+              );
+            } else if (error.message.includes("Insufficient balance")) {
+              toast.error("Insufficient balance to complete the transaction.");
+            } else {
+              // General error message
+              toast.error(
+                "An unexpected error occurred. Please try again later."
+              );
+            }
           }
         } else {
           console.log("Error in save Latest NFT Transfer");
