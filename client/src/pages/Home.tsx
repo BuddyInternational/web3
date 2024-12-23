@@ -203,6 +203,7 @@ const gullyBuddyNFTCollectionAddress = [
 const Home = () => {
   const { address, isConnected, chainId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
+  const { authMethod, isLoggedIn, loginDetails } = useAuthContext();
   const { triggerUpdate, resetBalances } = useBalanceUpdate();
   const { triggerVanityAddressUpdate } = useVanityAddressUpdate();
   const [balances, setBalances] = useState<any>({
@@ -237,7 +238,6 @@ const Home = () => {
   const targetDate = new Date("2024-12-31T23:59:59");
   const [vanityAddresses, setVanityAddresses] = useState([]);
   const [isHoldGullyBuddyNFT, setIsHoldGullyBuddyNFT] = useState(false);
-  const { isLoggedIn, loginDetails } = useAuthContext();
 
   // open dropdown menu
   const handleDropdownToggle = (event: React.MouseEvent<HTMLElement>) => {
@@ -1000,9 +1000,20 @@ const Home = () => {
         {/* Middle section : Links */}
         <div className="flex flex-col text-white text-sm gap-3 items-center w-full md:w-1/2">
           <div className="flex flex-col gap-3 font-sans font-normal sm: ml-4 md:ml-10 lg:ml-0">
-            <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
-              Minigame (Player Vs. Player)
-            </button>
+            {authMethod === "wallet" ? (
+              <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
+                Minigame (Player Vs. Player)
+              </button>
+            ) : (
+              <>
+              <Link to="/getStarted">
+              <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
+                Get Started
+              </button>
+              </Link>
+              </>
+            )}
+
             <Link
               to="/endorsee/quest"
               className="hover:text-[#5692D9] cursor-pointer underline"
@@ -1107,22 +1118,26 @@ const Home = () => {
             </div>
             {/* Loop through tokenDetails to display the balances */}
             {tokenDetailsByChain[selectedChain] &&
-              Object.keys(tokenDetailsByChain[selectedChain]).filter((tokenAddress) => {
-                // Filter include/exclude tokens based on the selected chain
-                const tokenSymbol =
-                  tokenDetailsByChain[selectedChain][tokenAddress]?.symbol;
-          
-                if (selectedChain === "mainnet") {
-                  // For Ethereum, include all tokens
-                  return ["CDE", "TIM", "AN"].includes(tokenSymbol);
-                } else if (selectedChain === "matic") {
-                  // For Polygon, exclude CDE2
-                  return ["CDE", "TIM", "AN"].includes(tokenSymbol) && tokenSymbol !== "CDE2";
-                }
-          
-                return false;
-              }).map(
-                (tokenAddress, idx) => {
+              Object.keys(tokenDetailsByChain[selectedChain])
+                .filter((tokenAddress) => {
+                  // Filter include/exclude tokens based on the selected chain
+                  const tokenSymbol =
+                    tokenDetailsByChain[selectedChain][tokenAddress]?.symbol;
+
+                  if (selectedChain === "mainnet") {
+                    // For Ethereum, include all tokens
+                    return ["CDE", "TIM", "AN"].includes(tokenSymbol);
+                  } else if (selectedChain === "matic") {
+                    // For Polygon, exclude CDE2
+                    return (
+                      ["CDE", "TIM", "AN"].includes(tokenSymbol) &&
+                      tokenSymbol !== "CDE2"
+                    );
+                  }
+
+                  return false;
+                })
+                .map((tokenAddress, idx) => {
                   const walletToken = balances.wallet.find(
                     (token: any) =>
                       tokenDetailsByChain[selectedChain][tokenAddress]?.name ===
@@ -1153,8 +1168,7 @@ const Home = () => {
                       </span>
                     </div>
                   );
-                }
-              )}
+                })}
           </div>
           {/* Vanity Balance */}
           <div className="flex flex-col gap-2 mt-2">
@@ -1327,26 +1341,31 @@ const Home = () => {
                 return (
                   <>
                     {tokenDetailsByChain[selectedChain] &&
-                      Object.keys(tokenDetailsByChain[selectedChain]).filter((tokenAddress) => {
-                        // Filter include/exclude tokens based on the selected chain
-                        const tokenSymbol =
-                          tokenDetailsByChain[selectedChain][tokenAddress]?.symbol;
-                  
-                        if (selectedChain === "mainnet") {
-                          // For Ethereum, include all tokens
-                          return ["CDE", "TIM", "AN"].includes(tokenSymbol);
-                        } else if (selectedChain === "matic") {
-                          // For Polygon, exclude CDE2
-                          return ["CDE", "TIM", "AN"].includes(tokenSymbol) && tokenSymbol !== "CDE2";
-                        }
-                  
-                        return false;
-                      }).map(
-                        (tokenAddress, idx) => {
+                      Object.keys(tokenDetailsByChain[selectedChain])
+                        .filter((tokenAddress) => {
+                          // Filter include/exclude tokens based on the selected chain
+                          const tokenSymbol =
+                            tokenDetailsByChain[selectedChain][tokenAddress]
+                              ?.symbol;
+
+                          if (selectedChain === "mainnet") {
+                            // For Ethereum, include all tokens
+                            return ["CDE", "TIM", "AN"].includes(tokenSymbol);
+                          } else if (selectedChain === "matic") {
+                            // For Polygon, exclude CDE2
+                            return (
+                              ["CDE", "TIM", "AN"].includes(tokenSymbol) &&
+                              tokenSymbol !== "CDE2"
+                            );
+                          }
+
+                          return false;
+                        })
+                        .map((tokenAddress, idx) => {
                           const vanityToken = balances.vanity.find(
                             (token: any) =>
                               tokenDetailsByChain[selectedChain][tokenAddress]
-                                ?.name === token.name 
+                                ?.name === token.name
                           );
 
                           const vanityBalance = vanityToken
@@ -1378,8 +1397,7 @@ const Home = () => {
                               </span>
                             </div>
                           );
-                        }
-                      )}
+                        })}
                   </>
                 );
               }

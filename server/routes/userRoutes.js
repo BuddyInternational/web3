@@ -1,9 +1,10 @@
 import express from "express";
-import { checkExistingUserVanityAddress, downloadVanityAddressForUser, logInUser, logOutUser, storeUserVanityWallet } from "../controllers/registrationController.js";
+import { checkExistingUserVanityAddress, downloadVanityAddressForUser, getAllUsersData, logInUser, logOutUser, storeUserVanityWallet } from "../controllers/registrationController.js";
 
 const userVanityRoutes = express.Router();
 
 userVanityRoutes.get("/checkUserVanityAddress", checkExistingUserVanityAddress);
+userVanityRoutes.get("/getAllUsersData", getAllUsersData);
 userVanityRoutes.post("/storeUserVanityWallet",storeUserVanityWallet);
 userVanityRoutes.post("/logInUser",logInUser);
 userVanityRoutes.post("/logOutUser",logOutUser);

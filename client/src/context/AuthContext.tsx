@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [authMethod, setAuthMethod] = useState<string>(""); 
+  const [authMethod, setAuthMethod] = useState<string>("wallet"); 
   const [loginDetails, setLoginDetails] = useState<{ mobile?: string; email?: string }>({}); 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); 
 

@@ -99,6 +99,33 @@ export const checkExistingUserVanityAddress = async (req, res) => {
   }
 };
 
+// Fetch All Registered User Data
+export const getAllUsersData = async (req, res) => {
+  try {
+    // Fetch all user records from the database
+    const allUsers = await RegisterData.find();
+    
+    if (allUsers.length === 0) {
+      return res.status(404).json({
+        message: "No user data found",
+      });
+    }
+
+    console.log("All user data fetched:", allUsers);
+
+    return res.status(200).json({
+      message: "All user data fetched successfully",
+      data: allUsers,
+    });
+  } catch (error) {
+    console.error("Error fetching all user data:", error);
+    return res.status(500).json({
+      message: "Error fetching all user data",
+      error: error.message,
+    });
+  }
+};
+
 // Login User
 export const logInUser = async (req, res) => {
   const { logInContent} = req.body;

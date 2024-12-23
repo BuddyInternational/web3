@@ -14,6 +14,7 @@ import CreateStoryLines from "../pages/CreateStoryLines";
 import { AnimatePresence } from "framer-motion";
 import ScreenWrite from "../pages/ScreenWrite";
 import DownloadCSV from "../pages/DownloadCSVFiles";
+import GetStartedForm from "../components/EndorseeQuestComponents/forms/GetStartedForm";
 
 const AllRoutes = () => {
   return (
@@ -28,6 +29,10 @@ const AllRoutes = () => {
           <Route
             path="/quest/completed/:walletAddress"
             element={<EndorseeQuest />}
+          />
+          <Route
+            path="/getStarted"
+            element={<GetStartedForm />}
           />
           <Route
             path="/content/:walletAddress"

@@ -501,7 +501,7 @@ export default function App() {
 
       if (response) {
         toast.success("User logged out successfully");
-        setAuthMethod("");
+        setAuthMethod("wallet");
         setLoginDetails({});
         setIsLoggedIn(false);
         setVanityAddress("0x0000000000000000000000000000000000000000");

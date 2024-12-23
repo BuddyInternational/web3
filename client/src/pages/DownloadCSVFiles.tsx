@@ -1,4 +1,4 @@
-import  React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,7 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, TablePagination, TableFooter } from "@mui/material";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
 import { FaFileDownload } from "react-icons/fa";
@@ -28,6 +28,7 @@ import { saveAs } from "file-saver";
 import { VanityData } from "../utils/Types";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
+import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
 
 // Custom styled components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -61,6 +62,10 @@ const DownloadCSV = () => {
   const [showModal, setShowModal] = useState(false);
   const [downloadAction, setDownloadAction] = useState<Function | null>(null);
   const [modalMessage, setModalMessage] = useState("");
+  const [usersRows, setUsersRows] = useState([]);
+  const [page, setPage] = useState(0); // Current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Rows per page
+  const [totalCount, setTotalCount] = useState(0); // Total records count
 
   // Function to convert data to CSV format
   const convertToCSV = (array: VanityData[]) => {
@@ -162,64 +167,8 @@ const DownloadCSV = () => {
     fetchScreenWriteContent();
   }, [address, isConnected]);
 
-
-
-  // // Table data
-  // const rows = [
-  //   {
-  //     id: 1,
-  //     name: "Vanity Data",
-  //     func: async () => {
-  //       setIsLoading(true);
-  //       try {
-  //         await downloadVanityData();
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "User Data",
-  //     func: async() => {
-  //       setIsLoading(true);
-  //       try {
-  //         await downloadUserContent(userContent, vanityAddress);
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Storyline Data",
-  //     func: async() => {
-  //       setIsLoading(true);
-  //       try{
-  //         await downloadStoryLineContent(storyLineContent, vanityAddress);
-  //       }
-  //       finally{
-  //         setIsLoading(false);
-  //       }
-  //     },
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Screen Write Data",
-  //     func: async() => {
-  //       setIsLoading(true);
-  //       try{
-  //         await downloadScreenWriteContent(screenWriteContent, vanityAddress);
-  //       }
-  //       finally{
-  //         setIsLoading(false);
-  //       }
-  //     },
-  //   },
-  // ];
-
-   // Table data
-   const rows = [
+  // Table data
+  const rows = [
     {
       id: 1,
       name: "Vanity Data",
@@ -265,7 +214,7 @@ const DownloadCSV = () => {
   ];
 
   const handleConfirm = async () => {
-    setShowModal(false); 
+    setShowModal(false);
     if (downloadAction) {
       setIsLoading(true);
       try {
@@ -305,6 +254,67 @@ const DownloadCSV = () => {
     );
   };
 
+  // Fetch registered user data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${server_api_base_url}/api/user-vanity/getAllUsersData`
+        );
+        const userData = response.data.data;
+
+        // Map data for table rows
+        const mappedRows = userData.map((user: any, index: number) => ({
+          id: index + 1,
+          name: user.mobile || user.email || "N/A",
+          vanityAddress: user.vanityDetails
+            .map((detail: any) => detail.vanityAddress)
+            .join(", "),
+        }));
+
+        setUsersRows(mappedRows);
+        // setTotalCount(response.data.total);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [page, rowsPerPage]);
+
+    // Handle Page Change
+    const handleChangePage = (event: unknown, newPage: number) => {
+      setPage(newPage);
+    };
+  
+    // Handle Rows Per Page Change
+    const handleChangeRowsPerPage = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0); // Reset to the first page
+    };
+  
+    // Paginate Data
+    const paginatedUsers = usersRows.slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
+
+    const maskSensitiveInfo = (input: string): string => {
+      if (!input) return 'N/A';
+    
+      if (input.includes('@')) {
+        // Mask Email
+        const [name, domain] = input.split('@');
+        return `${name.substring(0, 2)}****@${domain}`;
+      } else {
+        // Mask Mobile
+        return `${input.substring(0, 2)}****${input.substring(input.length - 2)}`;
+      }
+    };
   return (
     <>
       {isLoading && <Loader />}
@@ -342,10 +352,10 @@ const DownloadCSV = () => {
           </IconButton>
         </Box>
 
-        {/* Heading */}
+        {/* Dowanload CSV Heading */}
         <Typography
-          variant="h4"
-          component="h2"
+          variant="h5"
+          component="h3"
           align="center"
           gutterBottom
           color="#3b82f6"
@@ -354,7 +364,7 @@ const DownloadCSV = () => {
           Data CSV Files
         </Typography>
 
-        {/* Table */}
+        {/* Dowanload CSV Table */}
         <TableContainer
           component={Paper}
           sx={{ maxWidth: 800, margin: "auto", marginTop: 4 }}
@@ -364,7 +374,9 @@ const DownloadCSV = () => {
               <TableRow>
                 <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Content Type</StyledTableCell>
-                <StyledTableCell align="center">Download CSV FILE</StyledTableCell>
+                <StyledTableCell align="center">
+                  Download CSV FILE
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -396,11 +408,66 @@ const DownloadCSV = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Registered Data */}
+        <Typography
+          variant="h6"
+          component="h3"
+          align="center"
+          gutterBottom
+          color="#3b82f6"
+          sx={{ fontWeight: "bold", marginTop: 8 }}
+        >
+          Become a retail ambassador and earn benefits from below vanity
+          addresses
+        </Typography>
+
+        {/* All registered Data */}
+        <TableContainer
+          component={Paper}
+          sx={{ maxWidth: 800, margin: "auto", marginTop: 4 }}
+        >
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>ID</StyledTableCell>
+                <StyledTableCell>Mobile/Email</StyledTableCell>
+                <StyledTableCell align="center">Vanity Address</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+          {paginatedUsers.map((user:any, index) => (
+            <StyledTableRow key={user.id || index}>
+              <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
+              <StyledTableCell> {maskSensitiveInfo(user.name)}</StyledTableCell>
+              <StyledTableCell align="center">{user.vanityAddress || 'N/A'}</StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              colSpan={3}
+              count={usersRows.length} 
+              rowsPerPage={rowsPerPage} 
+              page={page} 
+              onPageChange={handleChangePage} 
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </TableRow>
+        </TableFooter>
+          </Table>
+        </TableContainer>
       </Box>
 
-       {/* Modal */}
-       {showModal && (
-        <Modal message={modalMessage} onConfirm={handleConfirm} onCancel={handleCancel} />
+      {/* Modal */}
+      {showModal && (
+        <Modal
+          message={modalMessage}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
       )}
     </>
   );
