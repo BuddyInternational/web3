@@ -1,16 +1,19 @@
 import {
   Box,
+  Button,
   DialogContent,
   DialogTitle,
   Fade,
   IconButton,
   Modal,
+  Snackbar,
   Typography,
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
+import { toast } from "react-toastify";
 
 const videoURL = process.env.REACT_APP_MEETING_ROOM_VIDEO!;
 // Server API Base URL
@@ -31,6 +34,31 @@ const MeetingLayerOperatorsModal: React.FC<{
   const [hasFetched, setHasFetched] = useState(false);
 
   console.log("vedio url ===============", songData.videoUrl);
+
+  // Timer State
+  const [timer, setTimer] = useState(30);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+
+  // Start timer when modal opens
+  useEffect(() => {
+    let countdown: NodeJS.Timeout;
+    if (open) {
+      setIsTimerActive(true);
+      setTimer(30);
+      countdown = setInterval(() => {
+        setTimer((prev) => {
+          if (prev === 1) {
+            clearInterval(countdown);
+            setIsTimerActive(false);
+            toast.success("Thanks! This meeting room has earned TIM tokens.");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(countdown);
+  }, [open]);
 
   // Function to resolve the short URL and set the full video URL
   useEffect(() => {
@@ -78,7 +106,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               xl: "50vw",
             },
             height: {
-              xs: "40%", // Adjusted for small screens
+              xs: "40%", 
               sm: "60%",
               md: "70%",
             },
@@ -92,37 +120,60 @@ const MeetingLayerOperatorsModal: React.FC<{
             borderColor: "white",
           }}
         >
-          {/* Title */}
-          <DialogTitle
+          {/* Header Section */}
+          <Box
             sx={{
-              m: 0,
-              p: 2,
-              textAlign: "center",
-              color: "white",
-              fontSize: { xs: "0.5rem", sm: "0.7rem", md: "1rem" },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: 2,
+              borderBottom: "1px solid white",
             }}
-            id="customized-dialog-title"
           >
-            This Meeting Room has Earned 152 TIM
-          </DialogTitle>
+            {/* Claim Button */}
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: isTimerActive ? "green" : "#5692D9",
+                color: "white",
+                fontSize: isTimerActive
+                  ? { xs: "0.5rem", sm: "0.6rem", md: "0.8rem" }
+                  : { xs: "0.6rem", sm: "0.8rem", md: "1rem" },
+                "&.Mui-disabled": {
+                  backgroundColor: "green",
+                },
+              }}
+              disabled={isTimerActive}
+            >
+              {isTimerActive
+                ? `Claim Rewards in ${timer} SECONDS`
+                : "Claim TIM"}
+            </Button>
 
-          {/* Close Button */}
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{
-              position: "absolute",
-              right: { xs: 8, sm: 10, md: 16 },
-              top: { xs: 8, sm: 10, md: 16 },
-              // fontSize: "20px",
-              fontSize: { xs: "0.5rem", sm: "0.7rem", md: "1rem" },
-              border: "1px solid white",
-              borderRadius: "10px",
-              color: "white",
-            }}
-          >
-            <IoClose />
-          </IconButton>
+            {/* Title */}
+            <DialogTitle
+              sx={{
+                textAlign: "center",
+                color: "white",
+                fontSize: { xs: "0.5rem", sm: "0.7rem", md: "1rem" },
+              }}
+            >
+              This Meeting Room has Earned 152 TIM
+            </DialogTitle>
+
+            {/* Close Button */}
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={{
+                color: "white",
+                fontSize: { xs: "0.5rem", sm: "0.7rem", md: "1rem" },
+              }}
+            >
+              <IoClose />
+            </IconButton>
+          </Box>
+
           <DialogContent
             dividers
             sx={{
@@ -139,8 +190,8 @@ const MeetingLayerOperatorsModal: React.FC<{
                 justifyContent: "center",
                 width: "100%",
                 height: {
-                  xs: "200px", 
-                  sm: "300px", 
+                  xs: "200px",
+                  sm: "300px",
                   md: "400px",
                 },
               }}
@@ -182,14 +233,11 @@ const MeetingLayerOperatorsModal: React.FC<{
               {/* Song Cover Image */}
               <Box
                 sx={{
-                  // width: "90px",
-                  // height: "90px",
                   width: { xs: "70px", sm: "90px", md: "120px" }, // Responsive image size
                   height: { xs: "70px", sm: "90px", md: "120px" },
                   borderRadius: "8px",
                   overflow: "hidden",
                   flexShrink: 0,
-                  // marginLeft: 4,
                   marginBottom: { xs: 2, md: 0 }, // Add bottom margin on small screens for spacing
                   marginRight: { md: 4 },
                 }}
