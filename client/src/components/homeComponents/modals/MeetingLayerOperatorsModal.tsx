@@ -6,14 +6,30 @@ import {
   Fade,
   IconButton,
   Modal,
-  Snackbar,
   Typography,
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+
+// Shazam API call options
+const options = {
+  method: "GET",
+  url: "https://shazam.p.rapidapi.com/search",
+  params: {
+    term: "shape of you",
+    locale: "en-US",
+    offset: "0",
+    limit: "1",
+  },
+  headers: {
+    "x-rapidapi-key": process.env.REACT_APP_SHAZAM_KEY!,
+    "x-rapidapi-host": process.env.REACT_APP_SHAZAM_HOST!,
+  },
+};
 
 const videoURL = process.env.REACT_APP_MEETING_ROOM_VIDEO!;
 // Server API Base URL
@@ -23,21 +39,41 @@ const MeetingLayerOperatorsModal: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-  // Static Song Data
-  const songData = {
-    coverImage: "/music_cover.jpeg",
-    songName: "Shape of You",
-    artistName: "Ed Sheeran",
-    videoUrl: videoURL,
-  };
+  // States for song data, video URL, timer, and fetching status
+  const [songData, setSongData] = useState<any>({
+    songName: "",
+    artistName: "",
+    coverImage: "",
+    audioUrl: "",
+  });
   const [videoUrl, setVideoUrl] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
-
-  console.log("vedio url ===============", songData.videoUrl);
-
-  // Timer State
   const [timer, setTimer] = useState(30);
   const [isTimerActive, setIsTimerActive] = useState(false);
+
+  // Fetch the song details from Shazam API when modal opens
+  useEffect(() => {
+    const fetchSongDetails = async () => {
+      try {
+        const response = await axios.request(options);
+        const song = response.data.tracks.hits[0].track;
+        setSongData({
+          songName: song.title,
+          artistName: song.subtitle,
+          coverImage: song.images.coverart,
+          audioUrl: song.url,
+        });
+      } catch (error) {
+        console.error("Error fetching song details:", error);
+        toast.error("Failed to fetch song details.");
+      }
+    };
+
+    if (open && !hasFetched) {
+      fetchSongDetails();
+      setHasFetched(true);
+    }
+  }, [open, hasFetched]);
 
   // Start timer when modal opens
   useEffect(() => {
@@ -63,12 +99,12 @@ const MeetingLayerOperatorsModal: React.FC<{
   // Function to resolve the short URL and set the full video URL
   useEffect(() => {
     const resolveUrl = async () => {
-      if (songData.videoUrl) {
+      if (videoURL) {
         try {
           const response = await axios.get(
             `${server_api_base_url}/api/resolve-url`,
             {
-              params: { shortUrl: songData.videoUrl },
+              params: { shortUrl: videoURL },
             }
           );
           // Set the resolved URL if CORS allows
@@ -82,11 +118,11 @@ const MeetingLayerOperatorsModal: React.FC<{
         }
       }
     };
-    if (songData.videoUrl && !hasFetched) {
+    if (videoURL && !hasFetched) {
       resolveUrl();
       setHasFetched(true);
     }
-  }, [songData.videoUrl, hasFetched, server_api_base_url]);
+  }, [videoURL, hasFetched, server_api_base_url]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -106,7 +142,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               xl: "50vw",
             },
             height: {
-              xs: "40%", 
+              xs: "40%",
               sm: "60%",
               md: "70%",
             },
@@ -219,7 +255,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               />
             </Box>
 
-            {/* Middle Section */}
+            {/* Song Cover and Details Section */}
             <Box
               sx={{
                 display: "flex",
@@ -227,7 +263,6 @@ const MeetingLayerOperatorsModal: React.FC<{
                 justifyContent: "space-between",
                 p: 2,
                 mt: "auto",
-                // flexDirection: { sm: "column", md: "row" },
               }}
             >
               {/* Song Cover Image */}
@@ -260,7 +295,6 @@ const MeetingLayerOperatorsModal: React.FC<{
                   flexDirection: "column",
                   alignItems: "flex-end",
                   textAlign: "right",
-                  // marginRight: 4,
                   marginRight: { xs: 0, md: 4 },
                 }}
               >
@@ -283,8 +317,18 @@ const MeetingLayerOperatorsModal: React.FC<{
                 >
                   {songData.artistName}
                 </Typography>
+                {/* Shazam Link */}
+                <Link
+                  to={songData.audioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#6086d1] text-xs sm:text-base md:text-lg no-underline hover:underline"
+                >
+                  Listen on Shazam
+                </Link>
               </Box>
             </Box>
+
             {/* Bottom Section */}
             <Box
               sx={{
@@ -294,7 +338,6 @@ const MeetingLayerOperatorsModal: React.FC<{
                 mt: 2,
               }}
             >
-              {/* All right Reserved */}
               <Typography
                 variant="caption"
                 sx={{
