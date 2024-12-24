@@ -8,6 +8,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
+import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
@@ -41,10 +42,10 @@ const MeetingLayerOperatorsModal: React.FC<{
 }> = ({ open, onClose }) => {
   // States for song data, video URL, timer, and fetching status
   const [songData, setSongData] = useState<any>({
-    songName: "",
-    artistName: "",
-    coverImage: "",
-    audioUrl: "",
+    songName: "Shape of You",
+    artistName: "Ed Sheeran",
+    coverImage: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/2d/1c/4f/2d1c4fd7-018c-0529-693b-c67fea53b698/190295851286.jpg/400x400cc.jpg",
+    audioUrl: "https://www.shazam.com/track/338965882/shape-of-you",
   });
   const [videoUrl, setVideoUrl] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
@@ -65,7 +66,6 @@ const MeetingLayerOperatorsModal: React.FC<{
         });
       } catch (error) {
         console.error("Error fetching song details:", error);
-        toast.error("Failed to fetch song details.");
       }
     };
 
@@ -86,7 +86,6 @@ const MeetingLayerOperatorsModal: React.FC<{
           if (prev === 1) {
             clearInterval(countdown);
             setIsTimerActive(false);
-            toast.success("Thanks! This meeting room has earned TIM tokens.");
             return 0;
           }
           return prev - 1;
@@ -166,25 +165,11 @@ const MeetingLayerOperatorsModal: React.FC<{
               borderBottom: "1px solid white",
             }}
           >
-            {/* Claim Button */}
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: isTimerActive ? "green" : "#5692D9",
-                color: "white",
-                fontSize: isTimerActive
-                  ? { xs: "0.5rem", sm: "0.6rem", md: "0.8rem" }
-                  : { xs: "0.6rem", sm: "0.8rem", md: "1rem" },
-                "&.Mui-disabled": {
-                  backgroundColor: "green",
-                },
-              }}
-              disabled={isTimerActive}
-            >
-              {isTimerActive
+            <span className="bg-blue-100 text-blue-800 text-xs sm:text-[0.5rem] md:text-xs font-medium sm:p-1.5 md:p-2 rounded dark:bg-blue-900 dark:text-blue-300">
+            {isTimerActive
                 ? `Claim Rewards in ${timer} SECONDS`
-                : "Claim TIM"}
-            </Button>
+                : "Thanks! You Earned TIM tokens."}
+                </span>
 
             {/* Title */}
             <DialogTitle
@@ -268,12 +253,12 @@ const MeetingLayerOperatorsModal: React.FC<{
               {/* Song Cover Image */}
               <Box
                 sx={{
-                  width: { xs: "70px", sm: "90px", md: "120px" }, // Responsive image size
+                  width: { xs: "70px", sm: "90px", md: "120px" }, 
                   height: { xs: "70px", sm: "90px", md: "120px" },
                   borderRadius: "8px",
                   overflow: "hidden",
                   flexShrink: 0,
-                  marginBottom: { xs: 2, md: 0 }, // Add bottom margin on small screens for spacing
+                  marginBottom: { xs: 2, md: 0 }, 
                   marginRight: { md: 4 },
                 }}
               >

@@ -1,5 +1,18 @@
 import { RegisterData } from "../models/Register.js";
 
+const maskSensitiveInfo = (input) => {
+  if (!input) return "N/A";
+
+  if (input.includes("@")) {
+    // Mask Email
+    const [name, domain] = input.split("@");
+    return `${name.substring(0, 2)}****@${domain}`;
+  } else {
+    // Mask Mobile
+    return `${input.substring(0, 2)}****${input.substring(input.length - 2)}`;
+  }
+};
+
 // store User Vanity Details
 export const storeUserVanityWallet = async (req, res) => {
   const {
@@ -104,18 +117,28 @@ export const getAllUsersData = async (req, res) => {
   try {
     // Fetch all user records from the database
     const allUsers = await RegisterData.find();
-    
+
     if (allUsers.length === 0) {
       return res.status(404).json({
         message: "No user data found",
       });
     }
+    // Extract only the required fields and mask sensitive info
+    const formattedUsers = allUsers.map((user) => ({
+      // vanityAddress: user.vanityAddress || "N/A",
+      vanityAddress: user.vanityDetails
+            .map((detail) => detail.vanityAddress)
+            .join(", "),
+      contact: user.email
+        ? maskSensitiveInfo(user.email)
+        : maskSensitiveInfo(user.mobile),
+    }));
 
-    console.log("All user data fetched:", allUsers);
+    console.log("Filtered and masked user data:", formattedUsers);
 
     return res.status(200).json({
-      message: "All user data fetched successfully",
-      data: allUsers,
+      message: "User data fetched successfully",
+      data: formattedUsers,
     });
   } catch (error) {
     console.error("Error fetching all user data:", error);
@@ -128,7 +151,7 @@ export const getAllUsersData = async (req, res) => {
 
 // Login User
 export const logInUser = async (req, res) => {
-  const { logInContent} = req.body;
+  const { logInContent } = req.body;
   try {
     // Find user by mobile or email
     const user = await RegisterData.findOne({

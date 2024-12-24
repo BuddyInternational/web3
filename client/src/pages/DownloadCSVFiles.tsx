@@ -266,14 +266,12 @@ const DownloadCSV = () => {
         // Map data for table rows
         const mappedRows = userData.map((user: any, index: number) => ({
           id: index + 1,
-          name: user.mobile || user.email || "N/A",
-          vanityAddress: user.vanityDetails
-            .map((detail: any) => detail.vanityAddress)
-            .join(", "),
+          name: user.contact || "N/A",
+          vanityAddress: user.vanityAddress || "N/A",
+          roiEstimated:  "0", 
         }));
 
         setUsersRows(mappedRows);
-        // setTotalCount(response.data.total);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -303,18 +301,6 @@ const DownloadCSV = () => {
       page * rowsPerPage + rowsPerPage
     );
 
-    const maskSensitiveInfo = (input: string): string => {
-      if (!input) return 'N/A';
-    
-      if (input.includes('@')) {
-        // Mask Email
-        const [name, domain] = input.split('@');
-        return `${name.substring(0, 2)}****@${domain}`;
-      } else {
-        // Mask Mobile
-        return `${input.substring(0, 2)}****${input.substring(input.length - 2)}`;
-      }
-    };
   return (
     <>
       {isLoading && <Loader />}
@@ -433,14 +419,16 @@ const DownloadCSV = () => {
                 <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Mobile/Email</StyledTableCell>
                 <StyledTableCell align="center">Vanity Address</StyledTableCell>
+                <StyledTableCell align="center">R.O.I.s Estimated (USDT)</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
           {paginatedUsers.map((user:any, index) => (
             <StyledTableRow key={user.id || index}>
               <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-              <StyledTableCell> {maskSensitiveInfo(user.name)}</StyledTableCell>
+              <StyledTableCell> {user.name}</StyledTableCell>
               <StyledTableCell align="center">{user.vanityAddress || 'N/A'}</StyledTableCell>
+              <StyledTableCell align="center">{user.roiEstimated || "0"}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
