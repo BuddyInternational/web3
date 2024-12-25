@@ -134,7 +134,7 @@ export const getAllUsersData = async (req, res) => {
         : maskSensitiveInfo(user.mobile),
     }));
 
-    console.log("Filtered and masked user data:", formattedUsers);
+    // console.log("Filtered and masked user data:", formattedUsers);
 
     return res.status(200).json({
       message: "User data fetched successfully",

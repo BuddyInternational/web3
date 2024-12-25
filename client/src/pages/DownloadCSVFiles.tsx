@@ -404,7 +404,7 @@ const DownloadCSV = () => {
           color="#3b82f6"
           sx={{ fontWeight: "bold", marginTop: 8 }}
         >
-          Become a retail ambassador and earn benefits from below vanity
+          recommendation and/or referral vanity
           addresses
         </Typography>
 

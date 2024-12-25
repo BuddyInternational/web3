@@ -44,7 +44,8 @@ const MeetingLayerOperatorsModal: React.FC<{
   const [songData, setSongData] = useState<any>({
     songName: "Shape of You",
     artistName: "Ed Sheeran",
-    coverImage: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/2d/1c/4f/2d1c4fd7-018c-0529-693b-c67fea53b698/190295851286.jpg/400x400cc.jpg",
+    coverImage:
+      "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/2d/1c/4f/2d1c4fd7-018c-0529-693b-c67fea53b698/190295851286.jpg/400x400cc.jpg",
     audioUrl: "https://www.shazam.com/track/338965882/shape-of-you",
   });
   const [videoUrl, setVideoUrl] = useState("");
@@ -166,10 +167,10 @@ const MeetingLayerOperatorsModal: React.FC<{
             }}
           >
             <span className="bg-blue-100 text-blue-800 text-xs sm:text-[0.5rem] md:text-xs font-medium sm:p-1.5 md:p-2 rounded dark:bg-blue-900 dark:text-blue-300">
-            {isTimerActive
+              {isTimerActive
                 ? `Claim Rewards in ${timer} SECONDS`
                 : "Thanks! You Earned TIM tokens."}
-                </span>
+            </span>
 
             {/* Title */}
             <DialogTitle
@@ -200,6 +201,8 @@ const MeetingLayerOperatorsModal: React.FC<{
             sx={{
               borderColor: "white",
               color: "white",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             {/* Full-Width GIF Section */}
@@ -253,12 +256,12 @@ const MeetingLayerOperatorsModal: React.FC<{
               {/* Song Cover Image */}
               <Box
                 sx={{
-                  width: { xs: "70px", sm: "90px", md: "120px" }, 
+                  width: { xs: "70px", sm: "90px", md: "120px" },
                   height: { xs: "70px", sm: "90px", md: "120px" },
                   borderRadius: "8px",
                   overflow: "hidden",
                   flexShrink: 0,
-                  marginBottom: { xs: 2, md: 0 }, 
+                  marginBottom: { xs: 2, md: 0 },
                   marginRight: { md: 4 },
                 }}
               >
