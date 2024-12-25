@@ -142,7 +142,7 @@ const MeetingLayerOperatorsModal: React.FC<{
               xl: "50vw",
             },
             height: {
-              xs: "40%",
+              xs: "50%",
               sm: "60%",
               md: "70%",
             },
