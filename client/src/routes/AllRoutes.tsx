@@ -15,6 +15,7 @@ import { AnimatePresence } from "framer-motion";
 import ScreenWrite from "../pages/ScreenWrite";
 import DownloadCSV from "../pages/DownloadCSVFiles";
 import GetStartedForm from "../components/EndorseeQuestComponents/forms/GetStartedForm";
+import RewardPhotoProof from "../pages/RewardPhotoProof";
 
 const AllRoutes = () => {
   return (
@@ -45,6 +46,10 @@ const AllRoutes = () => {
           <Route
             path="/screenwrite/:walletAddress"
             element={<ScreenWrite />}
+          />
+          <Route
+            path="/reward-photo-proof"
+            element={<RewardPhotoProof />}
           />
           <Route path="/order/NFTApparel" element={<OrderNFTApparelForm />} />
           <Route path="/nft/socketNFT/:vanityAddress" element={<SocketNFTDetails />} />

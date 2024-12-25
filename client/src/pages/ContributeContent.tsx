@@ -156,55 +156,87 @@ const ContributeContent: React.FC = () => {
       <div className="container mx-auto min-h-screen py-10 bg-[#0e0e0e] text-white flex flex-col items-center relative justify-center px-4">
         {/* Display Loader */}
         {isLoading && <Loader />}
-        {/* StoryLines Button */}
-        <Link to={`/storylinescontent/${address}`}>
-          <motion.button
-            className="absolute top-4 right-4 px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
-            style={{
-              background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
-            }}
-            whileHover={{
-              scale: 1.1,
-              boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 120,
-              damping: 12,
-              delay: 0.1,
-            }}
+        {/* Responsive Buttons Section */}
+        <div className="w-full flex flex-col md:flex-row sm:justify-end items-center gap-4 mb-4 px-4">
+          {/* Create StoryLines Button */}
+          <Link
+            to={`/storylinescontent/${address}`}
+            className="w-full sm:w-auto"
           >
-            Create StoryLines
-          </motion.button>
-        </Link>
+            <motion.button
+              className="w-full sm:w-auto px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
+              style={{
+                background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
+              }}
+              whileHover={{
+                scale: 1.1,
+                boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 120,
+                damping: 12,
+                delay: 0.1,
+              }}
+            >
+              Create StoryLines
+            </motion.button>
+          </Link>
 
-        {/* Write Screen Button */}
-        <Link to={`/screenwrite/${address}`}>
-          <motion.button
-            className="absolute top-20 right-4 px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
-            style={{
-              background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
-            }}
-            whileHover={{
-              scale: 1.1,
-              boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 120,
-              damping: 12,
-              delay: 0.2,
-            }}
+          {/* Screen Write Button */}
+          <Link to={`/screenwrite/${address}`} className="w-full sm:w-auto">
+            <motion.button
+              className="w-full sm:w-auto px-5 py-3 text-white rounded-lg border-2 border-transparent shadow-lg"
+              style={{
+                background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
+              }}
+              whileHover={{
+                scale: 1.1,
+                boxShadow: "0px 5px 20px rgba(72, 209, 204, 0.8)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 120,
+                damping: 12,
+                delay: 0.2,
+              }}
+            >
+              Screen Write
+            </motion.button>
+          </Link>
+        </div>
+
+        {/* Reward Photo Proof Link with Token Icon */}
+        <div className="w-full text-end mb-4 sm:px-2 md:px-4">
+          <Link
+            to="/reward-photo-proof"
+            className="flex items-center justify-end hover:underline md:text-md lg:text-lg"
           >
-            Screen Write
-          </motion.button>
-        </Link>
+            {/* Token Icon */}
+            <img
+              src="/TIM.svg"
+              alt="Token"
+              className="h-10 w-10 mr-1" 
+            />
+            {/* Text */}
+            <p
+              className="md:text-sm lg:text-md font-semibold"
+              style={{
+                background: "linear-gradient(90deg, #1E90FF, #6A5ACD, #48D1CC)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Reward ! *Photo Proof
+            </p>
+          </Link>
+        </div>
 
         {/* Wallet and Vanity Address */}
         <div className="flex flex-col sm:flex-col md:flex-row sm:space-x-0 md:space-x-4 mb-8 mt-0 items-center gap-2 w-full sm:w-full md:w-3/4 lg:w-1/2 justify-center">
