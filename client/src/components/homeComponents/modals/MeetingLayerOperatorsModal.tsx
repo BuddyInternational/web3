@@ -201,8 +201,8 @@ const MeetingLayerOperatorsModal: React.FC<{
             sx={{
               borderColor: "white",
               color: "white",
-              display: "flex",
-              flexDirection: "column",
+              // display: "flex",
+              // flexDirection: "column",
             }}
           >
             {/* Full-Width GIF Section */}

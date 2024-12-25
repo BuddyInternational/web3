@@ -8,7 +8,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
-import { Box, Typography, IconButton, TablePagination, TableFooter } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  TablePagination,
+  TableFooter,
+} from "@mui/material";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
 import { FaFileDownload } from "react-icons/fa";
@@ -268,7 +274,7 @@ const DownloadCSV = () => {
           id: index + 1,
           name: user.contact || "N/A",
           vanityAddress: user.vanityAddress || "N/A",
-          roiEstimated:  "0", 
+          roiEstimated: "0",
         }));
 
         setUsersRows(mappedRows);
@@ -282,24 +288,24 @@ const DownloadCSV = () => {
     fetchData();
   }, [page, rowsPerPage]);
 
-    // Handle Page Change
-    const handleChangePage = (event: unknown, newPage: number) => {
-      setPage(newPage);
-    };
-  
-    // Handle Rows Per Page Change
-    const handleChangeRowsPerPage = (
-      event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0); // Reset to the first page
-    };
-  
-    // Paginate Data
-    const paginatedUsers = usersRows.slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage
-    );
+  // Handle Page Change
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  // Handle Rows Per Page Change
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to the first page
+  };
+
+  // Paginate Data
+  const paginatedUsers = usersRows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <>
@@ -353,7 +359,28 @@ const DownloadCSV = () => {
         {/* Dowanload CSV Table */}
         <TableContainer
           component={Paper}
-          sx={{ maxWidth: 800, margin: "auto", marginTop: 4 }}
+          sx={{
+            maxWidth: 800,
+            margin: "auto",
+            marginTop: 4,
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "12px", // Width of the scrollbar
+              height: "12px", // Height for horizontal scrollbar
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1", // Track color
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#3b82f6", // Scrollbar thumb color
+              borderRadius: "10px",
+              border: "2px solid #f1f1f1", // Adds spacing around thumb
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: "#2563eb", // Hover color
+            },
+          }}
         >
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
@@ -402,16 +429,39 @@ const DownloadCSV = () => {
           align="center"
           gutterBottom
           color="#3b82f6"
-          sx={{ fontWeight: "bold", marginTop: 8 }}
+          sx={{
+            fontWeight: "bold",
+            marginTop: 8,
+          }}
         >
-          recommendation and/or referral vanity
-          addresses
+          Recommendation and referral vanity Addresses
         </Typography>
 
         {/* All registered Data */}
         <TableContainer
           component={Paper}
-          sx={{ maxWidth: 800, margin: "auto", marginTop: 4 }}
+          sx={{
+            maxWidth: 800,
+            margin: "auto",
+            marginTop: 4,
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "12px", // Width of the scrollbar
+              height: "12px", // Height for horizontal scrollbar
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1", // Track color
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#3b82f6", // Scrollbar thumb color
+              borderRadius: "10px",
+              border: "2px solid #f1f1f1", // Adds spacing around thumb
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: "#2563eb", // Hover color
+            },
+          }}
         >
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
@@ -419,32 +469,40 @@ const DownloadCSV = () => {
                 <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Mobile/Email</StyledTableCell>
                 <StyledTableCell align="center">Vanity Address</StyledTableCell>
-                <StyledTableCell align="center">R.O.I.s Estimated (USDT)</StyledTableCell>
+                <StyledTableCell align="center">
+                  R.O.I.s Estimated (USDT)
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-          {paginatedUsers.map((user:any, index) => (
-            <StyledTableRow key={user.id || index}>
-              <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-              <StyledTableCell> {user.name}</StyledTableCell>
-              <StyledTableCell align="center">{user.vanityAddress || 'N/A'}</StyledTableCell>
-              <StyledTableCell align="center">{user.roiEstimated || "0"}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              colSpan={3}
-              count={usersRows.length} 
-              rowsPerPage={rowsPerPage} 
-              page={page} 
-              onPageChange={handleChangePage} 
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableRow>
-        </TableFooter>
+              {paginatedUsers.map((user: any, index) => (
+                <StyledTableRow key={user.id || index}>
+                  <StyledTableCell>
+                    {index + 1 + page * rowsPerPage}
+                  </StyledTableCell>
+                  <StyledTableCell> {user.name}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {user.vanityAddress || "N/A"}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {user.roiEstimated || "0"}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25]}
+                  colSpan={3}
+                  count={usersRows.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableContainer>
       </Box>

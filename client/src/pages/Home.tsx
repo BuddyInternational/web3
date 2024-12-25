@@ -1106,7 +1106,7 @@ const Home = () => {
         <div className="flex flex-col sm:gap-4 md:gap-4 lg:gap-6 text-md font-normal w-full md:w-1/4 sm:text-center md:text-left">
           <div className="text-white flex gap-1">
             <span className="text-blue-400 mr-2">Total Value :</span>{" "}
-            <span>{calculateTotalNFTValue()} USD</span>
+            <span>{calculateTotalNFTValue()} USDT</span>
           </div>
           {/* Wallet Balance */}
           <div className="flex flex-col gap-2">
