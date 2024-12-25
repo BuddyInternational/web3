@@ -364,7 +364,11 @@ const DownloadCSV = () => {
             margin: "auto",
             marginTop: 4,
             overflowY: "auto",
+            overflowX: "auto",
+            overflow: "auto",
+            maxHeight: 400,
             WebkitOverflowScrolling: "touch",
+            whiteSpace: "nowrap",
             "&::-webkit-scrollbar": {
               width: "12px", // Width of the scrollbar
               height: "12px", // Height for horizontal scrollbar
@@ -446,6 +450,11 @@ const DownloadCSV = () => {
             margin: "auto",
             marginTop: 4,
             overflowY: "auto",
+            overflowX: "auto",
+            overflow: "auto",
+            maxHeight: 400,
+            WebkitOverflowScrolling: "touch",
+            whiteSpace: "nowrap",
             "&::-webkit-scrollbar": {
               width: "12px", // Width of the scrollbar
               height: "12px", // Height for horizontal scrollbar
