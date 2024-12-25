@@ -364,6 +364,7 @@ const DownloadCSV = () => {
             margin: "auto",
             marginTop: 4,
             overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
             "&::-webkit-scrollbar": {
               width: "12px", // Width of the scrollbar
               height: "12px", // Height for horizontal scrollbar
