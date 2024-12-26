@@ -526,111 +526,114 @@ export default function App() {
             onCancel={handleCancel}
           />
         )}
-        {/* vanity Address Section */}
-        <div className="sm:py-1 md:py-2 md:pl-14 sm:pl-0 flex md:flex-row sm:flex-col md:gap-3 sm:gap-1 justify-center">
+        {/* Vanity Address Section */}
+        <div className="py-2 px-4 sm:px-6 md:px-14 bg-gray-800 rounded-lg">
           {isLoading ? (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={50}
-              // animation="wave"
-              // sx={{ bgcolor: "red" }}
-            />
+            <Skeleton variant="rectangular" width="100%" height={50} />
           ) : (
             <>
-              <div className="text-[#5692D9] font-normal font-sans text-base m-auto">
-                Vanity Address :
-              </div>
-              <div className="flex flex-col">
-                <div className="text-white flex gap-3 font-normal font-sans text-sm items-center">
-                  <span className="mt-1">
-                    {vanityAddress?.slice(0, 6)}... {vanityAddress?.slice(-4)}
-                  </span>
-                  <span className="">
-                    {isAddressCopied ? (
-                      <FaCheck className="mt-1 text-green-500 cursor-pointer" />
-                    ) : (
-                      <FaRegCopy
+              {/* Content Container */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-6">
+                {/* Title */}
+                <div className="text-[#5692D9] font-sans font-medium text-sm md:text-base text-center md:text-left">
+                  Vanity Address:
+                </div>
+
+                {/* Address and Actions */}
+                <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
+                  {/* Address Display */}
+                  <div className="text-white font-sans text-sm md:text-base flex items-center gap-2 justify-center md:justify-start">
+                    <span>
+                      {vanityAddress?.slice(0, 6)}...{vanityAddress?.slice(-4)}
+                    </span>
+                    <span>
+                      {isAddressCopied ? (
+                        <FaCheck className="text-green-500 cursor-pointer" />
+                      ) : (
+                        <FaRegCopy
+                          onClick={() => {
+                            navigator.clipboard.writeText(vanityAddress || "");
+                            setIsAddressCopied(true);
+                            clearTimeout(copyAddressTimeoutRef.current);
+                            copyAddressTimeoutRef.current = setTimeout(() => {
+                              setIsAddressCopied(false);
+                            }, 1000);
+                          }}
+                          className="text-[#5692D9] cursor-pointer"
+                          data-tip="Copy Vanity Address"
+                        />
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 flex-wrap md:flex-nowrap justify-center md:justify-start">
+                    {/* Download CSV */}
+                    <Tooltip title="Download Vanity address csv" arrow>
+                      <a
+                        onClick={() => setShowModal(true)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#5692D9] cursor-pointer"
+                      >
+                        <FaDownload />
+                      </a>
+                    </Tooltip>
+
+                    {/* Etherscan */}
+                    <Tooltip title="View on Etherscan" arrow>
+                      <a
+                        href={`https://etherscan.io/address/${vanityAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#5692D9] cursor-pointer"
+                      >
+                        <FaEthereum />
+                      </a>
+                    </Tooltip>
+
+                    {/* Polygonscan */}
+                    <Tooltip title="View on Polygonscan" arrow>
+                      <a
+                        href={`https://polygonscan.com/address/${vanityAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#5692D9] cursor-pointer"
+                      >
+                        <SiPolygon />
+                      </a>
+                    </Tooltip>
+
+                    {/* CDE */}
+                    <Tooltip title="CDE" arrow>
+                      <a
+                        href={`/#`}
                         onClick={() => {
-                          navigator.clipboard.writeText(vanityAddress || "");
-                          setIsAddressCopied(true);
-                          clearTimeout(copyAddressTimeoutRef.current);
-                          copyAddressTimeoutRef.current = setTimeout(() => {
-                            setIsAddressCopied(false);
-                          }, 1000);
+                          alert("Prestige this Account");
                         }}
-                        className="text-[#5692D9] font-thin mt-1 cursor-pointer"
-                        data-tip="Copy Vanity Address"
-                        data-tip-content=".tooltip"
-                      />
-                    )}
-                  </span>
-                  {/* Download link */}
-                  <Tooltip title="Download Vanity address csv" arrow>
-                    <a
-                      // href={`/#`}
-                      onClick={() => setShowModal(true)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1 cursor-pointer"
-                      data-tip="View on Etherscan"
-                    >
-                      <FaDownload />
-                    </a>
-                  </Tooltip>
-                  {/* Etherscan Link */}
-                  <Tooltip title="View on Etherscan" arrow>
-                    <a
-                      href={`https://etherscan.io/address/${vanityAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1 cursor-pointer"
-                      data-tip="View on Etherscan"
-                    >
-                      <FaEthereum />
-                    </a>
-                  </Tooltip>
-                  {/* Polygonscan Link */}
-                  <Tooltip title="View on Polygonscan" arrow>
-                    <a
-                      href={`https://polygonscan.com/address/${vanityAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1 cursor-pointer"
-                      data-tip="View on Polygonscan"
-                    >
-                      <SiPolygon />
-                    </a>
-                  </Tooltip>
-                  <Tooltip title="CDE" arrow>
-                    <a
-                      href={`/#`}
-                      // target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5692D9] mt-1 cursor-pointer"
-                      data-tip="CDE"
-                      onClick={() => {
-                        alert("Prestige this Account");
-                      }}
-                    >
-                      <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
-                    </a>
-                  </Tooltip>
+                        className="text-[#5692D9] cursor-pointer"
+                      >
+                        <img src="/CDE.svg" className="h-4 w-auto" alt="CDE" />
+                      </a>
+                    </Tooltip>
+                  </div>
+
+                  {/* Assign Vanity Button */}
                   {isConnected && (
                     <Button
                       color="primary"
                       variant="contained"
-                      className="bg-[#5692D9] text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#4578B5] transition-all mt-1"
+                      className="bg-[#5692D9] text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#4578B5] transition-all mt-2 md:mt-0"
                       onClick={handleOpenModal(setOpenRegisterModal)}
                     >
                       Assign Vanity
                     </Button>
                   )}
                 </div>
-                <div>
-                  <hr className="border-t border-gray-600 w-full mt-2" />
-                </div>
               </div>
+
+              {/* Divider Outside Flex Container */}
+              <hr className="border-t border-gray-600 w-full mt-4" />
             </>
           )}
         </div>
@@ -639,7 +642,7 @@ export default function App() {
         <div className="flex flex-row justify-end px-2 py-6 mx-5">
           {!isLoggedIn && !isConnected ? (
             <>
-              <div className="flex gap-2 flex-col lg:flex-col xl:flex-row items-center">
+              <div className="flex gap-2 flex-col md:flex-col xl:flex-row items-center">
                 <Button
                   variant="contained"
                   sx={{
@@ -794,7 +797,7 @@ export default function App() {
                     }}
                   >
                     Log Out
-                    <IoIosLogOut className="ml-2 mt-0.5 text-white text-lg"/>
+                    <IoIosLogOut className="ml-2 mt-0.5 text-white text-lg" />
                   </Button>
                 </>
               )}

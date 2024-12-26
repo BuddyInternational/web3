@@ -385,6 +385,13 @@ const DownloadCSV = () => {
             "&::-webkit-scrollbar-thumb:hover": {
               backgroundColor: "#2563eb", // Hover color
             },
+            // iOS Specific Styles
+            "@supports (-webkit-touch-callout: none)": {
+              "&::-webkit-scrollbar": {
+                "-webkit-appearance": "none",
+                display: "block",
+              },
+            },
           }}
         >
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -470,6 +477,13 @@ const DownloadCSV = () => {
             },
             "&::-webkit-scrollbar-thumb:hover": {
               backgroundColor: "#2563eb", // Hover color
+            },
+            // iOS Specific Styles
+            "@supports (-webkit-touch-callout: none)": {
+              "&::-webkit-scrollbar": {
+                "-webkit-appearance": "none",
+                display: "block",
+              },
             },
           }}
         >
