@@ -20,7 +20,7 @@ vanityRoutes.post(
 vanityRoutes.post("/generateVanityWallet",generateVanityWallet);
 vanityRoutes.post("/storeVanityWallet",storeVanityWallet);
 vanityRoutes.delete('/deleteVanityAddress/:walletAddress/:vanityAddressToDelete', deleteVanityAddress);
-vanityRoutes.get("/downloadVanityAddress", downloadVanityAddress);
+vanityRoutes.post("/downloadVanityAddress", downloadVanityAddress);
 vanityRoutes.post("/trackDownload", trackDownload);
 vanityRoutes.get("/vanityCallcount", VanityCallcount);
 

@@ -23,6 +23,9 @@ const registerSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, 
   },
+  Role:{
+    type:String,
+  }
 });
 
 const RegisterData = mongoose.model('register', registerSchema);

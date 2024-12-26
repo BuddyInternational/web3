@@ -20,7 +20,6 @@ export const generateAndSaveVanityAddress = async (
   walletAddress: string
 ): Promise<GenerateVanityResponse | null> => {
   try {
-    console.log("server_api_base_url", server_api_base_url);
     const response: AxiosResponse<GenerateVanityResponse> = await axios.post(
       `${server_api_base_url}/api/vanity/generateAndStoreVanityAddress`,
       {
@@ -35,64 +34,7 @@ export const generateAndSaveVanityAddress = async (
   }
 };
 
-// // Function to check existing vanity address
-// export const checkExistingVanityAddress = async (walletAddress: string) => {
-//   try {
-//     const response: any = await axios.get(
-//       `${server_api_base_url}/api/vanity/checkVanityAddress`,
-//       {
-//         params: { walletAddress },
-//       }
-//     );
-//     console.log("response============************************",response);
-//     if (response) {
-//       return response.data;
-//     } else {
-//       return null;
-//     }
-//   } catch (error:any) {
-//     console.error("Error checking existing vanity address:", error);
-//     // return error;
-//     if (error.code === "ERR_NETWORK") {
-//       // Handle network errors specifically
-//       return {
-//         AxiosError: {
-//           code: error.code,
-//           name: error.name,
-//           message: "Network error: Please check your internet connection and try again.",
-//         },
-//       };
-//     } else if (error.response) {
-//       // Handle server-related errors (response status code outside 2xx range)
-//       return {
-//         AxiosError: {
-//           code: error.response.status,
-//           name: "Server Error",
-//           message: `Server returned an error: ${error.response.data.message || "Unknown error"}`,
-//         },
-//       };
-//     } else if (error.request) {
-//       // Handle no response received (server didn't respond)
-//       return {
-//         AxiosError: {
-//           code: "ERR_NO_RESPONSE",
-//           name: "No Response",
-//           message: "No response from server. Please try again later.",
-//         },
-//       };
-//     } else {
-//       // Handle other errors
-//       return {
-//         AxiosError: {
-//           code: "ERR_UNKNOWN",
-//           name: "Unknown Error",
-//           message: "An unexpected error occurred. Please try again later.",
-//         },
-//       };
-//     }
-//   }
-// };
-
+// Function to check existing vanity address
 export const checkExistingVanityAddress = async (walletAddress: string) => {
   try {
     const response: any = await axios.get(
@@ -124,7 +66,6 @@ export const checkExistingVanityAddress = async (walletAddress: string) => {
   }
 };
 
-
 // Generate the vanityWallet
 export const generateVanityWallet = async (
   suffix: string,
@@ -148,7 +89,7 @@ export const storeVanityWallet = async (
   walletAddress: string,
   vanityAddress: string,
   vanityPrivateKey: string,
-  vanityAccountType: string,
+  vanityAccountType: string
 ) => {
   try {
     const response = await axios.post(
@@ -169,9 +110,12 @@ export const storeVanityWallet = async (
 };
 
 // Function to Delete specific vanity Details from wallet
-export const deleteVanityAddress = async (walletAddress: string,vanityAddressToDelete:string) => {
+export const deleteVanityAddress = async (
+  walletAddress: string,
+  vanityAddressToDelete: string
+) => {
   try {
-    const response:any = await axios.delete(
+    const response: any = await axios.delete(
       `${server_api_base_url}/api/vanity/deleteVanityAddress/${walletAddress}/${vanityAddressToDelete}`
     );
     return response.data;
@@ -179,4 +123,4 @@ export const deleteVanityAddress = async (walletAddress: string,vanityAddressToD
     console.error("Error deleting content detail:", error);
     return null;
   }
-}
+};

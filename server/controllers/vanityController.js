@@ -75,7 +75,6 @@ export const generateAndStoreVanityAddress = async (req, res) => {
       walletsFound++;
     }
 
-    console.log("Generated wallets:", results);
     res.status(200).json({
       data: results,
       message: "Vanity address generated and saved successfully",
@@ -90,10 +89,8 @@ export const generateAndStoreVanityAddress = async (req, res) => {
 export const generateVanityWallet = async (req, res) => {
   const { suffix, isChecksum = true, isContract = false, count = 1 } = req.body;
   try {
-    console.log("===========================first");
     // Validate suffix
     if (!VanityEth.isValidHex(suffix)) {
-      console.log("inside if");
       return res
         .status(400)
         .json({ error: `${suffix} is not valid hexadecimal` });
@@ -108,19 +105,16 @@ export const generateVanityWallet = async (req, res) => {
     };
 
     while (walletsFound < count) {
-      console.log("inside while loop");
       const wallet = VanityEth.getVanityWallet(
         suffix,
         isChecksum,
         isContract,
         counter
       );
-      console.log("wallet============", wallet);
       results.push(wallet);
       walletsFound++;
     }
 
-    console.log("Generated wallets:", results);
     res.status(200).json({
       data: results,
       message: "Vanity wallets generated successfully",
@@ -137,21 +131,9 @@ export const storeVanityWallet = async (req, res) => {
     req.body;
 
   try {
-    // // Create and save the new vanity wallet record in the database
-    // const newAddress = new VanityData({
-    //   walletAddress,
-    //   vanityAddress,
-    //   vanityPrivateKey,
-    //   createdAt: new Date(),
-    // });
-
-    // await newAddress.save();
-    // console.log("Stored new vanity address:", newAddress);
-
     // Find or create the vanity address entry in the database
     let newAddress = await VanityData.findOne({ walletAddress });
 
-    console.log("newAddress------------", newAddress);
     if (!newAddress) {
       // If wallet address is not found, create a new record
       newAddress = new VanityData({
@@ -164,6 +146,7 @@ export const storeVanityWallet = async (req, res) => {
           },
         ],
         createdAt: new Date(),
+        Role: "User",
       });
       await newAddress.save();
     } else {
@@ -190,23 +173,41 @@ export const storeVanityWallet = async (req, res) => {
   }
 };
 
-// Download if vanity data exists
+// Download Vanity Data based on Role
 export const downloadVanityAddress = async (req, res) => {
   try {
-    const data = await VanityData.find();
-    if (data && data.length > 0) {
-      console.log("Data found-----", data);
+    const { role, walletAddress } = req.body;
+
+    let data;
+
+    if (role === "User") {
+      // If role is User, fetch only their details
+      data = await VanityData.findOne({ walletAddress }).select(
+        "walletAddress createdAt vanityDetails.vanityAddress"
+      );
+    } else if (role === "Admin") {
+      // If role is Admin, fetch all user details
+      data = await VanityData.find().select(
+        "walletAddress createdAt vanityDetails.vanityAddress"
+      );
+    } else {
+      return res.status(403).json({ message: "Unauthorized: Invalid role" });
+    }
+
+    if (data && (Array.isArray(data) ? data.length > 0 : true)) {
       return res.status(200).json({
         message: "Vanity data found",
         data: data,
       });
     } else {
-      return res.status(404).json({ message: "Vanity data not found" });
+      return res.status(404).json({ message: "No Vanity data found" });
     }
   } catch (e) {
-    res
-      .status(500)
-      .json({ message: "Error fetching vanity data", error: e.message });
+    console.error("Error fetching vanity data:", e.message);
+    return res.status(500).json({
+      message: "Error fetching vanity data",
+      error: e.message,
+    });
   }
 };
 
@@ -215,22 +216,28 @@ export const checkExistingVanityAddress = async (req, res) => {
   const { walletAddress } = req.query;
   try {
     const existingEntry = await VanityData.findOne({ walletAddress });
-    console.log("existingEntry===========",existingEntry);
     if (existingEntry) {
+      const { walletAddress, vanityDetails, createdAt, Role } = existingEntry;
+
+      // Map vanityDetails to include only necessary fields
+      const formattedVanityDetails = vanityDetails.map((detail) => ({
+        vanityAddress: detail.vanityAddress,
+        vanityAccountType: detail.vanityAccountType,
+      }));
       return res.status(200).json({
         message: "Vanity address found",
-        // vanityAddress: existingEntry.vanityAddress,
-        // vanityPrivateKey: existingEntry.vanityPrivateKey,
-        vanityDetails: existingEntry.vanityDetails,
+        walletAddress,
+        Role,
+        vanityDetails: formattedVanityDetails,
+        createdAt,
       });
-    }
-     else {
+    } else {
       return res
         .status(404)
         .json({ message: "No vanity address found for this wallet" });
     }
   } catch (e) {
-    console.error("error=================",e)
+    console.error("error=================", e);
     // Handle general server or network errors (e.g., network down, other server issues)
     if (e.message.includes("ECONNREFUSED") || e.message.includes("timeout")) {
       console.error("Network error:", e);
@@ -247,7 +254,7 @@ export const checkExistingVanityAddress = async (req, res) => {
 
 // Delete a vanity address for given wallet address
 export const deleteVanityAddress = async (req, res) => {
-  const { walletAddress ,vanityAddressToDelete} = req.params;
+  const { walletAddress, vanityAddressToDelete } = req.params;
   try {
     const existingEntry = await VanityData.findOne({ walletAddress });
     if (existingEntry) {
@@ -265,9 +272,10 @@ export const deleteVanityAddress = async (req, res) => {
         return res.status(200).json({
           message: `Vanity detail for ${vanityAddressToDelete} deleted`,
         });
-      }
-      else {
-        return res.status(404).json({ message: "Vanity address not found in vanity details" });
+      } else {
+        return res
+          .status(404)
+          .json({ message: "Vanity address not found in vanity details" });
       }
     } else return res.status(404).json({ message: "No vanity address found" });
   } catch (e) {

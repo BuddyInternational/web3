@@ -214,9 +214,9 @@ const MeetingLayerOperatorsModal: React.FC<{
                 justifyContent: "center",
                 width: "100%",
                 height: {
-                  xs: "300px",
-                  sm: "350px",
-                  md: "400px",
+                  xs: "450px",
+                  sm: "470px",
+                  md: "500px",
                 },
               }}
             >

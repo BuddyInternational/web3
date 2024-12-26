@@ -36,6 +36,7 @@ import axios from "axios";
 import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
 import { useAuthContext } from "../context/AuthContext";
 import { MdNewReleases } from "react-icons/md";
+import { checkExistingVanityAddress } from "../api/vanityAPI";
 
 interface NFT {
   asset_contract: {
@@ -266,25 +267,22 @@ const Home = () => {
     }
     if (isConnected) {
       try {
-        const response = await axios.get(
-          `${server_api_base_url}/api/vanity/downloadVanityAddress`
-        );
-        // Extract the vanityAddresses from the response
-        if (response.data && response.data.data) {
-          const vanityDetails = response.data.data.find(
-            (vanityData: any) => vanityData.walletAddress === address
-          );
-          // Map each detail to include both vanityAddress and accountType
-          const vanityAddresses = vanityDetails.vanityDetails.map(
-            (detail: any) => ({
-              vanityAddress: detail.vanityAddress,
-              vanityAccountType: detail.vanityAccountType,
-            })
-          );
-          setVanityAddresses(vanityAddresses);
-        } else {
-          console.error("Invalid API response structure", response.data);
-          setVanityAddresses([]);
+        const existingAddress = await checkExistingVanityAddress(address!);
+        if (existingAddress) {
+          // Extract vanity details
+          if (existingAddress && existingAddress.vanityDetails) {
+            const vanityAddresses = existingAddress.vanityDetails.map(
+              (detail: any) => ({
+                vanityAddress: detail.vanityAddress,
+                vanityAccountType: detail.vanityAccountType,
+              })
+            );
+
+            setVanityAddresses(vanityAddresses);
+          } else {
+            console.error("Invalid response structure", existingAddress);
+            setVanityAddresses([]);
+          }
         }
       } catch (err) {
         console.error("Error fetching vanity addresses:", err);
@@ -1048,10 +1046,6 @@ const Home = () => {
                 const isNetworkConnected = handleClickCheckConnectNetwork(
                   e,
                   "Please connect your wallet to continue."
-                );
-                console.log(
-                  "isNetworkConnected============",
-                  isNetworkConnected
                 );
                 if (isNetworkConnected == true) {
                   setOpenCDERewardModal(true); // Open the modal if network is connected

@@ -23,83 +23,6 @@ const convertToCSV = (data: any[]) => {
     return [headers.join(","), ...rows].join("\n");
   };
 
-//   // Function to convert data to CSV format
-//   const convertToVanityCSV = (array: VanityData[]) => {
-//     const headers = Object.keys(array[0]).join(",") + "\n";
-//     const rows = array.map((obj) => Object.values(obj).join(",")).join("\n");
-//     return headers + rows;
-//   };
-
-//    // Function to fetch data from the backend
-//    const downloadVanityData = async () => {
-//     setShowModal(false);
-
-//     if (vanityAddress === "0x0000000000000000000000000000000000000000") {
-//       toast.error("Please connect your wallet to Download Vanity Data.");
-//       return;
-//     }
-//     try {
-//       const response = await axios.get(
-//         `${server_api_base_url}/api/vanity/downloadVanityAddress`
-//       );
-
-//       const responseCountLog = await axios.post(
-//         `${server_api_base_url}/proxyVanityDataDownload`,
-//         { vanityAddress },
-//         {
-//           headers: { "Content-Type": "application/json" },
-//         }
-//       );
-
-//       // Check if response.data exists and is an array
-//       if (response.data.data && Array.isArray(response.data.data)) {
-//         // // Filter data to exclude fields like _id and vanityPrivateKey
-//         // const filteredData = response.data.data.map(
-//         //   (item: {
-//         //     walletAddress: string;
-//         //     vanityAddress: string;
-//         //     createdAt: string;
-//         //   }) => {
-//         //     const { walletAddress, vanityAddress, createdAt } = item;
-//         //     return { walletAddress, vanityAddress, createdAt };
-//         //   }
-//         // );
-
-//         // Filter data to exclude fields like _id and vanityPrivateKey
-//         const filteredData = response.data.data.map(
-//           (item: {
-//             walletAddress: string;
-//             vanityDetails: {
-//               vanityAddress: string;
-//               vanityPrivateKey: string;
-//             }[];
-//             createdAt: string;
-//           }) => {
-//             const { walletAddress, vanityDetails, createdAt } = item;
-//             const vanityAddresses = vanityDetails.map(
-//               (detail) => detail.vanityAddress
-//             );
-//             return { walletAddress, vanityAddresses, createdAt };
-//           }
-//         );
-
-//         // Convert to CSV format
-//         const csv = convertToVanityCSV(filteredData);
-//         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-//         saveAs(blob, "data.csv");
-
-//         // alert("The CSV file has been downloaded successfully.");  // Success message
-//         toast.success("The CSV file has been downloaded successfully.");
-//       } else {
-//         console.log("No data found");
-//         return;
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data", error);
-//     }
-//   };
-
-
   // Function to download the CSV file
   export const downloadUserContent = async (data: any[],vanityAddress: string) => {
     // setIsLoading(true);
@@ -138,7 +61,6 @@ const convertToCSV = (data: any[]) => {
         headers: { "Content-Type": "application/json" },
       }
     );
-    console.log("responseStoryLineContentCountLog----------",responseStoryLineContentCountLog)
     const filteredData = data.map(({ _id, ...rest }) => rest);
     const csvData = convertToCSV(filteredData);
 
@@ -167,10 +89,6 @@ const convertToCSV = (data: any[]) => {
         {
           headers: { "Content-Type": "application/json" },
         }
-      );
-      console.log(
-        "responseScreenWriteContentCountLog----------",
-        responseScreenWriteContentCountLog
       );
       const filteredData = data.map(({ _id, ...rest }) => rest);
       const csvData = convertToCSV(filteredData);

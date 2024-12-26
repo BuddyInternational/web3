@@ -19,6 +19,9 @@ import GoogleMap from "./GoogleMap";
 import { saveAs } from "file-saver";
 import { useVanityContext } from "../../context/VanityContext";
 import { toast } from "react-toastify";
+import { AnyAaaaRecord } from "dns";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { checkExistingVanityAddress } from "../../api/vanityAPI";
 
 ChartJS.register(
   CategoryScale,
@@ -164,6 +167,7 @@ const ClickStatisticsModal: React.FC = () => {
   };
 
   const { vanityAddress } = useVanityContext();
+  const {address,isConnected} = useWeb3ModalAccount();
   const [clickData, setClickData] = useState<ClickDataPoint[]>([]);
   const [osData, setOsData] = useState<OSData[]>([]);
   const [countryData, setCountryData] = useState<CountryData[]>([]);
@@ -297,7 +301,7 @@ const ClickStatisticsModal: React.FC = () => {
 
   // dowanload Statistics Data
   const downloadCsv = () => {
-    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+    if (!address && !isConnected) {
       toast.error("Please connect your wallet to Download Statistics Data.");
       return;
     }
@@ -337,69 +341,69 @@ const ClickStatisticsModal: React.FC = () => {
 
   // Function to fetch data from the backend for vanity data
   const downloadVanityData = async () => {
-    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+    if (!address && !isConnected) {
       toast.error("Please connect your wallet to Download Vanity Data.");
       return;
     }
     try {
-      const response = await axios.get(
-        `${server_api_base_url}/api/vanity/downloadVanityAddress`
-      );
-
-      // Check if response.data exists and is an array
-      if (response.data.data && Array.isArray(response.data.data)) {
-        console.log("Setting data", response.data.data);
-
-        // // Filter data to exclude fields like _id and vanityPrivateKey
-        // const filteredData = response.data.data.map(
-        //   (item: {
-        //     walletAddress: string;
-        //     vanityAddress: string;
-        //     createdAt: string;
-        //   }) => {
-        //     const { walletAddress, vanityAddress, createdAt } = item;
-        //     return { walletAddress, vanityAddress, createdAt };
-        //   }
-        // );
-
-        // Filter data to exclude fields like _id and vanityPrivateKey
-        const filteredData = response.data.data.map(
-          (item: {
-            walletAddress: string;
-            vanityDetails: {
-              vanityAddress: string;
-              vanityPrivateKey: string;
-            }[];
-            createdAt: string;
-          }) => {
-            const { walletAddress, vanityDetails, createdAt } = item;
-            const vanityAddresses = vanityDetails.map(
-              (detail) => detail.vanityAddress
-            );
-            return { walletAddress, vanityAddresses, createdAt };
+      const existingAddress = await checkExistingVanityAddress(address!); 
+      if(existingAddress){
+        const role = existingAddress.Role; 
+        const walletAddress = address; 
+        const response = await axios.post(
+          `${server_api_base_url}/api/vanity/downloadVanityAddress`,
+          {
+            role,
+            walletAddress,
           }
         );
-
-        const csv = convertToCSV(filteredData);
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        saveAs(blob, "data.csv");
-      } else {
-        console.log("No data found");
-        alert("No data to download");
-        return;
+    
+        if (response.data?.data) {
+          const apiData = response.data.data;
+    
+          // Check if the data is an array (Admin response) or a single object (User response)
+          const dataArray = Array.isArray(apiData) ? apiData : [apiData];
+    
+          // Filter data into a flat structure for CSV
+          const filteredData = dataArray.map((item) => {
+            const { walletAddress, vanityDetails, createdAt } = item;
+    
+            // Map through vanityDetails array to flatten the addresses
+            const vanityAddresses = vanityDetails
+              .map((detail:any) => detail.vanityAddress)
+              .join("; "); 
+    
+            return {
+              walletAddress,
+              vanityAddresses,
+              createdAt,
+            };
+          });
+    
+          // Convert to CSV and trigger download
+          const csv = convertToCSV(filteredData);
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          saveAs(blob, "vanity_data.csv");
+        } else {
+          console.log("No data found");
+          return;
+        }
       }
     } catch (error) {
       console.error("Error fetching data", error);
+      toast.error("Failed to download vanity data.");
     }
   };
 
   // Function to convert data to CSV format
-  const convertToCSV = (array: VanityData[]) => {
-    const headers = Object.keys(array[0]).join(",") + "\n";
-    const rows = array.map((obj) => Object.values(obj).join(",")).join("\n");
+  const convertToCSV = (data: any[]) => {
+    const headers = Object.keys(data[0]).join(",") + "\n";
+    const rows = data
+      .map((row) => Object.values(row).map((val) => `"${val}"`).join(","))
+      .join("\n");
     return headers + rows;
   };
-
+  
   // Replace loading message with Skeleton components
   if (loading) {
     return (

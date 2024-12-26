@@ -15,6 +15,9 @@ const vanitySchema = new mongoose.Schema({
   ],
   createdAt: {
     type: Date,
+  },
+  Role:{
+    type:String,
   }
 });
 

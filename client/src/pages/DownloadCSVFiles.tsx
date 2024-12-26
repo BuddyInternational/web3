@@ -35,6 +35,7 @@ import { VanityData } from "../utils/Types";
 import { useLoader } from "../context/LoaderContext";
 import Loader from "../utils/Loader";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
+import { checkExistingVanityAddress } from "../api/vanityAPI";
 
 // Custom styled components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -74,66 +75,81 @@ const DownloadCSV = () => {
   const [totalCount, setTotalCount] = useState(0); // Total records count
 
   // Function to convert data to CSV format
-  const convertToCSV = (array: VanityData[]) => {
-    const headers = Object.keys(array[0]).join(",") + "\n";
-    const rows = array.map((obj) => Object.values(obj).join(",")).join("\n");
+  const convertToCSV = (data: any[]) => {
+    const headers = Object.keys(data[0]).join(",") + "\n";
+    const rows = data
+      .map((row) =>
+        Object.values(row)
+          .map((val) => `"${val}"`)
+          .join(",")
+      )
+      .join("\n");
     return headers + rows;
   };
 
   // Function to fetch data from the backend
   const downloadVanityData = async () => {
-    if (vanityAddress === "0x0000000000000000000000000000000000000000") {
+    setShowModal(false);
+    setIsLoading(true);
+    if (!address && !isConnected) {
       toast.error("Please connect your wallet to Download Vanity Data.");
       return;
     }
     try {
-      const response = await axios.get(
-        `${server_api_base_url}/api/vanity/downloadVanityAddress`
-      );
-
-      console.log("response=================", response);
-
-      const responseCountLog = await axios.post(
-        `${server_api_base_url}/proxyVanityDataDownload`,
-        { vanityAddress },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      // Check if response.data exists and is an array
-      if (response.data.data && Array.isArray(response.data.data)) {
-        // Filter data to exclude fields like _id and vanityPrivateKey
-        const filteredData = response.data.data.map(
-          (item: {
-            walletAddress: string;
-            vanityDetails: {
-              vanityAddress: string;
-              vanityPrivateKey: string;
-            }[];
-            createdAt: string;
-          }) => {
-            const { walletAddress, vanityDetails, createdAt } = item;
-            const vanityAddresses = vanityDetails.map(
-              (detail) => detail.vanityAddress
-            );
-            return { walletAddress, vanityAddresses, createdAt };
+      const existingAddress = await checkExistingVanityAddress(address!);
+      if (existingAddress) {
+        const role = existingAddress.Role;
+        const walletAddress = address;
+        const response = await axios.post(
+          `${server_api_base_url}/api/vanity/downloadVanityAddress`,
+          {
+            role,
+            walletAddress,
           }
         );
 
-        // Convert to CSV format
-        const csv = convertToCSV(filteredData);
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        saveAs(blob, "data.csv");
+        const responseCountLog = await axios.post(
+          `${server_api_base_url}/proxyVanityDataDownload`,
+          { vanityAddress },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-        // alert("The CSV file has been downloaded successfully.");  // Success message
-        toast.success("The CSV file has been downloaded successfully.");
-      } else {
-        console.log("No data found");
-        return;
+        if (response.data?.data) {
+          const apiData = response.data.data;
+          // Check if the data is an array (Admin response) or a single object (User response)
+          const dataArray = Array.isArray(apiData) ? apiData : [apiData];
+
+          // Filter data into a flat structure for CSV
+          const filteredData = dataArray.map((item) => {
+            const { walletAddress, vanityDetails, createdAt } = item;
+
+            // Map through vanityDetails array to flatten the addresses
+            const vanityAddresses = vanityDetails
+              .map((detail: any) => detail.vanityAddress)
+              .join("; ");
+
+            return {
+              walletAddress,
+              vanityAddresses,
+              createdAt,
+            };
+          });
+
+          // Convert to CSV and trigger download
+          const csv = convertToCSV(filteredData);
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          saveAs(blob, "vanity_data.csv");
+        } else {
+          console.log("No data found");
+          return;
+        }
       }
     } catch (error) {
       console.error("Error fetching data", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
