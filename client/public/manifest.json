@@ -1,5 +1,5 @@
 {
-  "short_name": "Gully Buddy International",
+  "short_name": "Gully Buddy",
   "name": "Gully Buddy International",
   "description": "Join our Web3-powered DApp membership platform for collaborative growth and exclusive perks. Manage your team, earn residuals from endorsements on YouTube, TikTok, and more. Explore our retail line with hoodies, sweats, and tees. Unlock access to mini-games, meeting rooms, and powerful promotional tools. Become a member today!",
   "icons": [
@@ -9,17 +9,17 @@
       "type": "image/x-icon"
     },
     {
-      "src": "CDE.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "CDE.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
     },
     {
-      "src": "CDE.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "CDE.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
