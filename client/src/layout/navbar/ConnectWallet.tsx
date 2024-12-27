@@ -518,7 +518,7 @@ export default function App() {
     <>
       {isLoading && <Loader />}
 
-      <div className="flex sm:items-center md:justify-between md:flex-row sm:flex-col-reverse">
+      <div className="flex sm:items-center md:justify-between sm:flex-col-reverse xl:flex-row ">
         {/* connected vanity address */}
         {showModal && (
           <Modal
