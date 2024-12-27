@@ -77,6 +77,7 @@ export const generateVanityWallet = async (
         `${server_api_base_url}/api/vanity/generateVanityWallet`,
         { suffix, count }
       );
+      console.log("generate vanity wallet Details:",response.data);
     return response.data;
   } catch (error) {
     console.error("Error generating vanity wallet:", error);
@@ -101,7 +102,7 @@ export const storeVanityWallet = async (
         vanityAccountType,
       }
     );
-    // console.log(" store VanityWallet response:", response);
+    console.log(" store VanityWallet response:", response);
     return response.data;
   } catch (error) {
     console.error("Error storing vanity wallet:", error);
