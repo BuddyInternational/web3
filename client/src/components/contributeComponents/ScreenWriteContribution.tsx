@@ -35,35 +35,63 @@ const ScreenWriteContribution: React.FC<ScreenWriteContributionsProps> = ({
     try {
       const sender = address!;
       const message = `A new contribution has been submitted to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights reserved.`;
-      const feesAmount = 1;
-      // const feesAmount = 0.5;
+      // const feesAmount = 1;
+      const feesAmount = 0.5;
       // Send notification
-      const notificationResult = await notifyGullyBuddy(
-        sender,
-        message,
-        feesAmount
-      );
-      if (notificationResult && notificationResult.notificationTxHash) {
-        toast.success("Successfully Sent Notification!");
-        // Update the content detail
-        const updateResponse = await updateScreenWriteContentDetail(
-          address!,
-          ipfsHash,
-          true,
-          new Date().toISOString(),
-          notificationResult.notificationTxHash,
-          notificationResult.chainId
+      let notificationResult: any;
+      // notificationResult = await notifyGullyBuddy(
+      //   sender,
+      //   message,
+      //   feesAmount
+      // );
+      try {
+        notificationResult = await notifyGullyBuddy(
+          sender,
+          message,
+          feesAmount
         );
+      } catch (error: any) {
+        console.error("Error in notifyGullyBuddy:", error);
+        toast.error(
+          error.message ||
+            "Failed to send notification due to an unexpected error."
+        );
+        return;
+      }
+      if (notificationResult && notificationResult.notificationTxHash) {
+        // toast.success("Successfully Sent Notification!");
+        // Update the content detail
+        try {
+          const updateResponse = await updateScreenWriteContentDetail(
+            address!,
+            ipfsHash,
+            true,
+            new Date().toISOString(),
+            notificationResult.notificationTxHash,
+            notificationResult.chainId
+          );
 
-        if (updateResponse) {
-          toast.success("Screen Write Content detail updated successfully!");
-        } else {
-          toast.error("Failed to update content detail.");
+          if (updateResponse) {
+            toast.success("Screen Write Content detail updated successfully!");
+          }
+        } catch (error: any) {
+          console.error("Error in updateContentDetail:", error);
+          toast.error(
+            error.message ||
+              "Failed to update content details after notification."
+          );
+          return;
         }
       }
     } catch (error: any) {
-      toast.error("Error sending notification:", error);
-      setIsLoading(false);
+      const errorMessage =
+        error?.info?.error?.message ||
+        error?.reason ||
+        error?.message ||
+        error?.data?.message ||
+        "An unknown error occurred.";
+      console.error("Unhandled Error:", errorMessage);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

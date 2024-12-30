@@ -35,9 +35,7 @@ export const useGullyBuddyNotifier = () => {
     content: string,
     feesAmount: number
   ) => {
-    console.log(
-      `Notifying Sender: ${sender}, Content: ${content}`
-    );
+    console.log(`Notifying Sender: ${sender}, Content: ${content}`);
     console.log("Fees Amount:", feesAmount);
 
     try {
@@ -81,17 +79,6 @@ export const useGullyBuddyNotifier = () => {
       if (gullyBuddyAddress) {
         console.log(`Resolved address for domain: ${gullyBuddyAddress}`);
 
-        // Send notification
-        const notificationTx = await sendNotificationTransaction(
-          gullyBuddyAddress,
-          content
-        );
-        if (!notificationTx) {
-          console.error("Failed to send notification message.");
-          throw new Error("Failed to send notification message.");
-          // return false;
-        }
-
         // Send payment
         const paymentTx = await sendPaymentTransaction(
           gullyBuddyAddress,
@@ -101,6 +88,16 @@ export const useGullyBuddyNotifier = () => {
         if (!paymentTx) {
           console.error("Failed to send payment.");
           throw new Error("Failed to send payment.");
+          // return false;
+        }
+        // Send notification
+        const notificationTx = await sendNotificationTransaction(
+          gullyBuddyAddress,
+          content
+        );
+        if (!notificationTx) {
+          console.error("Failed to send notification message.");
+          throw new Error("Failed to send notification message.");
           // return false;
         }
 
@@ -153,10 +150,7 @@ export const useGullyBuddyNotifier = () => {
       });
 
       await tx.wait();
-      console.log(
-        "Successfully Sent Notification!:",
-        tx
-      );
+      console.log("Successfully Sent Notification!:", tx);
       return tx;
     } catch (error: any) {
       console.error("Error sending notification transaction:", error);
@@ -249,23 +243,22 @@ export const useGullyBuddyNotifier = () => {
   // };
 
   // Send Payment Transaction
-const sendPaymentTransaction = async (
-  toAddress: string,
-  amountInUSD: number,
-  chainId: string
-) => {
+  const sendPaymentTransaction = async (
+    toAddress: string,
+    amountInUSD: number,
+    chainId: string
+  ) => {
+    try {
+      // ✅ Input Validation
+      if (!toAddress || !ethers.isAddress(toAddress)) {
+        throw new Error("Invalid recipient address.");
+      }
+      if (!amountInUSD || amountInUSD <= 0) {
+        throw new Error("Amount must be greater than zero.");
+      }
 
-  try {
-    // ✅ Input Validation
-    if (!toAddress || !ethers.isAddress(toAddress)) {
-      throw new Error("Invalid recipient address.");
-    }
-    if (!amountInUSD || amountInUSD <= 0) {
-      throw new Error("Amount must be greater than zero.");
-    }
-
-    let nativeCurrencySymbol: string;
-    // Dynamically assign native currency symbol based on chainId
+      let nativeCurrencySymbol: string;
+      // Dynamically assign native currency symbol based on chainId
       if (chainId === "1") {
         nativeCurrencySymbol = "Ethereum"; // For ETH
       } else if (chainId === "137") {
@@ -275,55 +268,65 @@ const sendPaymentTransaction = async (
           "Unsupported chain. Please use 'ethereum' or 'polygon'."
         );
       }
-    console.log("Native Currency Symbol:", nativeCurrencySymbol);
+      console.log("Native Currency Symbol:", nativeCurrencySymbol);
 
-    //  Fetch Conversion Rate from Mobula API
-    const mobulaUrl = `https://api.mobula.io/api/1/market/data?asset=${nativeCurrencySymbol}`;
-    const response = await axios.get(mobulaUrl, {
-      headers: { "Content-Type": "application/json" },
-    });
+      //  Fetch Conversion Rate from Mobula API
+      const mobulaUrl = `https://api.mobula.io/api/1/market/data?asset=${nativeCurrencySymbol}`;
+      const response = await axios.get(mobulaUrl, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-    const priceInUSD = response?.data?.data?.price;
-    if (!priceInUSD) {
-      throw new Error(`Failed to retrieve ${nativeCurrencySymbol} price in USD.`);
+      const priceInUSD = response?.data?.data?.price;
+      if (!priceInUSD) {
+        throw new Error(
+          `Failed to retrieve ${nativeCurrencySymbol} price in USD.`
+        );
+      }
+
+      console.log(`${nativeCurrencySymbol} price in USD:`, priceInUSD);
+
+      // Calculate Native Currency Amount
+      const amountInNativeCurrency = ethers.parseUnits(
+        (amountInUSD / priceInUSD).toFixed(18),
+        "ether"
+      );
+      console.log(
+        "Amount in Native Currency:",
+        amountInNativeCurrency.toString()
+      );
+
+      //  Initialize Signer
+      const signer = await ethersProvider.getSigner();
+      if (!signer) {
+        throw new Error(
+          "Failed to initialize signer. Please check your provider."
+        );
+      }
+
+      const signerBalance = await ethersProvider.getBalance(signer.address);
+      console.log("Signer Balance:", signerBalance.toString());
+
+      if (signerBalance < amountInNativeCurrency) {
+        throw new Error("Insufficient balance to send transaction.");
+      }
+
+      // Send Transaction
+      const paymentTx = await signer.sendTransaction({
+        to: toAddress,
+        value: amountInNativeCurrency,
+      });
+
+      await paymentTx.wait();
+      console.log("Payment transaction successful:", paymentTx.hash);
+      return paymentTx;
+    } catch (error: any) {
+      console.error(
+        "Error sending payment transaction:",
+        error.message || error
+      );
+      throw new Error("Payment transaction failed: " + error.message);
     }
-
-    console.log(`${nativeCurrencySymbol} price in USD:`, priceInUSD);
-
-    // Calculate Native Currency Amount
-    const amountInNativeCurrency = ethers.parseUnits(
-      (amountInUSD / priceInUSD).toFixed(18),
-      "ether"
-    );
-    console.log("Amount in Native Currency:", amountInNativeCurrency.toString());
-
-    //  Initialize Signer
-    const signer = await ethersProvider.getSigner();
-    if (!signer) {
-      throw new Error("Failed to initialize signer. Please check your provider.");
-    }
-
-    const signerBalance = await ethersProvider.getBalance(signer.address);
-    console.log("Signer Balance:", signerBalance.toString());
-
-    if (signerBalance < amountInNativeCurrency) {
-      throw new Error("Insufficient balance to send transaction.");
-    }
-
-    // Send Transaction
-    const paymentTx = await signer.sendTransaction({
-      to: toAddress,
-      value: amountInNativeCurrency,
-    });
-
-    await paymentTx.wait();
-    console.log("Payment transaction successful:", paymentTx.hash);
-    return paymentTx;
-  } catch (error: any) {
-    console.error("Error sending payment transaction:", error.message || error);
-    throw new Error("Payment transaction failed: " + error.message);
-  }
-};
+  };
 
   return { notifyGullyBuddy };
 };

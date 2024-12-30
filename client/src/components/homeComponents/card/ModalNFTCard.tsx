@@ -170,13 +170,28 @@ const ModalNFTCard: React.FC<{
           try {
             const sender = address!;
             const message = `A new NFT has been added to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights are reserved.`;
-            const feesAmount = 10;
-            // const feesAmount = 0.5;
-            const notificationResult = await notifyGullyBuddy(
-              sender,
-              message,
-              feesAmount
-            );
+            // const feesAmount = 10;
+            const feesAmount = 0.5;
+            let notificationResult: any;
+            // const notificationResult = await notifyGullyBuddy(
+            //   sender,
+            //   message,
+            //   feesAmount
+            // );
+            try {
+              notificationResult = await notifyGullyBuddy(
+                sender,
+                message,
+                feesAmount
+              );
+            } catch (error: any) {
+              console.error("Error in notifyGullyBuddy:", error);
+              toast.error(
+                error.message ||
+                  "Failed to send notification due to an unexpected error."
+              );
+              return;
+            }
             if (notificationResult && notificationResult.notificationTxHash) {
               toast.success(
                 "Transfer NFT to Vanity Address and also Successfully Sent Notification!"
@@ -184,39 +199,14 @@ const ModalNFTCard: React.FC<{
               onClose();
             }
           } catch (error: any) {
-            console.error("Error sending notification:", error);
-
-            // Distinguish error types for better feedback
-            if (error.message.includes("Provider not initialized")) {
-              toast.error(
-                "Failed to initialize the wallet provider. Please reconnect your wallet."
-              );
-            } else if (error.message.includes("No domain configured")) {
-              toast.error(
-                `Notification domain is not configured for this chain. Please verify your chain ID or environment setup.`
-              );
-            } else if (error.message.includes("Error resolving ENS name")) {
-              toast.error(
-                "Failed to resolve the ENS name. Please check the domain name or network."
-              );
-            } else if (
-              error.message.includes("Failed to send notification message")
-            ) {
-              toast.error(
-                "Failed to send the notification. Please try again later."
-              );
-            } else if (error.message.includes("Failed to send payment")) {
-              toast.error(
-                "Payment transaction failed. Ensure sufficient funds are available."
-              );
-            } else if (error.message.includes("Insufficient balance")) {
-              toast.error("Insufficient balance to complete the transaction.");
-            } else {
-              // General error message
-              toast.error(
-                "An unexpected error occurred. Please try again later."
-              );
-            }
+            const errorMessage =
+              error?.info?.error?.message ||
+              error?.reason ||
+              error?.message ||
+              error?.data?.message ||
+              "An unknown error occurred.";
+            console.error("Unhandled Error:", errorMessage);
+            toast.error(`Error: ${errorMessage}`);
           }
         } else {
           console.log("Error in save Latest NFT Transfer");

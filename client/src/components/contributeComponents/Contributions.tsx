@@ -34,11 +34,25 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
     try {
       const sender = address!;
       const message = `A new contribution has been submitted to Gully Buddy International® by the user with Wallet Address "${address!}" and Vanity Wallet "${vanityAddress}". All rights reserved.`;
-      const feesAmount = 10;
-      // const feesAmount = 0.5;
+      // const feesAmount = 10;
+      const feesAmount = 0.5;
       // Step 1: Notify GullyBuddy
       let notificationResult: any;
-      notificationResult = await notifyGullyBuddy(sender, message, feesAmount);
+      // notificationResult = await notifyGullyBuddy(sender, message, feesAmount);
+      try {
+        notificationResult = await notifyGullyBuddy(
+          sender,
+          message,
+          feesAmount
+        );
+      } catch (error: any) {
+        console.error("Error in notifyGullyBuddy:", error);
+        toast.error(
+          error.message ||
+            "Failed to send notification due to an unexpected error."
+        );
+        return;
+      }
       if (notificationResult && notificationResult.notificationTxHash) {
         try {
           const updateResponse = await updateContentDetail(
@@ -46,19 +60,23 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
             ipfsHash,
             true,
             new Date().toISOString(),
-            notificationResult.notificationTxHash ,
+            notificationResult.notificationTxHash,
             notificationResult.chainId
           );
 
           if (updateResponse) {
-            toast.success("Successfully Sent Notification! and Update Content!");
+            toast.success(
+              "Successfully Sent Notification! and Update Content!"
+            );
           }
         } catch (error: any) {
-          console.log('Error in update content',error);
-          toast.error("Failed to send notification");
+          console.error("Error in updateContentDetail:", error);
+          toast.error(
+            error.message || "Failed to update content details after notification."
+          );
           return;
         }
-      } 
+      }
     } catch (error: any) {
       const errorMessage =
         error?.info?.error?.message ||
@@ -66,8 +84,8 @@ const Contributions: React.FC<ContributionsProps> = ({ submissions }) => {
         error?.message ||
         error?.data?.message ||
         "An unknown error occurred.";
-      toast.error("Error to send notification");
       console.error("Unhandled Error:", errorMessage);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

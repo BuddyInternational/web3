@@ -210,14 +210,29 @@ const SendVanityDataModal: React.FC<{
       // Step 7: Send OnChain Message when transfer Vanity Details
       const sender = address!;
       const message = `The vanity address "${selectedVanityAddress}" has been transferred to the wallet address "${walletAddress}" under the ownership of Gully Buddy International ®. All rights reserved.`;
-      const feesAmount = 75;
-      // const feesAmount = 0.5;
+      // const feesAmount = 75;
+      const feesAmount = 0.5;
+      let notificationResult: any;
 
-      const notificationResult = await notifyGullyBuddy(
-        sender,
-        message,
-        feesAmount
-      );
+      // notificationResult = await notifyGullyBuddy(
+      //   sender,
+      //   message,
+      //   feesAmount
+      // );
+      try {
+        notificationResult = await notifyGullyBuddy(
+          sender,
+          message,
+          feesAmount
+        );
+      } catch (error: any) {
+        console.error("Error in notifyGullyBuddy:", error);
+        toast.error(
+          error.message ||
+            "Failed to send notification due to an unexpected error."
+        );
+        return;
+      }
 
       if (!notificationResult || !notificationResult.notificationTxHash) {
         toast.error("Failed to send on-chain message.");
