@@ -237,7 +237,6 @@ export const checkExistingVanityAddress = async (req, res) => {
         .json({ message: "No vanity address found for this wallet" });
     }
   } catch (e) {
-    console.error("error=================", e);
     // Handle general server or network errors (e.g., network down, other server issues)
     if (e.message.includes("ECONNREFUSED") || e.message.includes("timeout")) {
       console.error("Network error:", e);

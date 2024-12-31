@@ -37,6 +37,7 @@ import { useVanityAddressUpdate } from "../context/VanityAddressesListContext";
 import { useAuthContext } from "../context/AuthContext";
 import { MdNewReleases } from "react-icons/md";
 import { checkExistingVanityAddress } from "../api/vanityAPI";
+import MinigameModal from "../components/homeComponents/modals/MinigameModal";
 
 interface NFT {
   asset_contract: {
@@ -222,6 +223,7 @@ const Home = () => {
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openCDERewardModal, setOpenCDERewardModal] = useState(false);
   const [openLeadershipModal, setOpenLeadershipModal] = useState(false);
+  const [openMinigameModal, setOpenMinigameModal] = useState(false);
   const [openWithdrawModal, setOpenWithdrawModal] = useState(false);
   const [openSocketNFTModal, setOpenSocketNFTModal] = useState(false);
   const [openMeetingRoomModal, setOpenMeetingRoomModal] = useState(false);
@@ -999,16 +1001,19 @@ const Home = () => {
         <div className="flex flex-col text-white text-sm gap-3 items-center w-full md:w-1/2">
           <div className="flex flex-col gap-3 font-sans font-normal sm: ml-4 md:ml-10 lg:ml-0">
             {authMethod === "wallet" ? (
-              <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
+              <button
+                className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2"
+                onClick={handleOpenModal(setOpenMinigameModal)}
+              >
                 Minigame (Player Vs. Player)
               </button>
             ) : (
               <>
-              <Link to="/getStarted">
-              <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
-                Get Started
-              </button>
-              </Link>
+                <Link to="/getStarted">
+                  <button className="border-2 border-[#5682D980] px-2 py-2 rounded-md hover:bg-neutral-400 hover:text-blue-800 w-fit mb-2">
+                    Get Started
+                  </button>
+                </Link>
               </>
             )}
 
@@ -1518,6 +1523,16 @@ const Home = () => {
         </>
       )}
 
+      {/* Minigame players vs players Modal */}
+      {openMinigameModal && (
+        <>
+          <MinigameModal
+            open={openMinigameModal}
+            onClose={handleCloseModal(setOpenMinigameModal)}
+          />
+        </>
+      )}
+      
       {/* CDE Reward Modal */}
       {openCDERewardModal && (
         <>

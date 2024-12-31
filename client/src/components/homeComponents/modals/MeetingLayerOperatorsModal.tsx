@@ -15,13 +15,16 @@ import { IoClose } from "react-icons/io5";
 import ReactPlayer from "react-player";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { randomKeywords } from "../../../utils/Keywords";
+
+
 
 // Shazam API call options
 const options = {
   method: "GET",
   url: "https://shazam.p.rapidapi.com/search",
   params: {
-    term: "shape of you",
+    term: "",
     locale: "en-US",
     offset: "0",
     limit: "1",
@@ -57,14 +60,32 @@ const MeetingLayerOperatorsModal: React.FC<{
   useEffect(() => {
     const fetchSongDetails = async () => {
       try {
+        // Select a random keyword
+        const randomTerm =
+          randomKeywords[Math.floor(Math.random() * randomKeywords.length)];
+
+          console.log("randomTerm===========",randomTerm);
+        options.params.term = randomTerm;
+
         const response = await axios.request(options);
         const song = response.data.tracks.hits[0].track;
-        setSongData({
-          songName: song.title,
-          artistName: song.subtitle,
-          coverImage: song.images.coverart,
-          audioUrl: song.url,
-        });
+        console.log("song===============",song);
+        // setSongData({
+        //   songName: song.title,
+        //   artistName: song.subtitle,
+        //   coverImage: song.images.coverart,
+        //   audioUrl: song.url,
+        // });
+        if (song) {
+          setSongData({
+            songName: song.title,
+            artistName: song.subtitle,
+            coverImage: song.images.coverart,
+            audioUrl: song.url,
+          });
+        } else {
+          console.warn("No song found for the given keyword.");
+        }
       } catch (error) {
         console.error("Error fetching song details:", error);
       }

@@ -187,14 +187,12 @@ export const trackDownloadUserContent = async (req, res) => {
   try {
     // Find or create the entry for the vanity address
     let log = await UserContentCallLogData.findOne({ vanityAddress });
-    console.log("log1===========", log);
     if (log) {
       log.callCount += 1; // Increment individual call count
     } else {
       log = new UserContentCallLogData({ vanityAddress });
     }
 
-    console.log("log==========", log);
     await log.save();
 
     res.json({

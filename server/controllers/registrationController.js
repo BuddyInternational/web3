@@ -62,8 +62,6 @@ export const storeUserVanityWallet = async (req, res) => {
       await userRecord.save();
     }
 
-    console.log("Stored vanity details:", userRecord);
-
     res.status(200).json({
       message: "Vanity details stored successfully",
       data: userRecord,
@@ -94,7 +92,6 @@ export const checkExistingUserVanityAddress = async (req, res) => {
     const existingEntry = await RegisterData.findOne(query);
 
     if (existingEntry) {
-      console.log("Vanity details found for:", existingEntry);
       return res.status(200).json({
         message: "Vanity address found",
         vanityDetails: existingEntry.vanityDetails,
@@ -133,8 +130,6 @@ export const getAllUsersData = async (req, res) => {
         ? maskSensitiveInfo(user.email)
         : maskSensitiveInfo(user.mobile),
     }));
-
-    // console.log("Filtered and masked user data:", formattedUsers);
 
     return res.status(200).json({
       message: "User data fetched successfully",
@@ -217,7 +212,6 @@ export const downloadVanityAddressForUser = async (req, res) => {
   try {
     const data = await RegisterData.find();
     if (data && data.length > 0) {
-      console.log("Data found-----", data);
       return res.status(200).json({
         message: "Vanity data found",
         data: data,

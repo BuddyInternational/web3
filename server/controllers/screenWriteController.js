@@ -6,7 +6,6 @@ export const saveScreenWriteContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
-    console.log("contentDetails--------", contentDetails);
     let screenWriteContent = await ScreenWriteContentData.findOne({
       walletAddress,
       vanityAddress,

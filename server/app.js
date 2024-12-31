@@ -54,9 +54,6 @@ app.post("/proxyUserContentDownload", async (req, res) => {
       process.env.TRACK_DOWNLOAD_USER_CONTENT_DATA,
       req.body
     );
-
-    console.log("response===========", response);
-    // Forward the response from downloads.gully.app to the frontend
     res.json(response.data);
   } catch (error) {
     console.error("proxyUserContentDownload request failed:", error);
@@ -67,15 +64,11 @@ app.post("/proxyUserContentDownload", async (req, res) => {
 // Track download Story Line Content CSV using short link
 app.post("/proxyStoryLineContentDownload", async (req, res) => {
   try {
-    console.log("story line-----------",process.env.TRACK_DOWNLOAD_STORYLINE_CONTENT_DATA);
     // Make the actual request to downloads.gully.app
     const response = await axios.post(
       process.env.TRACK_DOWNLOAD_STORYLINE_CONTENT_DATA,
       req.body
     );
-
-    console.log("response===========", response);
-    // Forward the response from downloads.gully.app to the frontend
     res.json(response.data);
   } catch (error) {
     console.error("proxyStoryLineContentDownload request failed:", error);
@@ -86,15 +79,11 @@ app.post("/proxyStoryLineContentDownload", async (req, res) => {
 // Track download Screen Write Content CSV using short link
 app.post("/proxyScreenWriteContentDownload", async (req, res) => {
   try {
-    console.log("Screen Write-----------",process.env.TRACK_DOWNLOAD_SCREENWRITE_CONTENT_DATA);
     // Make the actual request to downloads.gully.app
     const response = await axios.post(
       process.env.TRACK_DOWNLOAD_SCREENWRITE_CONTENT_DATA,
       req.body
     );
-
-    console.log("response===========", response);
-    // Forward the response from downloads.gully.app to the frontend
     res.json(response.data);
   } catch (error) {
     console.error("proxyScreenWriteContentDownload request failed:", error);
@@ -113,8 +102,6 @@ app.get("/api/resolve-url", async (req, res) => {
       method: "HEAD",
       redirect: "follow",
     });
-
-    console.log("response===========",response.url)
     res.json({ resolvedUrl: response.url });
   } catch (error) {
     res.status(500).json({ message: "Error resolving URL" });

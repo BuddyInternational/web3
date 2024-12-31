@@ -6,7 +6,6 @@ export const saveStoryLineContent = async (req, res) => {
   try {
     const { walletAddress, vanityAddress, contentDetails } = req.body;
 
-    console.log("contentDetails--------", contentDetails);
     let storyLineContent = await StoryLineContentData.findOne({
       walletAddress,
       vanityAddress,
@@ -198,14 +197,11 @@ export const trackDownloadStoryLineContent = async (req, res) => {
   try {
     // Find or create the entry for the vanity address
     let log = await StoryLineContentCallLogData.findOne({ vanityAddress });
-    console.log("log1===========", log);
     if (log) {
       log.callCount += 1; // Increment individual call count
     } else {
       log = new StoryLineContentCallLogData({ vanityAddress });
     }
-
-    console.log("log==========", log);
     await log.save();
 
     res.json({
