@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SupportMenu from "./SupportMenu";
 import { FaHeart, FaRegCopy } from "react-icons/fa";
 import VendorRewardModal from "./modals/VendorRewardModal";
+import { MdNewReleases } from "react-icons/md";
 
 const Footer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,6 +52,7 @@ const Footer: React.FC = () => {
               link.
             </p>
 
+            {/* Donation Section */}
             <div className="text-sm opacity-90 flex flex-col lg:flex-row flex-1 items-center justify-center 2xl:justify-start text-center 2xl:text-left space-y-2 lg:space-y-0">
               {/* Link to Ly.money */}
               <a
@@ -71,16 +73,12 @@ const Footer: React.FC = () => {
                 <span>to:</span>
                 <div className="relative ml-1 flex gap-1">
                   {/* Full address for larger screens */}
-                  <span
-                    className="md:inline sm:hidden cursor-pointer text-blue-500 hover:text-blue-400"
-                  >
+                  <span className="md:inline sm:hidden cursor-pointer text-blue-500 hover:text-blue-400">
                     {donateAddress}
                   </span>
 
                   {/* Shortened address for small screens */}
-                  <span
-                    className="sm:inline md:hidden cursor-pointer text-blue-500 hover:text-blue-400"
-                  >
+                  <span className="sm:inline md:hidden cursor-pointer text-blue-500 hover:text-blue-400">
                     {`${donateAddress.slice(0, 6)}...${donateAddress.slice(
                       -4
                     )}`}
@@ -90,7 +88,7 @@ const Footer: React.FC = () => {
                     className="m-auto cursor-pointer text-blue-500 hover:text-blue-400"
                     onClick={handleCopyAddress}
                   >
-                    <FaRegCopy /> 
+                    <FaRegCopy />
                   </span>
 
                   {/* Tooltip */}
@@ -103,6 +101,21 @@ const Footer: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            {/* Collectibles Section */}
+            <div className="flex flex-col lg:flex-row items-center justify-center 2xl:justify-start text-center 2xl:text-left gap-2 lg:gap-4 mt-4">
+              <p className="bg-gradient-to-r from-teal-200 via-purple-500 to-orange-500 bg-clip-text text-transparent text-sm text-center animate-blink flex items-center">
+                Over 10,000 Collectibles
+                <MdNewReleases className="ml-2 text-xl text-yellow-400" />
+              </p>
+              <a
+                href="https://8bet.io/win/S14YA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-400 text-sm font-normal text-center lg:text-left underline cursor-pointer"
+              >
+                Now The Official Lottery Of Cryptocurrency
+              </a>
             </div>
 
             <p className="text-sm opacity-90 lg:flex flex-1 items-center justify-center text-center mt-4 ">
