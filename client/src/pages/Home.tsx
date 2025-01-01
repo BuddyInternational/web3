@@ -238,7 +238,7 @@ const Home = () => {
   const [value, setValue] = React.useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const targetDate = new Date("2024-12-31T23:59:59");
+  const targetDate = new Date("2025-12-31T23:59:59");
   const [vanityAddresses, setVanityAddresses] = useState([]);
   const [isHoldGullyBuddyNFT, setIsHoldGullyBuddyNFT] = useState(false);
 
