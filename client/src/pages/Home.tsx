@@ -427,11 +427,6 @@ const Home = () => {
         };
       });
 
-      // console.log(
-      //   "formattedWalletBalances=====================",
-      //   formattedWalletBalances
-      // );
-
       // Fetch vanity balances
       const vanityBalances = await Promise.all(
         tokenContracts.map((contract) => contract.balanceOf(vanityAddress))
