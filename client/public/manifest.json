@@ -9,13 +9,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "CDE.svg",
-      "type": "image/svg+xml",
+      "src": "CDE.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "CDE.svg",
-      "type": "image/svg+xml",
+      "src": "CDE.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
