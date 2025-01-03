@@ -11,12 +11,7 @@
     {
       "src": "CDE.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "CDE.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "192x187"
     }
   ],
   "start_url": "/",
